@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+.dropdown-enter, .dropdown-leave-to {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+
 @layer base {
   @font-face {
     font-family: "iransans";
