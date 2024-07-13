@@ -54,11 +54,11 @@ function Navbar() {
       {/* Mobile Menu (Dropdowns) */}
       {showMobileMenu && (
         <div className="lg:hidden">
-          <div className="flex flex-col items-center text-gray-700 bg-white w-full py-2">
+          <div className="flex flex-col items-center text-gray-700 bg-white w-full py-2 rtl">
             {/* Pages Dropdown */}
-            <div className="relative">
+            <div className="relative w-full">
               <button
-                className="block w-full text-left px-4 py-2 text-sm font-semibold hover:bg-green-100"
+                className="block w-full text-right px-4 py-2 text-sm font-semibold hover:bg-green-100 border-b"
                 onClick={togglePagesDropdown}
               >
                 صفحات
@@ -81,16 +81,58 @@ function Navbar() {
               </button>
 
               {showPagesDropdown && (
-                <div className="bg-white rounded-lg shadow-md mt-2 py-1 w-full text-sm text-gray-800">
-                  <PagesDropdown isMobile />
+                <div className="bg-white rounded-lg shadow-md mt-2 py-1 w-full text-sm text-gray-800 rtl">
+                  <ul className="list-reset">
+                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
+                      <a href="./404.html" className="block w-full">
+                        404
+                      </a>
+                      <ul className="pl-4 mt-1">
+                        <li className="py-1">
+                          <a href="./404-sub1.html" className="block w-full">
+                            404 Subpage 1
+                          </a>
+                        </li>
+                        <li className="py-1">
+                          <a href="./404-sub2.html" className="block w-full">
+                            404 Subpage 2
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
+                      <a href="./another-page.html" className="block w-full">
+                        Another Page
+                      </a>
+                      <ul className="pl-4 mt-1">
+                        <li className="py-1">
+                          <a
+                            href="./another-page-sub1.html"
+                            className="block w-full"
+                          >
+                            Another Page Subpage 1
+                          </a>
+                        </li>
+                        <li className="py-1">
+                          <a
+                            href="./another-page-sub2.html"
+                            className="block w-full"
+                          >
+                            Another Page Subpage 2
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    {/* Add more main items and their sub-items as needed */}
+                  </ul>
                 </div>
               )}
             </div>
 
             {/* User Dropdown */}
-            <div className="relative mt-2">
+            <div className="relative w-full mt-2">
               <button
-                className="block w-full text-left px-4 py-2 text-sm font-semibold hover:bg-green-100"
+                className="block w-full text-right px-4 py-2 text-sm font-semibold hover:bg-green-100 border-b"
                 onClick={toggleUserDropdown}
               >
                 ورود | ثبت نام
@@ -112,8 +154,56 @@ function Navbar() {
                 </svg>
               </button>
               {showUserDropdown && (
-                <div className="bg-white rounded-lg shadow-md mt-2 py-1 w-full text-sm text-gray-800">
-                  <UserDropdown isMobile />
+                <div className="bg-white rounded-lg shadow-md mt-2 py-1 w-full text-sm text-gray-800 rtl">
+                  <ul className="list-reset">
+                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
+                      <a href="./profile.html" className="block w-full">
+                        محمد سعادتی
+                      </a>
+                      <ul className="pl-4 mt-1">
+                        <li className="py-1">
+                          <a
+                            href="./profile-sub1.html"
+                            className="block w-full"
+                          >
+                            Profile Subpage 1
+                          </a>
+                        </li>
+                        <li className="py-1">
+                          <a
+                            href="./profile-sub2.html"
+                            className="block w-full"
+                          >
+                            Profile Subpage 2
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
+                      <a href="./settings.html" className="block w-full">
+                        Settings
+                      </a>
+                      <ul className="pl-4 mt-1">
+                        <li className="py-1">
+                          <a
+                            href="./settings-sub1.html"
+                            className="block w-full"
+                          >
+                            Settings Subpage 1
+                          </a>
+                        </li>
+                        <li className="py-1">
+                          <a
+                            href="./settings-sub2.html"
+                            className="block w-full"
+                          >
+                            Settings Subpage 2
+                          </a>
+                        </li>
+                      </ul>
+                    </li>
+                    {/* Add more main items and their sub-items as needed */}
+                  </ul>
                 </div>
               )}
             </div>
