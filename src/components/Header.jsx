@@ -89,7 +89,7 @@ function Header() {
           <div className="md:w-1/3 relative">
             <input
               type="text"
-              className="hidden md:w-full md:block ml-8 border-opacity-65 placeholder:text-sm min-h-10 cursor-pointer outline-none rounded-3xl border border-gray-300 px-4 py-2"
+              className="hidden md:w-full md:block ml-8 border-opacity-65 placeholder:text-sm min-h-12 cursor-pointer outline-none rounded-3xl border border-gray-300 px-4 py-2"
               placeholder="شهر مقصد، عنوان و یا شناسه اقامتگاه"
             />
             <svg
@@ -98,7 +98,7 @@ function Header() {
               viewBox="0 0 24 24"
               strokeWidth={2}
               stroke="white"
-              className="size-5 absolute left-1.5 top-1.5 rounded-full bg-green-500 w-8 h-8 p-1.5"
+              className="size-5 absolute left-1.5 top-1.5 rounded-full bg-green-500 w-9 h-9 p-1.5"
             >
               <path
                 strokeLinecap="round"
