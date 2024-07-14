@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Container from "./components/Container";
 import Login from "./components/Login";
-import Dashboard from "./components/Dashboard"; // Import the Dashboard component
+import Dashboard from "./components/dashboard/Dashboard"; // Import the Dashboard component
 
 function App() {
   return (
