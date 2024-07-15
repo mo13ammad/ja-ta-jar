@@ -6,7 +6,7 @@ import Dashboard from "./components/dashboard/Dashboard"; // Import the Dashboar
 
 function App() {
   return (
-    <div className="font-sans w-full bg-gray-200 h-screen">
+    <div className="font-sans w-full bg-gray-100 min-h-[100vh]">
       <Router>
         <Routes>
           <Route path="/" element={<Container />} />
