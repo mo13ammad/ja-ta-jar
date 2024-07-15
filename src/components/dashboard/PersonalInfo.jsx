@@ -2,7 +2,7 @@ import React from 'react';
 
 const PersonalInfo = () => {
   return (
-    <div className="md:w-8/12 lg:w-9/12">
+    <div className="w-full">
     <div className="rounded-xl flex flex-col p-5 gap-y-5">
       <div className="border-b pb-3">اطلاعات شخصی</div>
       <div className="flex pb-2">
