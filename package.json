@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "proxy": "http://jatajar.viraup.com",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -12,9 +13,13 @@
   "dependencies": {
     "@headlessui/react": "^2.1.2",
     "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",
+    "react-hot-toast": "^2.4.1",
+    "react-loader-spinner": "^6.1.6",
     "react-router-dom": "^6.24.1"
   },
   "devDependencies": {

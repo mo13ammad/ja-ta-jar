@@ -1,74 +1,88 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.webp";
-import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [message, setMessage] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form with phone number:", phoneNumber);
+    setLoading(true);
+
     try {
-      const response = await axios.post("YOUR_BACKEND_ENDPOINT", {
-        phoneNumber,
-      });
-      console.log("Response from server:", response);
-      setMessage("OTP sent successfully!");
+      console.log("Sending request with phone number:", phone); // Debugging line
+      const response = await axios.post(
+        "http://jatajar.viraup.com/api/auth/authenticate",
+        { phone }
+      );
+
+      console.log("Response from server:", response); // Debugging line
+
+      if (response.data.isRegistered) {
+        navigate("/login", { state: { phone } });
+      } else {
+        navigate("/register", { state: { phone } });
+      }
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      setMessage("Error sending OTP.");
+      let errorMessage = "An unexpected error occurred";
+      if (error.response) {
+        errorMessage = error.response.data?.message || "Error from server";
+      } else if (error.request) {
+        errorMessage = "No response received from server";
+      }
+      console.error(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <Helmet>
-        <title>ورود</title>
-      </Helmet>
-      <div className="flex  justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
-        <div className="rounded-2xl p-8 bg-gray-100">
-          <form onSubmit={handleSubmit}>
-            <div className="mb-2">
-              <a href="./index.html">
-                <img src={logo} alt="Logo" className="w-22 mx-auto" />
-              </a>
-            </div>
-            <div className="opacity-90 text-lg font-bold mb-5">ورود</div>
-            <div className="text-sm mb-4"> شماره همراه خود را وارد کنید :</div>
-            <div className="mb-2">
-              <input
-                className="w-full text-left drop-shadow-lg outline-none rounded-2xl py-2 text-center"
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="1245 345 912"
-              />
-            </div>
-            <div className="text-center mt-5 mb-3">
-              <button
-                className="bg-green-500 font-bold hover:bg-green-600 transition-all duration-300 text-white opacity-80 rounded-2xl w-full py-2"
-                type="submit"
-              >
-                ورود
-              </button>
-            </div>
-            <div className="text-xs opacity-80 leading-normal">
-              ثبت نام یا ورود شما به منظور پذیرش
-              <a href="#" className="text-red-500 ml-1 mr-1">
-                قوانین و مقررات
-              </a>
-              جات آجار می باشد.
-            </div>
-
-            {message && (
-              <div className="text-center mt-4 text-red-500">{message}</div>
-            )}
-          </form>
-        </div>
+    <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
+      <div className="rounded-2xl p-8 bg-gray-100">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-2">
+            <a href="/">
+              <img src={logo} alt="Logo" className="w-22 mx-auto" />
+            </a>
+          </div>
+          <div className="opacity-90 text-lg font-bold mb-5">ورود</div>
+          <div className="text-sm mb-4">شماره همراه خود را وارد کنید :</div>
+          <div className="mb-2">
+            <input
+              className="w-full drop-shadow-lg outline-none rounded-2xl py-2 text-center"
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="******0912"
+              disabled={loading}
+            />
+          </div>
+          <div className="text-center mt-5 mb-3">
+            <button
+              className={`bg-green-500 font-bold hover:bg-green-600 transition-all duration-300 text-white opacity-80 rounded-2xl w-full py-2 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "در حال ارسال..." : "ورود"}
+            </button>
+          </div>
+          <div className="text-xs opacity-80 leading-normal">
+            ثبت نام یا ورود شما به منظور پذیرش
+            <a href="#" className="text-red-500 ml-1 mr-1">
+              قوانین و مقررات
+            </a>
+            جات آجار می باشد.
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
