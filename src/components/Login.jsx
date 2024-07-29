@@ -16,16 +16,17 @@ const Login = () => {
     try {
       console.log("Sending request with phone number:", phone); // Debugging line
       const response = await axios.post(
-        "http://jatajar.viraup.com/api/auth/authenticate",
+        "http://jatajar.com/api/auth/authenticate",
         { phone }
       );
 
       console.log("Response from server:", response); // Debugging line
-
-      if (response.data.isRegistered) {
-        navigate("/login", { state: { phone } });
+      
+      const hasAccount = response.data.data.has_account;
+      if (hasAccount) {
+        navigate("/register", { state: { phone, hasAccount } });
       } else {
-        navigate("/register", { state: { phone } });
+        navigate("/register", { state: { phone, hasAccount } });
       }
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
@@ -43,7 +44,7 @@ const Login = () => {
 
   return (
     <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
-      <div className="rounded-2xl p-8 bg-gray-100">
+      <div className="rounded-2xl p-8 bg-gray-50 shadow-sm">
         <form onSubmit={handleSubmit}>
           <div className="mb-2">
             <a href="/">
