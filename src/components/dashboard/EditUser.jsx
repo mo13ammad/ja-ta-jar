@@ -24,10 +24,7 @@ const EditUser = ({ user }) => {
         birth_date: birthDate,
         sex: gender,
       }, {
-        headers: {
-          'Authorization': `Bearer ZldcMuDu9PPwtCmeAS3VgoDhgkyAl8z2kx3iyQws14db1511`, // Bearer Token
-          'Content-Type': 'application/json',
-        }
+        
       });
       toast.success("Profile updated successfully!");
       console.log("API response:", response.data);
@@ -152,9 +149,9 @@ const EditUser = ({ user }) => {
           </div>
         </div>
       </div>
-      <div className="text-center mt-5 mb-3">
+      <div className="text-center  mt-5 w-1/2 mb-3">
         <button
-          className={`bg-green-500 font-bold hover:bg-green-600 transition-all text-lg duration-300 text-white rounded-2xl ml-52 px-16 py-4 ${
+          className={`bg-green-500 font-bold hover:bg-green-600 transition-all text-lg duration-300 text-white rounded-2xl px-12 py-3 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
           type="submit"
