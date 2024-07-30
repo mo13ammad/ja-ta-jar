@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PersonalInfo = () => {
+const PersonalInfo = ({user}) => {
   return (
     <div className="w-full">
     <div className="rounded-xl flex flex-col p-5 gap-y-5">
@@ -11,7 +11,7 @@ const PersonalInfo = () => {
             نام و نام خانوادگی:
           </div>
           <div className="text-sm opacity-90">
-            محمد سعادتی
+          {user.name}
           </div>
         </div>
         <div className="w-1/2">
@@ -19,7 +19,7 @@ const PersonalInfo = () => {
             ایمیل:
           </div>
           <div className="text-sm opacity-90">
-            aaaaaaaa@gmail.com
+            {user.email === null ? (<p>ایمیل شما وارد نشده است</p>) : user.email}
           </div>
         </div>
       </div>
@@ -29,7 +29,7 @@ const PersonalInfo = () => {
             شماره تلفن همراه:
           </div>
           <div className="text-sm opacity-90">
-            0999999999
+            {user.phone}
           </div>
         </div>
         <div className="w-1/2">
@@ -41,21 +41,13 @@ const PersonalInfo = () => {
           </div>
         </div>
       </div>
-      <div className="flex pb-2">
-        <div className="w-1/2">
-          <div className="text-xs opacity-80 mb-1">
-            احراز هویت:
-          </div>
-          <div className="text-sm opacity-90">
-            خیر
-          </div>
-        </div>
+      <div className="flex pb-2">       
         <div className="w-1/2">
           <div className="text-xs opacity-80 mb-1">
             کدملی:
           </div>
           <div className="text-sm opacity-90">
-            0888888888
+            {user.national_code}
           </div>
         </div>
       </div>

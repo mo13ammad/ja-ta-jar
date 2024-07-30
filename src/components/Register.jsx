@@ -66,10 +66,10 @@ const Register = () => {
         });
       }
 
-      console.log("API response:", { response });
+      console.log("API response:", response);
 
       toast.success("Registration successful!");
-      navigate("/dashboard");
+      navigate("/dashboard", { state: { userData: response.data } });
     } catch (error) {
       console.error("Error during registration:", error);
       if (error.response) {
