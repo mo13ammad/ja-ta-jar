@@ -1,32 +1,40 @@
 import React from "react";
 import { Tab } from "@headlessui/react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import profile from "./assets/profile.webp";
 
-const ProfileSidebar = ({user}) => {
-  console.log(user);
+const ProfileSidebar = ({ user }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.delete("http://jatajar.com/api/client/profile/logout", {
+       
+      });
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
   return (
     <div className="border w-full rounded-xl flex flex-col justify-center items-center bg-white py-4 gap-y-5">
       <img className="border rounded-full w-24" src={profile} alt="Profile" />
       <span className="font-semibold opacity-80">{user.name}</span>
-      <span className="text-xs opacity-70">عضویت 2 سال</span>
+      
       <span className="flex text-xs opacity-70">
         <div>شماره تلفن: </div>
         <div>{user.phone}</div>
       </span>
       <a
-        href=""
-        className="text-sm opacity-80 border-t w-full pt-2 flex justify-center flex-row-reverse items-center hover:text-red-600 transition"
+        href="#"
+        onClick={(e) => { e.preventDefault(); handleLogout(); }}
+        className="text-sm opacity-80 border rounded-xl px-8 py-2 flex justify-center flex-row-reverse items-center hover:text-red-600 hover:bg-red-100 transition-all"
       >
         خروج از حساب
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          className="ml-1"
-          fill="#474747"
-          viewBox="0 0 256 256"
-        >
-          <path d="M110,216a6,6,0,0,1-6,6H48a14,14,0,0,1-14-14V48A14,14,0,0,1,48,34h56a6,6,0,0,1,0,12H48a2,2,0,0,0-2,2V208a2,2,0,0,0,2,2h56A6,6,0,0,1,110,216Zm110.24-92.24-40-40a6,6,0,0,0-8.48,8.48L201.51,122H104a6,6,0,0,0,0,12h97.51l-29.75,29.76a6,6,0,1,0,8.48,8.48l40-40A6,6,0,0,0,220.24,123.76Z"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
         </svg>
       </a>
       <Tab.List className="border w-5/6 rounded-xl flex flex-col justify-center items-center p-2 gap-y-2">
@@ -51,8 +59,20 @@ const ProfileSidebar = ({user}) => {
             </button>
           )}
         </Tab>
-        
-       
+        <Tab as={React.Fragment}>
+          {({ selected }) => (
+            <button
+              className={`text-sm opacity-80 outline-none w-full flex justify-end pr-5 flex-row-reverse items-center hover:text-green-600 transition  py-3 rounded-xl ${
+                selected ? "bg-gray-100 text-green-500" : ""
+              }`}
+            >
+              ویرایش اطلاعات
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#474747" className="size-6 ml-1">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+              </svg>
+            </button>
+          )}
+        </Tab>
         <Tab as={React.Fragment}>
           {({ selected }) => (
             <button

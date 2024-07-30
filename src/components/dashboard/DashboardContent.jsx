@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProfileSidebar from "./ProfileSidebar";
 import PersonalInfo from "./PersonalInfo";
-import ProfileOrders from "./ProfileOrders";
-
 import Addresses from "./ProfileAddresses";
+import EditUser from "./EditUser";
 import { Tab } from "@headlessui/react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,12 +11,11 @@ import toast, { Toaster } from "react-hot-toast";
 const DashboardContent = () => {
   const API_BASE_URL = "http://jatajar.com/api";
   const location = useLocation();
+  const navigate = useNavigate();
   const initialData = location.state?.userData || null;
 
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(!initialData);
-
-
 
   useEffect(() => {
     if (!initialData) {
@@ -28,6 +26,7 @@ const DashboardContent = () => {
           setData(response.data);
         } catch (error) {
           console.error("Error fetching profile data:", error);
+          navigate("/login");
         } finally {
           setLoading(false);
         }
@@ -37,7 +36,7 @@ const DashboardContent = () => {
     } else {
       toast.success("Welcome to your dashboard!");
     }
-  }, [initialData]);
+  }, [initialData, navigate]);
 
   if (loading) {
     return <div>Loading...</div>; // Replace with a better loading indicator if needed
@@ -52,18 +51,18 @@ const DashboardContent = () => {
       <Toaster />
       <Tab.Group>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <ProfileSidebar user={data.data.user}/>
+          <ProfileSidebar user={data.data.user} />
           <div className="col-span-1 lg:col-span-3 border p-4 rounded-xl bg-white">
             <Tab.Panels>
               <Tab.Panel>
-                <PersonalInfo  user={data.data.user}/>
+                <PersonalInfo user={data.data.user} />
               </Tab.Panel>
-             
-              
-             <Tab.Panel>
-                <Addresses />
+              <Tab.Panel>
+                <EditUser user={data.data.user} />
               </Tab.Panel>
-              
+              <Tab.Panel>
+                <Addresses user={data.data.user} />
+              </Tab.Panel>
             </Tab.Panels>
           </div>
         </div>

@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import PagesDropdown from "./PagesDropdown";
-import UserDropdown from "./UserDropdown";
 import logo from "../assets/logo.webp";
 
-function Navbar() {
+function Navbar({ userName }) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showPagesDropdown, setShowPagesDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
@@ -40,15 +38,50 @@ function Navbar() {
         </div>
 
         {/* Logo */}
-        <a className="order-1 lg:order-2" href="./index.html">
+        <a  href="./index.html">
           <img className="w-28 md:w-32" src={logo} alt="Logo" />
         </a>
 
-        {/* Main Menu (Desktop) */}
-        <PagesDropdown />
-
         {/* User Menu (Desktop) */}
-        <UserDropdown />
+        <div className=" relative">
+          <button
+            className="flex items-center text-gray-700 p-3"
+            onClick={toggleUserDropdown}
+          >
+            <span>{userName}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className={`w-4 h-4 inline-block ml-1 ${
+                showUserDropdown ? "transform rotate-180" : ""
+              }`}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          {showUserDropdown && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-md py-1 text-sm text-gray-800 rtl">
+              <ul className="list-reset">
+                <li className="px-4 py-2 hover:bg-green-50">
+                  <a href="/profile">Profile</a>
+                </li>
+                <li className="px-4 py-2 hover:bg-green-50">
+                  <a href="/settings">Settings</a>
+                </li>
+                <li className="px-4 py-2 hover:bg-green-50">
+                  <a href="/logout">Logout</a>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Mobile Menu (Dropdowns) */}
@@ -119,85 +152,6 @@ function Navbar() {
                             className="block w-full"
                           >
                             Another Page Subpage 2
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    {/* Add more main items and their sub-items as needed */}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {/* User Dropdown */}
-            <div className="relative w-full mt-2">
-              <button
-                className="block w-full text-right px-4 py-2 text-sm font-semibold hover:bg-green-100 border-b"
-                onClick={toggleUserDropdown}
-              >
-                ورود | ثبت نام
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  className={`w-4 h-4 inline-block ml-1 ${
-                    showUserDropdown ? "transform rotate-180" : ""
-                  }`}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {showUserDropdown && (
-                <div className="bg-white rounded-lg shadow-md mt-2 py-1 w-full text-sm text-gray-800 rtl">
-                  <ul className="list-reset">
-                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
-                      <a href="./profile.html" className="block w-full">
-                        محمد سعادتی
-                      </a>
-                      <ul className="pl-4 mt-1">
-                        <li className="py-1">
-                          <a
-                            href="./profile-sub1.html"
-                            className="block w-full"
-                          >
-                            Profile Subpage 1
-                          </a>
-                        </li>
-                        <li className="py-1">
-                          <a
-                            href="./profile-sub2.html"
-                            className="block w-full"
-                          >
-                            Profile Subpage 2
-                          </a>
-                        </li>
-                      </ul>
-                    </li>
-                    <li className="relative px-4 py-2 hover:bg-green-50 border-b">
-                      <a href="./settings.html" className="block w-full">
-                        Settings
-                      </a>
-                      <ul className="pl-4 mt-1">
-                        <li className="py-1">
-                          <a
-                            href="./settings-sub1.html"
-                            className="block w-full"
-                          >
-                            Settings Subpage 1
-                          </a>
-                        </li>
-                        <li className="py-1">
-                          <a
-                            href="./settings-sub2.html"
-                            className="block w-full"
-                          >
-                            Settings Subpage 2
                           </a>
                         </li>
                       </ul>

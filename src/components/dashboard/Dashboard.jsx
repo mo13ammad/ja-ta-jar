@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import Navbar from "../Navbar";
 import DashboardContent from "./DashboardContent";
+import { useLocation } from "react-router-dom";
 
 function Dashboard() {
+  const location = useLocation();
+  const userName = location.state?.userData?.data?.user?.name || "User";
+
   return (
-    <div color="min-h-[100vh]">
-      <Navbar />
+    <div className="min-h-[100vh]">
+      <Navbar userName={userName} />
       <DashboardContent />
     </div>
   );
