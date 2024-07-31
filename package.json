@@ -13,11 +13,13 @@
   "dependencies": {
     "@hassanmojab/react-modern-calendar-datepicker": "^3.1.7",
     "@headlessui/react": "^2.1.2",
+    "@heroicons/react": "^2.1.5",
     "@sentry/react": "^8.20.0",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "express": "^4.19.2",
+    "jalaali-js": "^1.2.7",
     "moment-jalaali": "^0.10.1",
     "react": "^18.3.1",
     "react-calendar": "^5.0.0",

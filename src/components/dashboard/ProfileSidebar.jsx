@@ -27,8 +27,8 @@ const ProfileSidebar = ({ user ,token}) => {
       <span className="font-semibold opacity-80">{user.name}</span>
       
       <span className="flex text-xs opacity-70">
-        <div>شماره تلفن: </div>
-        <div>{user.phone}</div>
+        <div>شماره تلفن : </div>
+        <div className="mr-1"> {user.phone}</div>
       </span>
       <a
         href="#"
