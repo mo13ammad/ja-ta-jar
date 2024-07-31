@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import profile from "./assets/profile.webp";
 
-const ProfileSidebar = ({ user }) => {
+const ProfileSidebar = ({ user ,token}) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axios.delete("http://jatajar.com/api/client/profile/logout", {
-       
+      await axios.delete("http://portal1.jatajar.com/api/client/profile/logout", {
+        headers: {
+          'Authorization': `Bearer ${token}`, // Bearer Token
+          'Content-Type': 'application/json',
+        }
       });
       navigate("/login");
     } catch (error) {

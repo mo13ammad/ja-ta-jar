@@ -1,33 +1,72 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const EditUser = ({ user }) => {
+// Gender options with labels
+const genderOptions = [
+  { key: 'Male', label: 'مرد' },
+  { key: 'Female', label: 'زن' }
+];
+
+// Format date from YYYY-MM-DD to YYYY/MM/DD
+const formatDateForDisplay = (dateString) => {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split('T')[0].split('-');
+  return `${year}/${parseInt(month, 10)}/${parseInt(day, 10)}`;
+};
+
+// Parse date from YYYY/MM/DD to YYYY-MM-DD
+const parseDateForSubmission = (dateString) => {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split('/');
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [firstName, setFirstName] = useState(user.first_name || "");
   const [lastName, setLastName] = useState(user.last_name || "");
   const [nationalCode, setNationalCode] = useState(user.national_code || "");
   const [email, setEmail] = useState(user.email || "");
-  const [birthDate, setBirthDate] = useState(user.birth_date || "");
-  const [gender, setGender] = useState(user.sex || "male");
+  const [birthDate, setBirthDate] = useState(formatDateForDisplay(user.birth_date) || "");
+  const [gender, setGender] = useState(user.sex || "Male");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Update state when user prop changes
+    setFirstName(user.first_name || "");
+    setLastName(user.last_name || "");
+    setNationalCode(user.national_code || "");
+    setEmail(user.email || "");
+    setBirthDate(formatDateForDisplay(user.birth_date) || "");
+    setGender(user.sex || "Male");
+  }, [user]);
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    onEditStart(); // Notify Dashboard to show spinner
 
     try {
-      const response = await axios.put("http://jatajar.com/api/client/profile", {
+      const response = await axios.put("http://portal1.jatajar.com/api/client/profile", {
         first_name: firstName,
         last_name: lastName,
         national_code: nationalCode,
         email,
-        birth_date: birthDate,
-        sex: gender,
+        birth_date: parseDateForSubmission(birthDate),
+        sex: gender
       }, {
-        
+
+        headers: {
+          'Authorization': `Bearer ${token}`, // Bearer Token
+          'Content-Type': 'application/json',
+        }
+
       });
-      toast.success("Profile updated successfully!");
+      
       console.log("API response:", response.data);
+     
+      // Call the onUpdate function to refetch data
+      onUpdate();
     } catch (error) {
       console.error("Error during profile update:", error);
       if (error.response) {
@@ -40,6 +79,7 @@ const EditUser = ({ user }) => {
       }
     } finally {
       setLoading(false);
+      onEditEnd(); // Notify Dashboard to hide spinner
     }
   };
 
@@ -77,13 +117,13 @@ const EditUser = ({ user }) => {
 
         <div className="mb-4 flex items-center">
           <label htmlFor="nationalCode" className="block text-sm font-medium text-gray-700 w-1/5">
-            شماره ملی:
+            کد ملی:
           </label>
           <input
             id="nationalCode"
             value={nationalCode}
             onChange={(e) => setNationalCode(e.target.value)}
-            placeholder="شماره ملی"
+            placeholder="کد ملی"
             disabled={loading}
             className="mt-1 border rounded-lg py-2 px-3 outline-none"
           />
@@ -91,10 +131,11 @@ const EditUser = ({ user }) => {
 
         <div className="mb-4 flex items-center">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 w-1/5">
-            ایمیل :
+            ایمیل:
           </label>
           <input
             id="email"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ایمیل"
@@ -105,59 +146,54 @@ const EditUser = ({ user }) => {
 
         <div className="mb-4 flex items-center">
           <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 w-1/5">
-            تاریخ تولد :
+            تاریخ تولد:
           </label>
           <input
             id="birthDate"
+            type="text"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
-            placeholder="1376/11/04"
+            placeholder="تاریخ تولد (YYYY/MM/DD)"
             disabled={loading}
             className="mt-1 border rounded-lg py-2 px-3 outline-none"
           />
         </div>
 
         <div className="mb-4 flex items-center">
-          <label className="block text-sm font-medium text-gray-700 w-1/5">
-            جنسیت :
-          </label>
-          <div className="flex items-center space-x-4">
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={gender === "male"}
-                onChange={(e) => setGender(e.target.value)}
-                disabled={loading}
-                className="form-radio"
-              />
-              <span className="px-2 ml-4">مرد</span>
-            </label>
-            <label className="inline-flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={gender === "female"}
-                onChange={(e) => setGender(e.target.value)}
-                disabled={loading}
-                className="form-radio"
-              />
-              <span className="px-2">زن</span>
-            </label>
+          <label className="block text-sm font-medium text-gray-700 w-1/5">جنسیت:</label>
+          <div className="flex items-center">
+            {genderOptions.map((option) => (
+              <label key={option.key} className="flex items-center ml-4">
+                <input
+                  type="radio"
+                  name="gender"
+                  value={option.key}
+                  checked={gender === option.key}
+                  onChange={() => setGender(option.key)}
+                  disabled={loading}
+                  className="mr-2"
+                />
+                {option.label}
+              </label>
+            ))}
           </div>
         </div>
+<<<<<<< HEAD
       </div>
       <div className="text-center  mt-5 w-1/2 mb-3">
         <button
           className={`bg-green-500 font-bold hover:bg-green-600 transition-all text-lg duration-300 text-white rounded-2xl px-12 py-3 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
+=======
+        
+        <button
+>>>>>>> b12775a (log out and edit user have been improved)
           type="submit"
           disabled={loading}
+          className="mt-5 px-4 py-2 bg-green-500 text-white rounded-lg"
         >
-          {loading ? "در حال ارسال..." : "ارسال"}
+          {loading ? 'در حال ارسال...' : 'ثبت'}
         </button>
       </div>
     </form>

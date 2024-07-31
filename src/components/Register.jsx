@@ -5,7 +5,7 @@ import logo from "../assets/logo.webp";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_BASE_URL = "http://jatajar.com/api/auth";
+const API_BASE_URL = "http://portal1.jatajar.com/api/auth";
 
 const InputField = ({ id, value, onChange, placeholder, disabled }) => (
   <div className="mb-2">
@@ -68,8 +68,9 @@ const Register = () => {
 
       console.log("API response:", response);
 
+      // Pass token and user data to Dashboard
       toast.success("Registration successful!");
-      navigate("/dashboard", { state: { userData: response.data } });
+      navigate("/dashboard", { state: { userData: response.data, token: response.data.data.token } });
     } catch (error) {
       console.error("Error during registration:", error);
       if (error.response) {
