@@ -178,20 +178,15 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             ))}
           </div>
         </div>
-<<<<<<< HEAD
+
       </div>
       <div className="text-center  mt-5 w-1/2 mb-3">
         <button
           className={`bg-green-500 font-bold hover:bg-green-600 transition-all text-lg duration-300 text-white rounded-2xl px-12 py-3 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
-=======
-        
-        <button
->>>>>>> b12775a (log out and edit user have been improved)
           type="submit"
           disabled={loading}
-          className="mt-5 px-4 py-2 bg-green-500 text-white rounded-lg"
         >
           {loading ? 'در حال ارسال...' : 'ثبت'}
         </button>
