@@ -192,7 +192,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
                   <ChevronDownIcon className="mr-1 mt-0.5 h-4 w-4" aria-hidden="true" />
                 </Menu.Button>
               </div>
-              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-gray-900/10 focus:outline-none">
+              <Menu.Items className="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg   focus:outline-none">
                 <div className="p-1">
                   {genderOptions.map((option) => (
                     <Menu.Item key={option.key}>
