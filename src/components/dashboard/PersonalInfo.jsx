@@ -23,10 +23,14 @@ const formatPersianDate = (date) => {
   return `${yearFormatted} ${monthFormatted} ${dayFormatted}`;
 };
 
-const PersonalInfo = ({ user }) => {
+const PersonalInfo = ({ user, token }) => {
   const handleBecomeHost = async () => {
     try {
-      const response = await axios.put('https://portal1.jatajar.com/api/client/profile/vendor');
+      const response = await axios.put('https://portal1.jatajar.com/api/client/profile/vendor', {
+        headers: {
+          Authorization: `Bearer ${token}` // Pass the token in the headers
+        }
+      });
       toast.success('Request sent successfully!');
       console.log('API response:', response.data);
     } catch (error) {

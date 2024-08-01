@@ -2,25 +2,25 @@ import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import ProfileSidebar from "./ProfileSidebar";
 import PersonalInfo from "./PersonalInfo";
-import Addresses from "./ProfileAddresses";
 import EditUser from "./EditUser";
-import Spinner from "../Spinner"; // Import Spinner component
+import Houses from "./Houses";
+import Spinner from "../Spinner";
 
 const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => {
   const [isGeneralLoading, setIsGeneralLoading] = useState(false);
 
   const handleUpdateSuccess = () => {
-    setIsGeneralLoading(true); // Show general spinner when update is successful
+    setIsGeneralLoading(true);
     onUpdate();
-    setTimeout(() => setIsGeneralLoading(false), 2000); // Hide spinner after some time
+    setTimeout(() => setIsGeneralLoading(false), 2000);
   };
 
   const handleEditStart = () => {
-    setIsGeneralLoading(true); // Optionally show a spinner while editing starts
+    setIsGeneralLoading(true);
   };
 
   const handleEditEnd = () => {
-    setIsGeneralLoading(false); // Hide spinner after editing ends
+    setIsGeneralLoading(false);
   };
 
   if (!data || !data.data) {
@@ -33,7 +33,7 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
     <div className="container mx-auto p-4">
       {isGeneralLoading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <Spinner /> {/* Use the custom Spinner component */}
+          <Spinner />
         </div>
       )}
       <Tab.Group>
@@ -44,18 +44,22 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
               <Tab.Panel>
                 <PersonalInfo user={userData} />
               </Tab.Panel>
-              <Tab.Panel>
-                <EditUser
-                  user={userData}
-                  token={token}
-                  onUpdate={handleUpdateSuccess}
-                  onEditStart={handleEditStart}
-                  onEditEnd={handleEditEnd}
-                />
-              </Tab.Panel>
-              <Tab.Panel>
-                <Addresses user={userData} />
-              </Tab.Panel>
+              {userData.type === "User" && (
+                <Tab.Panel>
+                  <EditUser
+                    user={userData}
+                    token={token}
+                    onUpdate={handleUpdateSuccess}
+                    onEditStart={handleEditStart}
+                    onEditEnd={handleEditEnd}
+                  />
+                </Tab.Panel>
+              )}
+              {userData.type !== "User" && (
+                <Tab.Panel>
+                  <Houses />
+                </Tab.Panel>
+              )}
             </Tab.Panels>
           </div>
         </div>
