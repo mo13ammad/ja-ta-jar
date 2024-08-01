@@ -1,4 +1,3 @@
-// Dashboard.js
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
@@ -60,10 +59,17 @@ function Dashboard() {
     );
   }
 
-  
+  if (!data || !data.data) {
+    // Handle the case where data or data.data is null
+    return (
+      <div className="min-h-[100vh] flex items-center justify-center">
+        <p>No data available</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-[100vh]">
+    <div className="min-h-[100vh] overflow-auto">
       <Navbar userName={data.data.name} />
       <DashboardContent
         data={data}
