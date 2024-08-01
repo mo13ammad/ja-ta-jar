@@ -3,7 +3,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import jalaali from "jalaali-js";
 import { Listbox } from "@headlessui/react";
-import Spinner from "../Spinner"; // Import Spinner component
 
 const genderOptions = [
   { key: '', label: 'انتخاب جنسیت' },
@@ -48,6 +47,8 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState("");
   const [initialGender, setInitialGender] = useState(gender);
+  const [avatar, setAvatar] = useState(null); // State for profile picture
+  const [bio, setBio] = useState(user.bio || ""); // State for biography
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -98,18 +99,20 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     onEditStart();
     setErrors({});
 
-    try {
-      const updateData = {
-        first_name: firstName,
-        last_name: lastName,
-        national_code: nationalCode,
-        email,
-        birth_date: persianToGregorian(birthDate),
-        second_phone: secondPhone,
-        ...(gender && gender !== initialGender && gender !== '' && { sex: gender }), // Include gender only if changed and valid
-        ...(selectedCity && { city_id: selectedCity })
-      };
+    const updateData = {
+      first_name: firstName,
+      last_name: lastName,
+      national_code: nationalCode,
+      email,
+      birth_date: persianToGregorian(birthDate),
+      second_phone: secondPhone,
+      ...(gender && gender !== initialGender && gender !== '' && { sex: gender }), // Include gender only if changed and valid
+      ...(selectedCity && { city_id: selectedCity }),
+      avatar,
+      bio
+    };
 
+    try {
       const response = await axios.put("https://portal1.jatajar.com/api/client/profile", updateData, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -153,193 +156,211 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   };
 
   return (
-    <form onSubmit={handleEditSubmit} className="flex flex-col items-end p-1.5">
-      <div className="opacity-90 text-lg font-bold mb-5 self-start">ویرایش پروفایل</div>
-      <div className="flex flex-col sm:grid grid-cols-2 gap-5 w-full">
-
-        {/* name: */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">نام</label>
-          <input
-            type="text"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            onFocus={() => setFocusedField('firstName')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.first_name ? 'border-red-500' : ''} ${focusedField === 'firstName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-            required
-          />
-          {renderErrorMessages(errors.first_name)}
-        </div>
-
-         {/* family name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">نام خانوادگی</label>
-          <input
-            type="text"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            onFocus={() => setFocusedField('lastName')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.last_name ? 'border-red-500' : ''} ${focusedField === 'lastName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-            required
-          />
-          {renderErrorMessages(errors.last_name)}
-        </div>
-          
-          {/* national code */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">کد ملی</label>
-          <input
-            type="text"
-            value={nationalCode}
-            onChange={(e) => setNationalCode(e.target.value)}
-            onFocus={() => setFocusedField('nationalCode')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.national_code ? 'border-red-500' : ''} ${focusedField === 'nationalCode' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-            required
-          />
-          {renderErrorMessages(errors.national_code)}
-        </div>
-
-         {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">ایمیل</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onFocus={() => setFocusedField('email')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.email ? 'border-red-500' : ''} ${focusedField === 'email' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-            required
-          />
-          {renderErrorMessages(errors.email)}
-        </div>
-
-             {/* province */}
-             <div>
-          <label className="block text-sm font-medium text-gray-700">استان</label>
-          <Listbox value={selectedProvince} onChange={setSelectedProvince}>
-            {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
-                    {provinces.find(province => province.id === selectedProvince)?.name || 'انتخاب استان'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
-                    <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </Listbox.Button>
-                  <Listbox.Options className={`absolute mt-2 w-3/5 border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
-                    {provinces.map((province) => (
-                      <Listbox.Option key={province.id} value={province.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${province.id === selectedProvince ? 'bg-gray-100' : ''}`}>
-                        {province.name}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </div>
-              </>
-            )}
-          </Listbox>
-          {renderErrorMessages(errors.province_id)}
-        </div>
-         
-            {/* city */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">شهر</label>
-          <Listbox value={selectedCity} onChange={setSelectedCity} disabled={!selectedProvince}>
-            {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
-                    {cities.find(city => city.id === selectedCity)?.name || 'انتخاب شهر'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
-                    <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </Listbox.Button>
-                  <Listbox.Options className={`absolute mt-2 w-3/5 border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
-                    {cities.map((city) => (
-                      <Listbox.Option key={city.id} value={city.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${city.id === selectedCity ? 'bg-gray-100' : ''}`}>
-                        {city.name}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </div>
-              </>
-            )}
-          </Listbox>
-          {renderErrorMessages(errors.city_id)}
-        </div>
-
-          {/* birth Date */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">تاریخ تولد</label>
-          <input
-            type="text"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            onFocus={() => setFocusedField('birthDate')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDate' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-            placeholder="YYYY/MM/DD"
-            required
-          />
-          {renderErrorMessages(errors.birth_date)}
-        </div>
-
-         {/* gender */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">جنسیت</label>
-          <Listbox value={gender} onChange={setGender}>
-            {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
-                    {genderOptions.find(option => option.key === gender)?.label || 'انتخاب جنسیت'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
-                    <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </Listbox.Button>
-                  <Listbox.Options className={`absolute mt-2 w-3/5 border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
-                    {genderOptions.map((option) => (
-                      <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === gender ? 'bg-gray-100' : ''}`}>
-                        {option.label}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </div>
-              </>
-            )}
-          </Listbox>
-          {renderErrorMessages(errors.sex)}
-        </div>
-
-           {/* second phone */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">شماره دوم</label>
-          <input
-            type="text"
-            value={secondPhone}
-            onChange={(e) => setSecondPhone(e.target.value)}
-            onFocus={() => setFocusedField('secondPhone')}
-            onBlur={() => setFocusedField('')}
-            className={`mt-1 p-2 border rounded-xl w-full ${errors.second_phone ? 'border-red-500' : ''} ${focusedField === 'secondPhone' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-          />
-          {renderErrorMessages(errors.second_phone)}
-        </div>
-
-       
-
-        <button type="submit" className={`w-1/2 mt-4 py-2 md:py-0  px-2 bg-green-600 text-white rounded-lg ${loading ? 'opacity-50 cursor-not-allowed' : ''}`} disabled={loading}>
-          ذخیره اطلاعات
-        </button>
+    <form onSubmit={handleEditSubmit} className="flex flex-col md:grid grid-cols-2 gap-6 p-1.5">
+      {/* Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">نام</label>
+        <input
+          type="text"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          onFocus={() => setFocusedField('firstName')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.first_name ? 'border-red-500' : ''} ${focusedField === 'firstName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+          required
+        />
+        {renderErrorMessages(errors.first_name)}
       </div>
+
+      {/* Family Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">نام خانوادگی</label>
+        <input
+          type="text"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          onFocus={() => setFocusedField('lastName')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.last_name ? 'border-red-500' : ''} ${focusedField === 'lastName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+          required
+        />
+        {renderErrorMessages(errors.last_name)}
+      </div>
+
+      {/* National Code */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">کد ملی</label>
+        <input
+          type="text"
+          value={nationalCode}
+          onChange={(e) => setNationalCode(e.target.value)}
+          onFocus={() => setFocusedField('nationalCode')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.national_code ? 'border-red-500' : ''} ${focusedField === 'nationalCode' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+          required
+        />
+        {renderErrorMessages(errors.national_code)}
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">ایمیل</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onFocus={() => setFocusedField('email')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.email ? 'border-red-500' : ''} ${focusedField === 'email' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+          required
+        />
+        {renderErrorMessages(errors.email)}
+      </div>
+
+      {/* Province */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">استان</label>
+        <Listbox value={selectedProvince} onChange={setSelectedProvince}>
+          {({ open }) => (
+            <>
+              <div className="relative mt-1">
+                <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                  {provinces.find(province => province.id === selectedProvince)?.name || 'انتخاب استان'}
+                </span>
+                <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
+                  <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Listbox.Button>
+                <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                  {provinces.map((province) => (
+                    <Listbox.Option key={province.id} value={province.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${province.id === selectedProvince ? 'bg-gray-100' : ''}`}>
+                      {province.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </div>
+            </>
+          )}
+        </Listbox>
+        {renderErrorMessages(errors.province_id)}
+      </div>
+
+      {/* City */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">شهر</label>
+        <Listbox value={selectedCity} onChange={setSelectedCity} disabled={!selectedProvince}>
+          {({ open }) => (
+            <>
+              <div className="relative mt-1">
+                <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                  {cities.find(city => city.id === selectedCity)?.name || 'انتخاب شهر'}
+                </span>
+                <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
+                  <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Listbox.Button>
+                <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                  {cities.map((city) => (
+                    <Listbox.Option key={city.id} value={city.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${city.id === selectedCity ? 'bg-gray-100' : ''}`}>
+                      {city.name}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </div>
+            </>
+          )}
+        </Listbox>
+        {renderErrorMessages(errors.city_id)}
+      </div>
+
+      {/* Birth Date */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">تاریخ تولد</label>
+        <input
+          type="text"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          onFocus={() => setFocusedField('birthDate')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDate' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+          placeholder="YYYY/MM/DD"
+          required
+        />
+        {renderErrorMessages(errors.birth_date)}
+      </div>
+
+      {/* Gender */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">جنسیت</label>
+        <Listbox value={gender} onChange={setGender}>
+          {({ open }) => (
+            <>
+              <div className="relative mt-1">
+                <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                  {genderOptions.find(option => option.key === gender)?.label || 'انتخاب جنسیت'}
+                </span>
+                <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
+                  <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </Listbox.Button>
+                <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                  {genderOptions.map((option) => (
+                    <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === gender ? 'bg-gray-100' : ''}`}>
+                      {option.label}
+                    </Listbox.Option>
+                  ))}
+                </Listbox.Options>
+              </div>
+            </>
+          )}
+        </Listbox>
+        {renderErrorMessages(errors.sex)}
+      </div>
+
+      {/* Second Phone */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">شماره دوم</label>
+        <input
+          type="text"
+          value={secondPhone}
+          onChange={(e) => setSecondPhone(e.target.value)}
+          onFocus={() => setFocusedField('secondPhone')}
+          onBlur={() => setFocusedField('')}
+          className={`mt-1 p-2 border rounded-xl w-full ${errors.second_phone ? 'border-red-500' : ''} ${focusedField === 'secondPhone' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+        />
+        {renderErrorMessages(errors.second_phone)}
+      </div>
+
+      {/* Profile Picture */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">عکس پروفایل</label>
+        <input
+          type="file"
+          onChange={(e) => setAvatar(e.target.files[0])}
+          className="mt-1 p-2 border rounded-xl w-full"
+          accept="image/png, image/jpeg"
+        />
+        {renderErrorMessages(errors.avatar)}
+      </div>
+
+      {/* Biography */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">درباره شما</label>
+        <textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          className="mt-1 p-2 border rounded-xl w-full"
+          rows="4"
+        />
+        {renderErrorMessages(errors.bio)}
+      </div>
+
+      <button type="submit" className="max-w-44 max-h-12  mt-6  py-2 md:py-0 px-2 bg-green-600 text-white rounded-lg" disabled={loading}>
+        {loading ? 'در حال بارگذاری...' : 'ذخیره اطلاعات'}
+      </button>
     </form>
   );
 };

@@ -23,7 +23,7 @@ const ProfileSidebar = ({ user ,token}) => {
 
   return (
     <div className="border w-full rounded-xl flex flex-col justify-center items-center bg-white py-4 gap-y-5">
-      <img className="border rounded-full w-24" src={profile} alt="Profile" />
+      <img className="border rounded-full w-24" src={user.avatar} alt="Profile" />
       <span className="font-semibold opacity-80">{user.name}</span>
       
       <span className="flex text-xs opacity-70">

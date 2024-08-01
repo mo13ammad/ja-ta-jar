@@ -87,6 +87,10 @@ const PersonalInfo = ({ user }) => {
             <div className="text-xs opacity-80 mb-1">جنسیت :</div>
             <div className="text-sm opacity-90">{sexLabel}</div>
           </div>
+          <div className="flex flex-col">
+            <div className="text-xs opacity-80 mb-1">درباره شما :</div>
+            <div className="text-sm opacity-90">{user.bio !== null ? user.bio : "اطلاعاتی وارد نشده"}</div>
+          </div>
         </div>
         <div className="mt-6 flex justify-start">
           <button
