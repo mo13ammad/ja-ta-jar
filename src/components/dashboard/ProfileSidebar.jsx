@@ -9,7 +9,7 @@ const ProfileSidebar = ({ user ,token}) => {
 
   const handleLogout = async () => {
     try {
-      await axios.delete("http://portal1.jatajar.com/api/client/profile/logout", {
+      await axios.delete("https://portal1.jatajar.com/api/client/profile/logout", {
         headers: {
           'Authorization': `Bearer ${token}`, // Bearer Token
           'Content-Type': 'application/json',

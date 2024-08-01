@@ -5,7 +5,7 @@ import logo from "../assets/logo.webp";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
 
-const API_BASE_URL = "http://portal1.jatajar.com/api/auth";
+const API_BASE_URL = "https://portal1.jatajar.com/api/auth";
 
 const InputField = ({ id, value, onChange, placeholder, disabled }) => (
   <div className="mb-2">

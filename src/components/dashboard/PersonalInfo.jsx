@@ -29,7 +29,7 @@ const formatPersianDate = (date) => {
 const PersonalInfo = ({ user }) => {
   const handleBecomeHost = async () => {
     try {
-      const response = await axios.put('http://portal1.jatajar.com/api/client/profile/vendor');
+      const response = await axios.put('https://portal1.jatajar.com/api/client/profile/vendor');
       toast.success('Request sent successfully!');
       console.log('API response:', response.data);
     } catch (error) {

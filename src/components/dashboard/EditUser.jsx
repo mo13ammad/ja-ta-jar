@@ -70,7 +70,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     onEditStart(); // Notify Dashboard to show spinner
 
     try {
-      const response = await axios.put("http://portal1.jatajar.com/api/client/profile", {
+      const response = await axios.put("https://portal1.jatajar.com/api/client/profile", {
         first_name: firstName,
         last_name: lastName,
         national_code: nationalCode,

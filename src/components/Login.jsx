@@ -16,7 +16,7 @@ const Login = () => {
     try {
       console.log("Sending request with phone number:", phone); // Debugging line
       const response = await axios.post(
-        "http://portal1.jatajar.com/api/auth/authenticate",
+        "https://portal1.jatajar.com/api/auth/authenticate",
         { phone }
       );
 

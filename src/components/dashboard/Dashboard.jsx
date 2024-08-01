@@ -8,7 +8,7 @@ import Spinner from "../Spinner"; // Import Spinner component
 import toast, { Toaster } from "react-hot-toast";
 
 function Dashboard() {
-  const API_BASE_URL = "http://portal1.jatajar.com/api";
+  const API_BASE_URL = "https://portal1.jatajar.com/api";
   const location = useLocation();
   const navigate = useNavigate();
   const token = location.state?.token || ""; // Get the token from location.state

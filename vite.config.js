@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://portal1.jatajar.com/',
+        target: 'https://portal1.jatajar.com/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
