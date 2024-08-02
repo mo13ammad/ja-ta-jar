@@ -57,7 +57,7 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
               )}
               {userData.type !== "User" && (
                 <Tab.Panel>
-                  <Houses />
+                  <Houses  token={token} user={userData}/>
                 </Tab.Panel>
               )}
             </Tab.Panels>
