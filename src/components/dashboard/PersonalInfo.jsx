@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import jalaali from 'jalaali-js';
@@ -23,24 +23,41 @@ const formatPersianDate = (date) => {
   return `${yearFormatted} ${monthFormatted} ${dayFormatted}`;
 };
 
-const PersonalInfo = ({ user, token }) => {
+const PersonalInfo = ({ user, token, onUpdate }) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(''); // State for error message
+
   const handleBecomeHost = async () => {
+    setLoading(true); // Set loading to true when the request starts
+    setError(''); // Clear any previous error
+
     try {
-      const response = await axios.put('https://portal1.jatajar.com/api/client/profile/vendor', {
-        headers: {
-          Authorization: `Bearer ${token}` // Pass the token in the headers
+      const response = await axios.put(
+        'https://portal1.jatajar.com/api/client/profile/vendor',
+        {}, // No data required
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // Pass the token in the headers
+          }
         }
-      });
+      );
       toast.success('Request sent successfully!');
       console.log('API response:', response.data);
+      
+      // Refresh the profile data
+      if (onUpdate) {
+        onUpdate();
+      }
     } catch (error) {
       console.error('Error during request:', error);
       if (error.response) {
         console.error('Error details:', error.response.data);
-        toast.error(error.response.data.message || 'An unexpected error occurred.');
+        setError(error.response.data.message || 'An unexpected error occurred.');
       } else {
-        toast.error('An unexpected error occurred.');
+        setError('An unexpected error occurred.');
       }
+    } finally {
+      setLoading(false); // Reset loading state after request
     }
   };
 
@@ -53,6 +70,9 @@ const PersonalInfo = ({ user, token }) => {
   const cityName = user?.city?.name ? user.city.name : 'شهر نامشخص';
   const sexLabel = user?.sex?.label ? user.sex.label : 'جنسیت نامشخص';
   const birthDate = formatPersianDate(user?.birth_date);
+
+  // Check if the user type is "Vendor" to conditionally render the button
+  const isVendor = user?.type === 'Vendor';
 
   return (
     <div className="w-full">
@@ -96,14 +116,19 @@ const PersonalInfo = ({ user, token }) => {
             <div className="text-sm opacity-90">{user.bio !== null ? user.bio : "اطلاعاتی وارد نشده"}</div>
           </div>
         </div>
-        <div className="mt-6 flex justify-start">
-          <button
-            className="px-7 py-2 text-center text-white bg-green-500 hover:bg-green-600 transition align-middle border-0 rounded-lg shadow-md text-sm"
-            onClick={handleBecomeHost}
-          >
-            میزبان شوید
-          </button>
-        </div>
+        {/* Conditionally render the button based on user type */}
+        {!isVendor && (
+          <div className="mt-6 flex flex-col items-start">
+            <button
+              className={`px-7 py-2 text-center text-white bg-green-500 hover:bg-green-600 transition align-middle border-0 rounded-lg shadow-md text-sm ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={handleBecomeHost}
+              disabled={loading} // Disable button while loading
+            >
+              {loading ? 'در حال ارسال درخواست ...' : 'میزبان شوید'}
+            </button>
+            {error && <p className="mt-2 text-red-500 text-sm">{error}</p>} {/* Display error message */}
+          </div>
+        )}
       </div>
     </div>
   );

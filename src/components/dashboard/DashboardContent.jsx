@@ -11,7 +11,7 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
 
   const handleUpdateSuccess = () => {
     setIsGeneralLoading(true);
-    onUpdate();
+    onUpdate(); // Call the onUpdate prop function (fetchData)
     setTimeout(() => setIsGeneralLoading(false), 2000);
   };
 
@@ -42,7 +42,7 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
           <div className="col-span-1 lg:col-span-3 border p-4 rounded-xl bg-white">
             <Tab.Panels>
               <Tab.Panel>
-                <PersonalInfo user={userData} />
+                <PersonalInfo user={userData} token={token} onUpdate={onUpdate} />
               </Tab.Panel>
               {userData.type === "User" && (
                 <Tab.Panel>
