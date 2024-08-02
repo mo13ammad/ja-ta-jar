@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Radio, Label } from '@headlessui/react';
 
-// Define SVG components
+// Define SVG components (same as before)
 const VilaaiIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
@@ -27,7 +27,6 @@ const ApartmentIcon = () => (
   </svg>
 );
 
-// Define options with icons
 const options = [
   { key: 'Boomgardi', label: 'بوم گردی', icon: <BoomgardiIcon />, color: '#4bceff' },
   { key: 'Vilaai', label: 'ویلایی', icon: <VilaaiIcon />, color: '#42ff00' },
@@ -35,12 +34,70 @@ const options = [
   { key: 'Apartment', label: 'آپارتمان', icon: <ApartmentIcon />, color: '#ff0000' },
 ];
 
-const Houses = ({ token , user }) => {
+const Houses = ({ token }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options[0].key);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [houses, setHouses] = useState([]);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useEffect(() => {
+    const fetchHouses = async () => {
+      setIsDataLoaded(false);
+      try {
+        const response = await axios.get('https://portal1.jatajar.com/api/client/house', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.status === 200) {
+          setHouses(Array.isArray(response.data.data) ? response.data.data : []);
+          setIsDataLoaded(true);
+        } else {
+          throw new Error('Failed to fetch data: ' + response.statusText);
+        }
+      } catch (error) {
+        setError('Failed to fetch data: ' + error.message);
+        setIsDataLoaded(true);
+      }
+    };
+
+    fetchHouses();
+  }, [token]);
+
+  const handleEditClick = async (uuid) => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await axios.post(
+        `https://portal1.jatajar.com/api/client/house/${uuid}`,
+        { _method: 'PUT' },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess('Successfully updated.');
+        await fetchHouses();
+      } else {
+        throw new Error('Failed to update: ' + response.statusText);
+      }
+    } catch (error) {
+      setError('Failed to update: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -50,11 +107,11 @@ const Houses = ({ token , user }) => {
     try {
       const response = await axios.post(
         'https://portal1.jatajar.com/api/client/house',
-        { structure: selectedOption }, // Adjusted payload structure
+        { structure: selectedOption },
         {
           headers: {
-            'Authorization': `Bearer ${token}`, // Include the token in the headers
-            'Content-Type': 'application/json', // Ensure the content type is JSON
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
           }
         }
       );
@@ -62,6 +119,7 @@ const Houses = ({ token , user }) => {
       if (response.status === 200) {
         setSuccess('Successfully added.');
         setIsOpen(false);
+        await fetchHouses();
       } else {
         throw new Error('Failed to add: ' + response.statusText);
       }
@@ -73,9 +131,44 @@ const Houses = ({ token , user }) => {
   };
 
   return (
-    <div className='w-full h-full p-1'>
-      <h2 className='text-xl'>اقامتگاه ها :</h2>
-      <p className='p-1'>اقامتگاهی وجود ندارد .</p>
+    <div className='w-full h-full p-4'>
+      <h2 className='text-xl mb-3'>اقامتگاه ها :</h2>
+      {isDataLoaded ? (
+        houses.length === 0 ? (
+          <p className='p-1'>اقامتگاهی وجود ندارد.</p>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            {houses.map((house) => (
+              <div key={house.uuid} className='border rounded-lg p-4 flex flex-col gap-2'>
+                <div className='flex gap-2'>
+                  <p className='font-semibold '>نوع اقامتگاه :</p>
+                  <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
+                </div>
+                <div className='flex gap-2'>
+                  <p className='font-semibold '>وضعیت :</p>
+                  <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
+                </div>
+                <div className='flex gap-2'>
+                  <p className='font-semibold '>نام :</p>
+                  <p className=''>{house.name || 'وارد نشده است'}</p>
+                </div>
+                <div className='flex gap-2'>
+                  <p className='font-semibold '>آدرس :</p>
+                  <p className='max-w-48 sm:max-w-52 md:max-w-60 2xl:max-w-92 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
+                </div>
+                <button 
+                  className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                  onClick={() => handleEditClick(house.uuid)}
+                >
+                  ویرایش
+                </button>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (
+        <p className='p-1'>در حال بارگذاری...</p>
+      )}
 
       <button 
         className='bg-green-600 px-4 py-2 rounded-xl text-white my-2'
