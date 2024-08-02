@@ -43,6 +43,7 @@ const Houses = ({ token }) => {
   const [success, setSuccess] = useState('');
   const [houses, setHouses] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState({}); // Added to track delete loading state
 
   useEffect(() => {
     const fetchHouses = async () => {
@@ -69,6 +70,28 @@ const Houses = ({ token }) => {
 
     fetchHouses();
   }, [token]);
+
+  const fetchHouses = async () => {
+    setIsDataLoaded(false);
+    try {
+      const response = await axios.get('https://portal1.jatajar.com/api/client/house', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (response.status === 200) {
+        setHouses(Array.isArray(response.data.data) ? response.data.data : []);
+        setIsDataLoaded(true);
+      } else {
+        throw new Error('Failed to fetch data: ' + response.statusText);
+      }
+    } catch (error) {
+      setError('Failed to fetch data: ' + error.message);
+      setIsDataLoaded(true);
+    }
+  };
 
   const handleEditClick = async (uuid) => {
     setLoading(true);
@@ -105,6 +128,35 @@ const Houses = ({ token }) => {
     setIsViewOpen(true);
   };
 
+  const handleDeleteClick = async (uuid) => {
+    setDeleteLoading((prevState) => ({ ...prevState, [uuid]: true }));
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await axios.delete(
+        `https://portal1.jatajar.com/api/client/house/${uuid}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess('Successfully deleted.');
+        await fetchHouses();
+      } else {
+        throw new Error('Failed to delete: ' + response.statusText);
+      }
+    } catch (error) {
+      setError('Failed to delete: ' + error.message);
+    } finally {
+      setDeleteLoading((prevState) => ({ ...prevState, [uuid]: false }));
+    }
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
@@ -139,7 +191,7 @@ const Houses = ({ token }) => {
   return (
     <div className='w-full h-full p-4'>
       <div className='w-full flex justify-between items-center mb-2'>
-        <h2 className='text-xl mb-3'>اقامتگاه ها :</h2>
+        <h2 className='text-xl'>اقامتگاه ها :</h2>
         <button
           className='bg-green-600 px-4 py-2 rounded-xl text-white'
           onClick={() => setIsOpen(true)}
@@ -178,10 +230,16 @@ const Houses = ({ token }) => {
                     ویرایش
                   </button>
                   <button
-                    className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                    className='bg-blue-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
                     onClick={() => handleViewClick(house)}
                   >
                     مشاهده
+                  </button>
+                  <button
+                    className='bg-red-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                    onClick={() => handleDeleteClick(house.uuid)}
+                  >
+                    {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
                   </button>
                 </div>
               </div>
