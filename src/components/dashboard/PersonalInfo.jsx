@@ -25,11 +25,11 @@ const formatPersianDate = (date) => {
 
 const PersonalInfo = ({ user, token, onUpdate }) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(''); // State for error message
+  const [errors, setErrors] = useState({}); // State for error messages
 
   const handleBecomeHost = async () => {
     setLoading(true); // Set loading to true when the request starts
-    setError(''); // Clear any previous error
+    setErrors({}); // Clear any previous errors
 
     try {
       const response = await axios.put(
@@ -52,9 +52,9 @@ const PersonalInfo = ({ user, token, onUpdate }) => {
       console.error('Error during request:', error);
       if (error.response) {
         console.error('Error details:', error.response.data);
-        setError(error.response.data.message || 'An unexpected error occurred.');
+        setErrors(error.response.data.errors.fields || {}); // Update errors state
       } else {
-        setError('An unexpected error occurred.');
+        setErrors({ general: 'An unexpected error occurred.' }); // Handle unexpected errors
       }
     } finally {
       setLoading(false); // Reset loading state after request
@@ -126,7 +126,20 @@ const PersonalInfo = ({ user, token, onUpdate }) => {
             >
               {loading ? 'در حال ارسال درخواست ...' : 'میزبان شوید'}
             </button>
-            {error && <p className="mt-2 text-red-500 text-sm">{error}</p>} {/* Display error message */}
+            {/* Display error messages */}
+            {Object.keys(errors).length > 0 && (
+              <div className="mt-4 text-red-500 text-sm">
+                {Object.keys(errors).map((key) => (
+                  <div key={key} className="mb-2">
+                    <ul className="list-disc list-inside">
+                      {errors[key].map((msg, index) => (
+                        <li key={index}>{msg}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

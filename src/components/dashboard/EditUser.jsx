@@ -201,7 +201,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           onFocus={() => setFocusedField('firstName')}
           onBlur={() => setFocusedField('')}
           className={`mt-1 p-2 border rounded-xl w-full ${errors.first_name ? 'border-red-500' : ''} ${focusedField === 'firstName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-          required
+         required
         />
         {renderErrorMessages(errors.first_name)}
       </div>
@@ -246,7 +246,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           onFocus={() => setFocusedField('email')}
           onBlur={() => setFocusedField('')}
           className={`mt-1 p-2 border rounded-xl w-full ${errors.email ? 'border-red-500' : ''} ${focusedField === 'email' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-          required
+        
         />
         {renderErrorMessages(errors.email)}
       </div>
@@ -320,7 +320,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           onBlur={() => setFocusedField('')}
           className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDate' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
           placeholder="YYYY/MM/DD"
-          required
+        
         />
         {renderErrorMessages(errors.birth_date)}
       </div>
