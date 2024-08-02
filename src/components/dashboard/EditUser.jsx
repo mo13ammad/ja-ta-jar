@@ -47,8 +47,23 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState("");
   const [initialGender, setInitialGender] = useState(gender);
-  const [avatar, setAvatar] = useState(null); // State for profile picture
-  const [bio, setBio] = useState(user.bio || ""); // State for biography
+  const [avatar, setAvatar] = useState(null);
+  const [bio, setBio] = useState(user.bio || "");
+
+  // Track initial values
+  const [initialValues, setInitialValues] = useState({
+    firstName: user.first_name || "",
+    lastName: user.last_name || "",
+    nationalCode: user.national_code || "",
+    email: user.email || "",
+    birthDate: gregorianToPersian(user.birth_date) || "",
+    gender: genderMap[user.sex] || "",
+    secondPhone: user.second_phone || "",
+    province: user.province_id || "",
+    city: user.city_id || "",
+    avatar: null,
+    bio: user.bio || ""
+  });
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -91,6 +106,19 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     setSelectedProvince(user.province_id || "");
     setSelectedCity(user.city_id || "");
     setInitialGender(genderMap[user.sex] || "");
+    setInitialValues({
+      firstName: user.first_name || "",
+      lastName: user.last_name || "",
+      nationalCode: user.national_code || "",
+      email: user.email || "",
+      birthDate: gregorianToPersian(user.birth_date) || "",
+      gender: genderMap[user.sex] || "",
+      secondPhone: user.second_phone || "",
+      province: user.province_id || "",
+      city: user.city_id || "",
+      avatar: null,
+      bio: user.bio || ""
+    });
   }, [user]);
 
   const handleEditSubmit = async (e) => {
@@ -98,28 +126,32 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     setLoading(true);
     onEditStart();
     setErrors({});
-
-    const updateData = {
-      first_name: firstName,
-      last_name: lastName,
-      national_code: nationalCode,
-      email,
-      birth_date: persianToGregorian(birthDate),
-      second_phone: secondPhone,
-      ...(gender && gender !== initialGender && gender !== '' && { sex: gender }), // Include gender only if changed and valid
-      ...(selectedCity && { city_id: selectedCity }),
-      avatar,
-      bio
-    };
-
+  
+    // Create FormData object
+    const formData = new FormData();
+    formData.append('first_name', firstName);
+    formData.append('_method', "PUT");
+    formData.append('last_name', lastName);
+    formData.append('national_code', nationalCode);
+    formData.append('email', email);
+    formData.append('birth_date', persianToGregorian(birthDate));
+    formData.append('second_phone', secondPhone);
+    formData.append('sex', gender);
+    formData.append('province_id', selectedProvince);
+    formData.append('city_id', selectedCity);
+    if (avatar) formData.append('avatar', avatar); // Append the file if provided
+    formData.append('bio', bio);
+  
     try {
-      const response = await axios.put("https://portal1.jatajar.com/api/client/profile", updateData, {
+      console.log("Submitting form data:", formData); // Log form data for debugging
+  
+      const response = await axios.post("https://portal1.jatajar.com/api/client/profile", formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         }
       });
-
+  
       console.log("API response:", response.data);
       onUpdate();
       toast.success("Profile updated successfully!");
@@ -139,6 +171,8 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       onEditEnd();
     }
   };
+  
+  
 
   const renderErrorMessages = (fieldErrors) => {
     if (!fieldErrors) return null;
