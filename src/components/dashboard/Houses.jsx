@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Radio, Label } from '@headlessui/react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const VilaaiIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -28,8 +29,8 @@ const ApartmentIcon = () => (
 
 const options = [
   { key: 'Boomgardi', label: 'بوم گردی', icon: <BoomgardiIcon />, color: '#4bceff' },
-  { key: 'Vilaai', label: 'ویلایی', icon: <VilaaiIcon />, color: '#42ff00' },
-  { key: 'Suite', label: 'سویت', icon: <SuiteIcon />, color: '#ceff0b' },
+  { key: 'Vilaii', label: 'ویلایی', icon: <VilaaiIcon />, color: '#42ff00' },
+  { key: 'Swit', label: 'سویت', icon: <SuiteIcon />, color: '#ceff0b' },
   { key: 'Apartment', label: 'آپارتمان', icon: <ApartmentIcon />, color: '#ff0000' },
 ];
 
@@ -161,7 +162,7 @@ const Houses = ({ token }) => {
     setLoading(true);
     setError('');
     setSuccess('');
-
+  
     try {
       const response = await axios.post(
         'https://portal1.jatajar.com/api/client/house',
@@ -173,23 +174,32 @@ const Houses = ({ token }) => {
           }
         }
       );
-
-      if (response.status === 200) {
+  
+      console.log('Add House Response:', response); // Log the response
+  
+      if (response.status === 201) {
         setSuccess('Successfully added.');
         setIsOpen(false);
+        toast.success('اقامتگاه اضافه شد'); // Show success toast
         await fetchHouses();
       } else {
-        throw new Error('Failed to add: ' + response.statusText);
+        throw new Error(response.statusText);
       }
     } catch (error) {
-      setError('Failed to add: ' + error.message);
+      if (error.response && error.response.data && error.response.data.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('Failed to add the house.');
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className='w-full h-full p-4'>
+      <Toaster /> {/* Add the Toaster component to show toast messages */}
       <div className='w-full flex justify-between items-center mb-2'>
         <h2 className='text-xl'>اقامتگاه ها :</h2>
         <button
@@ -230,7 +240,7 @@ const Houses = ({ token }) => {
                     ویرایش
                   </button>
                   <button
-                    className='bg-blue-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                    className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
                     onClick={() => handleViewClick(house)}
                   >
                     مشاهده
@@ -294,7 +304,6 @@ const Houses = ({ token }) => {
             </div>
 
             {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
           </DialogPanel>
         </div>
       </Dialog>
