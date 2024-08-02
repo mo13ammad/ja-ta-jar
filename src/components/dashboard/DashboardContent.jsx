@@ -38,8 +38,10 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
       )}
       <Tab.Group>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <ProfileSidebar user={userData} token={token} />
-          <div className="col-span-1 lg:col-span-3 border p-4 rounded-xl bg-white">
+          <div className="lg:max-h-[80vh] lg:overflow-auto">
+            <ProfileSidebar user={userData} token={token} />
+          </div>
+          <div className="col-span-1 lg:col-span-3 lg:max-h-[85vh] overflow-auto border p-4 rounded-xl bg-white">
             <Tab.Panels>
               <Tab.Panel>
                 <PersonalInfo user={userData} token={token} onUpdate={onUpdate} />

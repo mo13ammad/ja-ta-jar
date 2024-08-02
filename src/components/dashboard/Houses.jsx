@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Radio, Label } from '@headlessui/react';
 
-// Define SVG components (same as before)
 const VilaaiIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
@@ -36,6 +35,8 @@ const options = [
 
 const Houses = ({ token }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [selectedHouse, setSelectedHouse] = useState(null);
   const [selectedOption, setSelectedOption] = useState(options[0].key);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -99,6 +100,11 @@ const Houses = ({ token }) => {
     }
   };
 
+  const handleViewClick = (house) => {
+    setSelectedHouse(house);
+    setIsViewOpen(true);
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
@@ -132,7 +138,15 @@ const Houses = ({ token }) => {
 
   return (
     <div className='w-full h-full p-4'>
-      <h2 className='text-xl mb-3'>اقامتگاه ها :</h2>
+      <div className='w-full flex justify-between items-center mb-2'>
+        <h2 className='text-xl mb-3'>اقامتگاه ها :</h2>
+        <button
+          className='bg-green-600 px-4 py-2 rounded-xl text-white'
+          onClick={() => setIsOpen(true)}
+        >
+          اضافه کردن اقامتگاه
+        </button>
+      </div>
       {isDataLoaded ? (
         houses.length === 0 ? (
           <p className='p-1'>اقامتگاهی وجود ندارد.</p>
@@ -156,12 +170,20 @@ const Houses = ({ token }) => {
                   <p className='font-semibold '>آدرس :</p>
                   <p className='max-w-48 sm:max-w-52 md:max-w-60 2xl:max-w-92 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
                 </div>
-                <button 
-                  className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
-                  onClick={() => handleEditClick(house.uuid)}
-                >
-                  ویرایش
-                </button>
+                <div className='flex gap-2'>
+                  <button
+                    className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                    onClick={() => handleEditClick(house.uuid)}
+                  >
+                    ویرایش
+                  </button>
+                  <button
+                    className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+                    onClick={() => handleViewClick(house)}
+                  >
+                    مشاهده
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -170,14 +192,7 @@ const Houses = ({ token }) => {
         <p className='p-1'>در حال بارگذاری...</p>
       )}
 
-      <button 
-        className='bg-green-600 px-4 py-2 rounded-xl text-white my-2'
-        onClick={() => setIsOpen(true)}
-      >
-        اضافه کردن اقامتگاه
-      </button>
-
-      {/* Dialog Component */}
+      {/* Add House Dialog */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         {/* Background Blur Effect */}
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
@@ -185,7 +200,7 @@ const Houses = ({ token }) => {
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-xl w-full">
             <DialogTitle className="font-bold text-xl">افزودن اقامتگاه</DialogTitle>
             <Description>لطفاً نوع اقامتگاه خود را وارد کنید :</Description>
-            
+
             <div className="w-full">
               <RadioGroup value={selectedOption} onChange={setSelectedOption} className="grid grid-cols-2 gap-2">
                 {options.map((option) => (
@@ -206,13 +221,13 @@ const Houses = ({ token }) => {
             </div>
 
             <div className="flex gap-4 mt-4">
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="bg-gray-300 px-4 py-2 rounded-lg"
               >
                 لغو
               </button>
-              <button 
+              <button
                 onClick={handleSubmit}
                 className="bg-green-600 px-4 py-2 rounded-lg text-white"
               >
@@ -222,6 +237,45 @@ const Houses = ({ token }) => {
 
             {error && <p className="text-red-500">{error}</p>}
             {success && <p className="text-green-500">{success}</p>}
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* View House Dialog */}
+      <Dialog open={isViewOpen} onClose={() => setIsViewOpen(false)} className="relative z-50">
+        {/* Background Blur Effect */}
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-xl w-full">
+            <DialogTitle className="font-bold text-xl">مشاهده اقامتگاه</DialogTitle>
+            {selectedHouse && (
+              <>
+                <div className="flex gap-2">
+                  <p className="font-semibold">نوع اقامتگاه:</p>
+                  <p>{selectedHouse.structure ? selectedHouse.structure.label : 'وارد نشده است'}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="font-semibold">وضعیت:</p>
+                  <p>{selectedHouse.status ? selectedHouse.status.label : 'وارد نشده است'}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="font-semibold">نام:</p>
+                  <p>{selectedHouse.name || 'وارد نشده است'}</p>
+                </div>
+                <div className="flex gap-2">
+                  <p className="font-semibold">آدرس:</p>
+                  <p className=" text-sm">{selectedHouse.address?.address || 'وارد نشده است'}</p>
+                </div>
+              </>
+            )}
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => setIsViewOpen(false)}
+                className="bg-gray-300 px-4 py-2 rounded-lg"
+              >
+                بستن
+              </button>
+            </div>
           </DialogPanel>
         </div>
       </Dialog>
