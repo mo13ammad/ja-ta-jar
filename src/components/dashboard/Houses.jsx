@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Radio, Label } from '@headlessui/react';
+import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Label } from '@headlessui/react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const VilaaiIcon = () => (
@@ -35,6 +36,7 @@ const options = [
 ];
 
 const Houses = ({ token }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selectedHouse, setSelectedHouse] = useState(null);
@@ -44,7 +46,7 @@ const Houses = ({ token }) => {
   const [success, setSuccess] = useState('');
   const [houses, setHouses] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState({}); // Added to track delete loading state
+  const [deleteLoading, setDeleteLoading] = useState({});
 
   useEffect(() => {
     const fetchHouses = async () => {
@@ -95,33 +97,7 @@ const Houses = ({ token }) => {
   };
 
   const handleEditClick = async (uuid) => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const response = await axios.post(
-        `https://portal1.jatajar.com/api/client/house/${uuid}`,
-        { _method: 'PUT' },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
-        }
-      );
-
-      if (response.status === 200) {
-        setSuccess('Successfully updated.');
-        await fetchHouses();
-      } else {
-        throw new Error('Failed to update: ' + response.statusText);
-      }
-    } catch (error) {
-      setError('Failed to update: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
+    navigate(`/edit-house/${uuid}`, { state: { token } });
   };
 
   const handleViewClick = (house) => {
