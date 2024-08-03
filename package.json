@@ -5,6 +5,7 @@
   "type": "module",
   "proxy": "http://jatajar.viraup.com",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
@@ -31,7 +32,10 @@
     "react-hot-toast": "^2.4.1",
     "react-loader-spinner": "^6.1.6",
     "react-router-dom": "^6.24.1",
-    "react-spinners": "^0.14.1"
+    "react-slick": "^0.30.2",
+    "react-spinners": "^0.14.1",
+    "slick-carousel": "^1.8.1",
+    "swiper": "^11.1.9"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

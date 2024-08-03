@@ -4,13 +4,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["iranSans", "Arial", "sans-serif"],
+        sans: ["iransans", "Arial", "sans-serif"],
       },
-
       fontSize: {
         xs: "0.75rem",
       },
-    
     },
   },
   plugins: [],

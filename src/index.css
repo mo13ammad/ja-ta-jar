@@ -1,6 +1,30 @@
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+
+.slick-slide img {
+  outline: none; 
+  border: none; 
+}
+
+.slick-slide img:focus,
+.slick-slide img:active {
+  outline: none;
+  border: none; 
+}
+
+
+.slick-prev:before,
+.slick-next:before {
+  color: rgb(21, 202, 21); 
+}
 
 .dropdown-enter, .dropdown-leave-to {
   opacity: 0;
@@ -13,7 +37,6 @@
   visibility: visible;
   transition: opacity 0.5s ease, visibility 0.5s ease;
 }
-
 
 @layer base {
   @font-face {

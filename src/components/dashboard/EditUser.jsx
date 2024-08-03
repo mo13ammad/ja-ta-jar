@@ -62,7 +62,6 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState("");
-  const [initialGender, setInitialGender] = useState(gender);
   const [avatar, setAvatar] = useState(null);
   const [bio, setBio] = useState(user.bio || "");
 
@@ -117,17 +116,15 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     formData.append('national_code', nationalCode);
 
     // Check and append only if values have changed
-    if (email !== user.email) formData.append('email', email);
-    if (birthYear || birthMonth || birthDay) {
-      const birthDate = persianToGregorian(birthYear, birthMonth, birthDay);
-      formData.append('birth_date', birthDate);
-    }
-    if (secondPhone !== user.second_phone) formData.append('second_phone', secondPhone);
-    if (gender !== genderMap[user.sex]) formData.append('sex', gender);
-    if (selectedProvince !== user.province_id) formData.append('province_id', selectedProvince);
-    if (selectedCity !== user.city_id) formData.append('city_id', selectedCity);
-    if (avatar) formData.append('avatar', avatar); // Append the file if provided
-    if (bio !== user.bio) formData.append('bio', bio);
+     formData.append('email', email);
+     formData.append('birth_date', birthDate);
+    
+     formData.append('second_phone', secondPhone);
+     formData.append('sex', gender);
+     formData.append('province_id', selectedProvince);
+     formData.append('city_id', selectedCity);
+     formData.append('avatar', avatar); // Append the file if provided
+    formData.append('bio', bio);
 
     try {
       const response = await axios.post("https://portal1.jatajar.com/api/client/profile", formData, {
