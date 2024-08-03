@@ -27,7 +27,6 @@ function Dashboard() {
       });
       console.log("API response from get:", response.data);
       setData(response.data);
-      toast.success("Data fetched successfully!");
     } catch (error) {
       console.error("Error fetching profile data:", error);
       navigate("/login");

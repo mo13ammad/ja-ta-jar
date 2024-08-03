@@ -46,16 +46,18 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
               <Tab.Panel>
                 <PersonalInfo user={userData} token={token} onUpdate={onUpdate} />
               </Tab.Panel>
-              <Tab.Panel>
-                <EditUser
-                  user={userData}
-                  token={token}
-                  onUpdate={handleUpdateSuccess}
-                  onEditStart={handleEditStart}
-                  onEditEnd={handleEditEnd}
-                />
-              </Tab.Panel>
-              {userData.type !== "User" && (
+              {userData.type !== "Vendor" && (
+                <Tab.Panel>
+                  <EditUser
+                    user={userData}
+                    token={token}
+                    onUpdate={handleUpdateSuccess}
+                    onEditStart={handleEditStart}
+                    onEditEnd={handleEditEnd}
+                  />
+                </Tab.Panel>
+              )}
+              {userData.type === "Vendor" && (
                 <Tab.Panel>
                   <Houses token={token} user={userData} />
                 </Tab.Panel>

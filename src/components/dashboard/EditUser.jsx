@@ -138,7 +138,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       });
 
       onUpdate();
-      toast.success("Profile updated successfully!");
+      toast.success("اطلاعات شما با موفقیت ویرایش شد");
     } catch (error) {
       if (error.response) {
         const { data } = error.response;
@@ -147,7 +147,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         }
         toast.error(data.message || "An unexpected error occurred.");
       } else {
-        toast.error("An unexpected error occurred.");
+    toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید") 
       }
     } finally {
       setLoading(false);

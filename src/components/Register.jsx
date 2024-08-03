@@ -69,17 +69,17 @@ const Register = () => {
       console.log("API response:", response);
 
       // Pass token and user data to Dashboard
-      toast.success("Registration successful!");
+      toast.success("ورود موفقیت آمیز بود");
       navigate("/dashboard", { state: { userData: response.data, token: response.data.data.token } });
     } catch (error) {
       console.error("Error during registration:", error);
       if (error.response) {
         console.error("Error details:", error.response.data);
         toast.error(
-          error.response.data.message || "An unexpected error occurred."
+          error.response.data.message || "متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید"
         );
       } else {
-        toast.error("An unexpected error occurred.");
+        toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
       }
     } finally {
       setLoading(false);

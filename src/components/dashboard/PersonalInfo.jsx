@@ -41,7 +41,7 @@ const PersonalInfo = ({ user, token, onUpdate }) => {
           }
         }
       );
-      toast.success('Request sent successfully!');
+      toast.success('وضعیت شما به میزبان تغییر کرد');
       console.log('API response:', response.data);
       
       // Refresh the profile data
