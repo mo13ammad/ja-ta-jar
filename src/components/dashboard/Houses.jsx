@@ -98,6 +98,7 @@ const Houses = ({ token }) => {
 
   const handleEditClick = async (uuid) => {
     navigate(`/edit-house/${uuid}`, { state: { token } });
+    window.open(url, '_blank');
   };
 
   const handleViewClick = (house) => {

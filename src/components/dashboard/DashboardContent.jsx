@@ -42,11 +42,12 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
             <ProfileSidebar user={userData} token={token} />
           </div>
           <div className="col-span-1 lg:col-span-3 lg:max-h-[85vh] overflow-auto border p-4 rounded-xl bg-white">
+            
             <Tab.Panels>
               <Tab.Panel>
                 <PersonalInfo user={userData} token={token} onUpdate={onUpdate} />
               </Tab.Panel>
-              {userData.type === "User" && (
+              {userData.type === "User" ? (
                 <Tab.Panel>
                   <EditUser
                     user={userData}
@@ -56,10 +57,9 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
                     onEditEnd={handleEditEnd}
                   />
                 </Tab.Panel>
-              )}
-              {userData.type !== "User" && (
+              ) : (
                 <Tab.Panel>
-                  <Houses  token={token} user={userData}/>
+                  <Houses token={token} user={userData} />
                 </Tab.Panel>
               )}
             </Tab.Panels>

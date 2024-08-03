@@ -17,18 +17,32 @@ const genderMap = {
   'دیگر': 'Other'
 };
 
-const persianToGregorian = (persianDate) => {
-  if (!persianDate) return "";
-  const [year, month, day] = persianDate.split('/');
+const monthOptions = [
+  { key: '1', label: 'فروردین' },
+  { key: '2', label: 'اردیبهشت' },
+  { key: '3', label: 'خرداد' },
+  { key: '4', label: 'تیر' },
+  { key: '5', label: 'مرداد' },
+  { key: '6', label: 'شهریور' },
+  { key: '7', label: 'مهر' },
+  { key: '8', label: 'آبان' },
+  { key: '9', label: 'آذر' },
+  { key: '10', label: 'دی' },
+  { key: '11', label: 'بهمن' },
+  { key: '12', label: 'اسفند' }
+];
+
+const persianToGregorian = (year, month, day) => {
+  if (!year || !month || !day) return "";
   const gregorianDate = jalaali.toGregorian(parseInt(year), parseInt(month), parseInt(day));
   return `${gregorianDate.gy}-${String(gregorianDate.gm).padStart(2, '0')}-${String(gregorianDate.gd).padStart(2, '0')}`;
 };
 
 const gregorianToPersian = (gregorianDate) => {
-  if (!gregorianDate) return "";
+  if (!gregorianDate) return { year: "", month: "", day: "" };
   const [year, month, day] = gregorianDate.split('-');
   const persianDate = jalaali.toJalaali(parseInt(year), parseInt(month), parseInt(day));
-  return `${persianDate.jy}/${String(persianDate.jm).padStart(2, '0')}/${String(persianDate.jd).padStart(2, '0')}`;
+  return { year: persianDate.jy, month: String(persianDate.jm).padStart(2, '0'), day: String(persianDate.jd).padStart(2, '0') };
 };
 
 const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
@@ -36,7 +50,9 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [lastName, setLastName] = useState(user.last_name || "");
   const [nationalCode, setNationalCode] = useState(user.national_code || "");
   const [email, setEmail] = useState(user.email || "");
-  const [birthDate, setBirthDate] = useState(gregorianToPersian(user.birth_date) || "");
+  const [birthYear, setBirthYear] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthDay, setBirthDay] = useState("");
   const [gender, setGender] = useState(genderMap[user.sex] || "");
   const [secondPhone, setSecondPhone] = useState(user.second_phone || "");
   const [provinces, setProvinces] = useState([]);
@@ -50,20 +66,12 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [avatar, setAvatar] = useState(null);
   const [bio, setBio] = useState(user.bio || "");
 
-  // Track initial values
-  const [initialValues, setInitialValues] = useState({
-    firstName: user.first_name || "",
-    lastName: user.last_name || "",
-    nationalCode: user.national_code || "",
-    email: user.email || "",
-    birthDate: gregorianToPersian(user.birth_date) || "",
-    gender: genderMap[user.sex] || "",
-    secondPhone: user.second_phone || "",
-    province: user.province_id || "",
-    city: user.city_id || "",
-    avatar: null,
-    bio: user.bio || ""
-  });
+  useEffect(() => {
+    const { year, month, day } = gregorianToPersian(user.birth_date);
+    setBirthYear(year);
+    setBirthMonth(month);
+    setBirthDay(day);
+  }, [user.birth_date]);
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -95,68 +103,43 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     }
   }, [selectedProvince]);
 
-  useEffect(() => {
-    setFirstName(user.first_name || "");
-    setLastName(user.last_name || "");
-    setNationalCode(user.national_code || "");
-    setEmail(user.email || "");
-    setBirthDate(gregorianToPersian(user.birth_date) || "");
-    setGender(genderMap[user.sex] || "");
-    setSecondPhone(user.second_phone || "");
-    setSelectedProvince(user.province_id || "");
-    setSelectedCity(user.city_id || "");
-    setInitialGender(genderMap[user.sex] || "");
-    setInitialValues({
-      firstName: user.first_name || "",
-      lastName: user.last_name || "",
-      nationalCode: user.national_code || "",
-      email: user.email || "",
-      birthDate: gregorianToPersian(user.birth_date) || "",
-      gender: genderMap[user.sex] || "",
-      secondPhone: user.second_phone || "",
-      province: user.province_id || "",
-      city: user.city_id || "",
-      avatar: null,
-      bio: user.bio || ""
-    });
-  }, [user]);
-
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     onEditStart();
     setErrors({});
-  
+
     // Create FormData object
     const formData = new FormData();
     formData.append('first_name', firstName);
     formData.append('_method', "PUT");
     formData.append('last_name', lastName);
     formData.append('national_code', nationalCode);
-    formData.append('email', email);
-    formData.append('birth_date', persianToGregorian(birthDate));
-    formData.append('second_phone', secondPhone);
-    formData.append('sex', gender);
-    formData.append('province_id', selectedProvince);
-    formData.append('city_id', selectedCity);
+
+    // Check and append only if values have changed
+    if (email !== user.email) formData.append('email', email);
+    if (birthYear || birthMonth || birthDay) {
+      const birthDate = persianToGregorian(birthYear, birthMonth, birthDay);
+      formData.append('birth_date', birthDate);
+    }
+    if (secondPhone !== user.second_phone) formData.append('second_phone', secondPhone);
+    if (gender !== genderMap[user.sex]) formData.append('sex', gender);
+    if (selectedProvince !== user.province_id) formData.append('province_id', selectedProvince);
+    if (selectedCity !== user.city_id) formData.append('city_id', selectedCity);
     if (avatar) formData.append('avatar', avatar); // Append the file if provided
-    formData.append('bio', bio);
-  
+    if (bio !== user.bio) formData.append('bio', bio);
+
     try {
-      console.log("Submitting form data:", formData); // Log form data for debugging
-  
       const response = await axios.post("https://portal1.jatajar.com/api/client/profile", formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         }
       });
-  
-      console.log("API response:", response.data);
+
       onUpdate();
       toast.success("Profile updated successfully!");
     } catch (error) {
-      console.error("Error during profile update:", error);
       if (error.response) {
         const { data } = error.response;
         if (data.errors) {
@@ -171,8 +154,6 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       onEditEnd();
     }
   };
-  
-  
 
   const renderErrorMessages = (fieldErrors) => {
     if (!fieldErrors) return null;
@@ -246,7 +227,6 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           onFocus={() => setFocusedField('email')}
           onBlur={() => setFocusedField('')}
           className={`mt-1 p-2 border rounded-xl w-full ${errors.email ? 'border-red-500' : ''} ${focusedField === 'email' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-        
         />
         {renderErrorMessages(errors.email)}
       </div>
@@ -310,18 +290,51 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       </div>
 
       {/* Birth Date */}
-      <div>
+      <div className="flex flex-col gap-2">
         <label className="block text-sm font-medium text-gray-700">تاریخ تولد</label>
-        <input
-          type="text"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          onFocus={() => setFocusedField('birthDate')}
-          onBlur={() => setFocusedField('')}
-          className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDate' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-          placeholder="YYYY/MM/DD"
-        
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={birthYear}
+            onChange={(e) => setBirthYear(e.target.value)}
+            onFocus={() => setFocusedField('birthYear')}
+            onBlur={() => setFocusedField('')}
+            className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthYear' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+            placeholder="سال"
+          />
+          <Listbox value={birthMonth} onChange={setBirthMonth}>
+            {({ open }) => (
+              <>
+                <div className="relative mt-1 w-full">
+                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                    {monthOptions.find(option => option.key === birthMonth)?.label || 'ماه'}
+                  </span>
+                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
+                    <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </Listbox.Button>
+                  <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                    {monthOptions.map((option) => (
+                      <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === birthMonth ? 'bg-gray-100' : ''}`}>
+                        {option.label}
+                      </Listbox.Option>
+                    ))}
+                  </Listbox.Options>
+                </div>
+              </>
+            )}
+          </Listbox>
+          <input
+            type="text"
+            value={birthDay}
+            onChange={(e) => setBirthDay(e.target.value)}
+            onFocus={() => setFocusedField('birthDay')}
+            onBlur={() => setFocusedField('')}
+            className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDay' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+            placeholder="روز"
+          />
+        </div>
         {renderErrorMessages(errors.birth_date)}
       </div>
 
