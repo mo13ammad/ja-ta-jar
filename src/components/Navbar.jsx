@@ -54,7 +54,7 @@ function Navbar({ userName }) {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              className={`w-4 h-4 inline-block ml-1 ${
+              className={`w-4 h-4 inline-block mr-1 transition-all duration-300 ${
                 showUserDropdown ? "transform rotate-180" : ""
               }`}
             >
@@ -67,17 +67,12 @@ function Navbar({ userName }) {
             </svg>
           </button>
           {showUserDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-md py-1 text-sm text-gray-800 rtl">
+            <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-md py-1 text-sm text-gray-800 rtl">
               <ul className="list-reset">
                 <li className="px-4 py-2 hover:bg-green-50">
-                  <a href="/profile">Profile</a>
+                  <a href="/">صفحه اصلی</a>
                 </li>
-                <li className="px-4 py-2 hover:bg-green-50">
-                  <a href="/settings">Settings</a>
-                </li>
-                <li className="px-4 py-2 hover:bg-green-50">
-                  <a href="/logout">Logout</a>
-                </li>
+               
               </ul>
             </div>
           )}

@@ -89,7 +89,7 @@ const Register = () => {
   return (
     <>
       <Helmet>
-        <title>ثبت نام</title>
+        <title>{hasAccount ? "ورود" : "ثبت نام"}</title>
       </Helmet>
       <Toaster />
       <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
@@ -100,7 +100,9 @@ const Register = () => {
                 <img src={logo} alt="Logo" className="w-22 mx-auto" />
               </a>
             </div>
-            <div className="opacity-90 text-lg font-bold mb-5">ثبت نام</div>
+            <div className="opacity-90 text-lg font-bold mb-5">
+              {hasAccount ? "ورود" : "ثبت نام"}
+            </div>
             {loading}
 
             {!hasAccount && (
@@ -147,11 +149,11 @@ const Register = () => {
                 type="submit"
                 disabled={loading}
               >
-                {loading ? "در حال ارسال..." : "ارسال"}
+                {loading ? "در حال ارسال..." : hasAccount ? "ورود" : "ارسال"}
               </button>
             </div>
             <div className="text-xs opacity-80 leading-normal">
-              ثبت نام یا ورود شما به منظور پذیرش
+              {hasAccount ? "ورود شما به منظور پذیرش" : "ثبت نام شما به منظور پذیرش"}
               <a href="#" className="text-red-500 ml-1 mr-1">
                 قوانین و مقررات
               </a>

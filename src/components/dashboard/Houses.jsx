@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Label } from '@headlessui/react';
 import toast, { Toaster } from 'react-hot-toast';
+import Spinner from "../Spinner"; 
 
 const VilaaiIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -38,8 +39,6 @@ const options = [
 const Houses = ({ token }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [isViewOpen, setIsViewOpen] = useState(false);
-  const [selectedHouse, setSelectedHouse] = useState(null);
   const [selectedOption, setSelectedOption] = useState(options[0].key);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -98,12 +97,10 @@ const Houses = ({ token }) => {
 
   const handleEditClick = async (uuid) => {
     navigate(`/edit-house/${uuid}`, { state: { token } });
-    window.open(url, '_blank');
   };
 
-  const handleViewClick = (house) => {
-    setSelectedHouse(house);
-    setIsViewOpen(true);
+  const handleViewClick = (uuid) => {
+    navigate(`/house/${uuid}`, { state: { token } });
   };
 
   const handleDeleteClick = async (uuid) => {
@@ -187,55 +184,58 @@ const Houses = ({ token }) => {
         </button>
       </div>
       {isDataLoaded ? (
-        houses.length === 0 ? (
-          <p className='p-1'>اقامتگاهی وجود ندارد.</p>
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            {houses.map((house) => (
-              <div key={house.uuid} className='border rounded-lg p-4 flex flex-col gap-2'>
-                <div className='flex gap-2'>
-                  <p className='font-semibold '>نوع اقامتگاه :</p>
-                  <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2'>
-                  <p className='font-semibold '>وضعیت :</p>
-                  <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2'>
-                  <p className='font-semibold '>نام :</p>
-                  <p className=''>{house.name || 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2'>
-                  <p className='font-semibold '>آدرس :</p>
-                  <p className='max-w-48 sm:max-w-52 md:max-w-60 2xl:max-w-92 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2'>
-                  <button
-                    className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
-                    onClick={() => handleEditClick(house.uuid)}
-                  >
-                    ویرایش
-                  </button>
-                  <button
-                    className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
-                    onClick={() => handleViewClick(house)}
-                  >
-                    مشاهده
-                  </button>
-                  <button
-                    className='bg-red-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
-                    onClick={() => handleDeleteClick(house.uuid)}
-                  >
-                    {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
-                  </button>
-                </div>
-              </div>
-            ))}
+  houses.length === 0 ? (
+    <p className='p-1'>اقامتگاهی وجود ندارد.</p>
+  ) : (
+    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+      {houses.map((house) => (
+        <div key={house.uuid} className='border rounded-lg p-4 flex flex-col gap-2'>
+          <div className='flex gap-2'>
+            <p className='font-semibold '>نوع اقامتگاه :</p>
+            <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
           </div>
-        )
-      ) : (
-        <p className='p-1'>در حال بارگذاری...</p>
-      )}
+          <div className='flex gap-2'>
+            <p className='font-semibold '>وضعیت :</p>
+            <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
+          </div>
+          <div className='flex gap-2'>
+            <p className='font-semibold '>نام :</p>
+            <p className=''>{house.name || 'وارد نشده است'}</p>
+          </div>
+          <div className='flex gap-2'>
+            <p className='font-semibold '>آدرس :</p>
+            <p className='max-w-48 sm:max-w-52 md:max-w-60 2xl:max-w-92 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
+          </div>
+          <div className='flex gap-2'>
+            <button
+              className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              onClick={() => handleEditClick(house.uuid)}
+            >
+              ویرایش
+            </button>
+            <button
+              className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              onClick={() => handleViewClick(house.uuid)}
+            >
+              مشاهده
+            </button>
+            <button
+              className='bg-red-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              onClick={() => handleDeleteClick(house.uuid)}
+            >
+              {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+) : (
+  <div className='flex justify-center items-center w-full min-h-[50vh]'>
+    <Spinner />
+  </div>
+)}
+
 
       {/* Add House Dialog */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
@@ -281,45 +281,6 @@ const Houses = ({ token }) => {
             </div>
 
             {error && <p className="text-red-500">{error}</p>}
-          </DialogPanel>
-        </div>
-      </Dialog>
-
-      {/* View House Dialog */}
-      <Dialog open={isViewOpen} onClose={() => setIsViewOpen(false)} className="relative z-50">
-        {/* Background Blur Effect */}
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-xl w-full">
-            <DialogTitle className="font-bold text-xl">مشاهده اقامتگاه</DialogTitle>
-            {selectedHouse && (
-              <>
-                <div className="flex gap-2">
-                  <p className="font-semibold">نوع اقامتگاه:</p>
-                  <p>{selectedHouse.structure ? selectedHouse.structure.label : 'وارد نشده است'}</p>
-                </div>
-                <div className="flex gap-2">
-                  <p className="font-semibold">وضعیت:</p>
-                  <p>{selectedHouse.status ? selectedHouse.status.label : 'وارد نشده است'}</p>
-                </div>
-                <div className="flex gap-2">
-                  <p className="font-semibold">نام:</p>
-                  <p>{selectedHouse.name || 'وارد نشده است'}</p>
-                </div>
-                <div className="flex gap-2">
-                  <p className="font-semibold">آدرس:</p>
-                  <p className=" text-sm">{selectedHouse.address?.address || 'وارد نشده است'}</p>
-                </div>
-              </>
-            )}
-            <div className="flex gap-4 mt-4">
-              <button
-                onClick={() => setIsViewOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded-lg"
-              >
-                بستن
-              </button>
-            </div>
           </DialogPanel>
         </div>
       </Dialog>
