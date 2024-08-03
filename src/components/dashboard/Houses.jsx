@@ -152,10 +152,11 @@ const Houses = ({ token }) => {
       console.log('Add House Response:', response); // Log the response
   
       if (response.status === 201) {
+        const { uuid } = response.data.data; // Assuming the response data contains the house's uuid
         setSuccess('Successfully added.');
         setIsOpen(false);
         toast.success('اقامتگاه اضافه شد'); // Show success toast
-        await fetchHouses();
+        navigate(`/edit-house/${uuid}`, { state: { token } }); // Navigate to the edit-house page with the new uuid
       } else {
         throw new Error(response.statusText);
       }

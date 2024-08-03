@@ -5,7 +5,6 @@ import jalaali from "jalaali-js";
 import { Listbox } from "@headlessui/react";
 
 const genderOptions = [
-  { key: '', label: 'انتخاب جنسیت' },
   { key: 'Male', label: 'مرد' },
   { key: 'Female', label: 'زن' },
   { key: 'Other', label: 'دیگر' }
@@ -53,7 +52,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
-  const [gender, setGender] = useState(genderMap[user.sex] || "");
+  const [gender, setGender] = useState(user.sex || "");
   const [secondPhone, setSecondPhone] = useState(user.second_phone || "");
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
@@ -64,6 +63,11 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [focusedField, setFocusedField] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [bio, setBio] = useState(user.bio || "");
+
+  const [genderOpen, setGenderOpen] = useState(false);
+  const [provinceOpen, setProvinceOpen] = useState(false);
+  const [cityOpen, setCityOpen] = useState(false);
+  const [birthMonthOpen, setBirthMonthOpen] = useState(false);
 
   useEffect(() => {
     const { year, month, day } = gregorianToPersian(user.birth_date);
@@ -110,20 +114,19 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
 
     // Create FormData object
     const formData = new FormData();
+    formData.append('_method', 'PUT');
+
+    // Append original and updated values
     formData.append('first_name', firstName);
-    formData.append('_method', "PUT");
     formData.append('last_name', lastName);
     formData.append('national_code', nationalCode);
-
-    // Check and append only if values have changed
-     formData.append('email', email);
-     formData.append('birth_date', birthDate);
-    
-     formData.append('second_phone', secondPhone);
-     formData.append('sex', gender);
-     formData.append('province_id', selectedProvince);
-     formData.append('city_id', selectedCity);
-     formData.append('avatar', avatar); // Append the file if provided
+    formData.append('email', email);
+    formData.append('birth_date', persianToGregorian(birthYear, birthMonth, birthDay));
+    formData.append('second_phone', secondPhone);
+    formData.append('sex', gender);
+    formData.append('province_id', selectedProvince);
+    formData.append('city_id', selectedCity);
+    if (avatar) formData.append('avatar', avatar); // Append the file if provided
     formData.append('bio', bio);
 
     try {
@@ -179,7 +182,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           onFocus={() => setFocusedField('firstName')}
           onBlur={() => setFocusedField('')}
           className={`mt-1 p-2 border rounded-xl w-full ${errors.first_name ? 'border-red-500' : ''} ${focusedField === 'firstName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-         required
+          required
         />
         {renderErrorMessages(errors.first_name)}
       </div>
@@ -231,7 +234,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       {/* Province */}
       <div>
         <label className="block text-sm font-medium text-gray-700">استان</label>
-        <Listbox value={selectedProvince} onChange={setSelectedProvince}>
+        <Listbox value={selectedProvince} onChange={setSelectedProvince} open={provinceOpen} onClick={() => setProvinceOpen(!provinceOpen)}>
           {({ open }) => (
             <>
               <div className="relative mt-1">
@@ -260,7 +263,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       {/* City */}
       <div>
         <label className="block text-sm font-medium text-gray-700">شهر</label>
-        <Listbox value={selectedCity} onChange={setSelectedCity} disabled={!selectedProvince}>
+        <Listbox value={selectedCity} onChange={setSelectedCity} open={cityOpen} onClick={() => setCityOpen(!cityOpen)} disabled={!selectedProvince}>
           {({ open }) => (
             <>
               <div className="relative mt-1">
@@ -299,7 +302,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthYear' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             placeholder="سال"
           />
-          <Listbox value={birthMonth} onChange={setBirthMonth}>
+          <Listbox value={birthMonth} onChange={setBirthMonth} open={birthMonthOpen} onClick={() => setBirthMonthOpen(!birthMonthOpen)}>
             {({ open }) => (
               <>
                 <div className="relative mt-1 w-full">
@@ -338,7 +341,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
       {/* Gender */}
       <div>
         <label className="block text-sm font-medium text-gray-700">جنسیت</label>
-        <Listbox value={gender} onChange={setGender}>
+        <Listbox value={gender} onChange={setGender} open={genderOpen} onClick={() => setGenderOpen(!genderOpen)}>
           {({ open }) => (
             <>
               <div className="relative mt-1">
