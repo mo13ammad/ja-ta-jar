@@ -1,4 +1,3 @@
-// EditHouseSidebar.jsx
 import React from "react";
 import { Disclosure, Tab } from "@headlessui/react";
 
@@ -17,9 +16,15 @@ const ChevronIcon = ({ open }) => (
 
 const EditHouseSidebar = ({ tabs }) => {
   const sections = [
-    { label: "اطلاعات اقامتگاه", keys: ["general", "equipment", "costs"] },
-    { label: "جزئیات", keys: ["size", "interiorDesign", "security"] },
-    { label: "موقعیت مکانی", keys: ["address", "accessibility", "surroundings"] }
+    { label: "آدرس و موقعیت مکانی", keys: ["address", "location"] },
+    { label: "اطلاعات کلی", keys: ["generalInfo", "environmentInfo"] },
+    { label: "مشخصات اقامتگاه", keys: ["rooms", "bathrooms", "otherSpaces"] },
+    { label: "امکانات", keys: ["mainFacilities", "kitchenEquipment", "specialServices"] },
+    { label: "قوانین اقامتگاه", keys: ["reservationRules", "stayRules"] },
+    { label: "قیمت گذاری", keys: ["pricing"] },
+    { label: "تصاویر اقامتگاه", keys: ["images"] },
+    { label: "اطلاعات فردی", keys: ["personalInfo"] },
+    { label: "اطلاعات مالکیت", keys: ["ownershipInfo"] }
   ];
 
   return (

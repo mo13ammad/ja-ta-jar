@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.webp";
+import logo from "../assets/jatajarlogo.webp";
 import toast from "react-hot-toast";
 
 const Login = () => {
@@ -76,9 +76,9 @@ const Login = () => {
           </div>
           <div className="text-xs opacity-80 leading-normal">
             ثبت نام یا ورود شما به منظور پذیرش
-            <a href="#" className="text-red-500 ml-1 mr-1">
+           
               قوانین و مقررات
-            </a>
+            
             جات آجار می باشد.
           </div>
         </form>

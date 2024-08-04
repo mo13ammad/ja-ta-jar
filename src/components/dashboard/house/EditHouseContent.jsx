@@ -3,25 +3,39 @@ import { Tab } from "@headlessui/react";
 import EditHouseSidebar from "./EditHouseSidebar";
 import Spinner from "../../Spinner";
 import GeneralDetails from "./GeneralDetails";
-import EquipmentDetails from "./EquipmentDetails";
-import CostDetails from "./CostDetails";
-import SizeDetails from "./SizeDetails";
-import InteriorDesignDetails from "./InteriorDesignDetails";
-import SecurityDetails from "./SecurityDetails";
+import EnvironmentDetails from "./EnvironmentDetails";
+import RoomDetails from "./RoomDetails";
+import BathroomDetails from "./BathroomDetails";
+import OtherSpaceDetails from "./OtherSpaceDetails";
+import MainFacilityDetails from "./MainFacilityDetails";
+import KitchenEquipmentDetails from "./KitchenEquipmentDetails";
+import SpecialServiceDetails from "./SpecialServiceDetails";
+import ReservationRuleDetails from "./ReservationRuleDetails";
+import StayRuleDetails from "./StayRuleDetails";
+import PricingDetails from "./PricingDetails";
+import ImageDetails from "./ImageDetails";
+import PersonalInfoDetails from "./PersonalInfoDetails";
+import OwnershipInfoDetails from "./OwnershipInfoDetails";
 import AddressDetails from "./AddressDetails";
-import AccessibilityDetails from "./AccessibilityDetails";
-import SurroundingsDetails from "./SurroundingsDetails";
+import LocationDetails from "./LocationDetails";
 
 const tabs = [
-  { key: "general", label: "جزئیات عمومی" },
-  { key: "equipment", label: "تجهیزات" },
-  { key: "costs", label: "هزینه‌ها" },
-  { key: "size", label: "اندازه" },
-  { key: "interiorDesign", label: "طراحی داخلی" },
-  { key: "security", label: "امنیت" },
   { key: "address", label: "آدرس" },
-  { key: "accessibility", label: "دسترسی‌ها" },
-  { key: "surroundings", label: "محیط اطراف" }
+  { key: "location", label: "موقعیت مکانی" },
+  { key: "generalInfo", label: "اطلاعات اقامتگاه" },
+  { key: "environmentInfo", label: "اطلاعات محیطی" },
+  { key: "rooms", label: "اتاق‌ها و پذیرایی" },
+  { key: "bathrooms", label: "سرویس‌های بهداشتی و حمام" },
+  { key: "otherSpaces", label: "سایر فضاهای اقامتگاه" },
+  { key: "mainFacilities", label: "امکانات اصلی" },
+  { key: "kitchenEquipment", label: "تجهیزات آشپزخانه" },
+  { key: "specialServices", label: "خدمات ویژه" },
+  { key: "reservationRules", label: "قوانین رزرو" },
+  { key: "stayRules", label: "قوانین اقامت" },
+  { key: "pricing", label: "قیمت گذاری" },
+  { key: "images", label: "تصاویر اقامتگاه" },
+  { key: "personalInfo", label: "اطلاعات فردی" },
+  { key: "ownershipInfo", label: "اطلاعات مالکیت" }
 ];
 
 const EditHouseContent = ({ houseData, token, onUpdate }) => {
@@ -57,15 +71,22 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
             <Tab.Panels>
               {tabs.map((tab) => (
                 <Tab.Panel key={tab.key}>
-                  {tab.key === "general" && <GeneralDetails />}
-                  {tab.key === "equipment" && <EquipmentDetails />}
-                  {tab.key === "costs" && <CostDetails />}
-                  {tab.key === "size" && <SizeDetails />}
-                  {tab.key === "interiorDesign" && <InteriorDesignDetails />}
-                  {tab.key === "security" && <SecurityDetails />}
+                  {tab.key === "generalInfo" && <GeneralDetails />}
+                  {tab.key === "environmentInfo" && <EnvironmentDetails />}
+                  {tab.key === "rooms" && <RoomDetails />}
+                  {tab.key === "bathrooms" && <BathroomDetails />}
+                  {tab.key === "otherSpaces" && <OtherSpaceDetails />}
+                  {tab.key === "mainFacilities" && <MainFacilityDetails />}
+                  {tab.key === "kitchenEquipment" && <KitchenEquipmentDetails />}
+                  {tab.key === "specialServices" && <SpecialServiceDetails />}
+                  {tab.key === "reservationRules" && <ReservationRuleDetails />}
+                  {tab.key === "stayRules" && <StayRuleDetails />}
+                  {tab.key === "pricing" && <PricingDetails />}
+                  {tab.key === "images" && <ImageDetails />}
+                  {tab.key === "personalInfo" && <PersonalInfoDetails />}
+                  {tab.key === "ownershipInfo" && <OwnershipInfoDetails />}
                   {tab.key === "address" && <AddressDetails />}
-                  {tab.key === "accessibility" && <AccessibilityDetails />}
-                  {tab.key === "surroundings" && <SurroundingsDetails />}
+                  {tab.key === "location" && <LocationDetails />}
                 </Tab.Panel>
               ))}
             </Tab.Panels>

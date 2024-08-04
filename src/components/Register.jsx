@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.webp";
+import logo from "../assets/jatajarlogo.webp";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -153,10 +153,10 @@ const Register = () => {
               </button>
             </div>
             <div className="text-xs opacity-80 leading-normal">
-              {hasAccount ? "ورود شما به منظور پذیرش" : "ثبت نام شما به منظور پذیرش"}
-              <a href="#" className="text-red-500 ml-1 mr-1">
+         ورود شما به منظور پذیرش
+             
                 قوانین و مقررات
-              </a>
+              
               جات آجار می باشد.
             </div>
           </form>

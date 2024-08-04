@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Label } from '@headlessui/react';
 import toast, { Toaster } from 'react-hot-toast';
 import Spinner from "../Spinner"; 
+import ReactPaginate from 'react-paginate';
 
 const VilaaiIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
@@ -46,39 +47,17 @@ const Houses = ({ token }) => {
   const [houses, setHouses] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    const fetchHouses = async () => {
-      setIsDataLoaded(false);
-      try {
-        const response = await axios.get('https://portal1.jatajar.com/api/client/house', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
-        });
+    fetchHouses(currentPage);
+  }, [token, currentPage]);
 
-        console.log('Fetch Houses Response:', response); // Log the response here
-
-        if (response.status === 200) {
-          setHouses(Array.isArray(response.data.data) ? response.data.data : []);
-          setIsDataLoaded(true);
-        } else {
-          throw new Error('Failed to fetch data: ' + response.statusText);
-        }
-      } catch (error) {
-        setError('Failed to fetch data: ' + error.message);
-        setIsDataLoaded(true);
-      }
-    };
-
-    fetchHouses();
-  }, [token]);
-
-  const fetchHouses = async () => {
+  const fetchHouses = async (page) => {
     setIsDataLoaded(false);
     try {
-      const response = await axios.get('https://portal1.jatajar.com/api/client/house', {
+      const response = await axios.get(`https://portal1.jatajar.com/api/client/house?page=${page}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -89,6 +68,7 @@ const Houses = ({ token }) => {
 
       if (response.status === 200) {
         setHouses(Array.isArray(response.data.data) ? response.data.data : []);
+        setTotalPages(response.data.pagination.last_page);
         setIsDataLoaded(true);
       } else {
         throw new Error('Failed to fetch data: ' + response.statusText);
@@ -125,7 +105,7 @@ const Houses = ({ token }) => {
 
       if (response.status === 200) {
         setSuccess('Successfully deleted.');
-        await fetchHouses();
+        await fetchHouses(currentPage);
       } else {
         throw new Error('Failed to delete: ' + response.statusText);
       }
@@ -174,7 +154,11 @@ const Houses = ({ token }) => {
       setLoading(false);
     }
   };
-  
+
+  const handlePageClick = (data) => {
+    const selectedPage = data.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   return (
     <div className='w-full h-full p-4'>
@@ -189,58 +173,78 @@ const Houses = ({ token }) => {
         </button>
       </div>
       {isDataLoaded ? (
-  houses.length === 0 ? (
-    <p className='p-1'>اقامتگاهی وجود ندارد.</p>
-  ) : (
-    <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-      {houses.map((house) => (
-        <div key={house.uuid} className='border rounded-2xl flex justify-between items-center  gap-2 '>
-          <div className='px-3 py-2 w-full sm:w-3/5'>
-          <div className='flex gap-2 mb-2'>
-            <p className='font-semibold '>نام :</p>
-            <p className=''>{house.name || 'وارد نشده است'}</p>
+        houses.length === 0 ? (
+          <p className='p-1'>اقامتگاهی وجود ندارد.</p>
+        ) : (
+          <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
+            {houses.map((house) => (
+              <div key={house.uuid} className='border rounded-2xl flex justify-between items-center  gap-2 '>
+                <div className='px-3 py-2 w-full sm:w-3/5'>
+                <div className='flex gap-2 mb-2'>
+                  <p className='font-semibold '>نام :</p>
+                  <p className=''>{house.name || 'وارد نشده است'}</p>
+                </div>
+                <div className='flex gap-2 mb-2'>
+                  <p className='font-semibold '>نوع اقامتگاه :</p>
+                  <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
+                </div>
+                <div className='flex gap-2 mb-2'>
+                  <p className='font-semibold '>وضعیت :</p>
+                  <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
+                </div>
+               
+                <div className='flex gap-2'>
+                  <button
+                    className='bg-green-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
+                    onClick={() => handleEditClick(house.uuid)}
+                  >
+                    ویرایش
+                  </button>
+                  <button
+                    className='bg-gray-400 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
+                    onClick={() => handleViewClick(house.uuid)}
+                  >
+                    مشاهده
+                  </button>
+                  <button
+                    className='bg-red-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
+                    onClick={() => handleDeleteClick(house.uuid)}
+                  >
+                    {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
+                  </button>
+                </div>
+                </div>
+                <img src={house.image} className='hidden sm:block w-2/5 h-full object-cover rounded-tl-xl rounded-bl-xl' alt="" />
+              </div>
+            ))}
           </div>
-          <div className='flex gap-2 mb-2'>
-            <p className='font-semibold '>نوع اقامتگاه :</p>
-            <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
-          </div>
-          <div className='flex gap-2 mb-2'>
-            <p className='font-semibold '>وضعیت :</p>
-            <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
-          </div>
-         
-          <div className='flex gap-2'>
-            <button
-              className='bg-green-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-              onClick={() => handleEditClick(house.uuid)}
-            >
-              ویرایش
-            </button>
-            <button
-              className='bg-gray-400 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-              onClick={() => handleViewClick(house.uuid)}
-            >
-              مشاهده
-            </button>
-            <button
-              className='bg-red-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-              onClick={() => handleDeleteClick(house.uuid)}
-            >
-              {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
-            </button>
-          </div>
-          </div>
-          <img src={house.image} className='hidden sm:block w-2/5 h-full object-cover rounded-tl-xl rounded-bl-xl' alt="" />
+        )
+      ) : (
+        <div className='flex justify-center items-center w-full min-h-[50vh]'>
+          <Spinner />
         </div>
-      ))}
-    </div>
-  )
-) : (
-  <div className='flex justify-center items-center w-full min-h-[50vh]'>
-    <Spinner />
-  </div>
-)}
+      )}
 
+      {!loading && isDataLoaded && (
+        <div className="flex justify-center mt-4">
+          <ReactPaginate
+            previousLabel={<span className="ml-3">صفحه قبلی</span>}
+            nextLabel={"صفحه بعدی"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={totalPages}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            subContainerClassName={"pages pagination"}
+            activeClassName={"active"}
+            className="flex items-center space-x-2"
+            pageClassName="px-3 py-1.5 rounded-2xl bg-gray-200 hover:bg-gray-300 cursor-pointer"
+            activeLinkClassName="text-green-500"
+          />
+        </div>
+      )}
 
       {/* Add House Dialog */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">

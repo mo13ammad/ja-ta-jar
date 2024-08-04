@@ -8,6 +8,17 @@
 
 
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.pagination .pageClassName {
+  margin: 0 0.25rem;
+}
+
+
 
 .slick-slide img {
   outline: none; 
