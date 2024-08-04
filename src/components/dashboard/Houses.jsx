@@ -196,44 +196,41 @@ const Houses = ({ token }) => {
       {houses.map((house) => (
         <div key={house.uuid} className='border rounded-2xl flex justify-between items-center  gap-2 '>
           <div className='px-3 py-2 w-full sm:w-3/5'>
-          <div className='flex gap-2 mb-1'>
-            <p className='font-semibold '>نوع اقامتگاه :</p>
-            <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
-          </div>
-          <div className='flex gap-2 mb-1'>
-            <p className='font-semibold '>وضعیت :</p>
-            <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
-          </div>
-          <div className='flex gap-2 mb-1'>
+          <div className='flex gap-2 mb-2'>
             <p className='font-semibold '>نام :</p>
             <p className=''>{house.name || 'وارد نشده است'}</p>
           </div>
-          <div className='flex gap-2'>
-            <p className='font-semibold '>آدرس :</p>
-            <p className='max-w-36 sm:max-w-40  truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
+          <div className='flex gap-2 mb-2'>
+            <p className='font-semibold '>نوع اقامتگاه :</p>
+            <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
           </div>
+          <div className='flex gap-2 mb-2'>
+            <p className='font-semibold '>وضعیت :</p>
+            <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
+          </div>
+         
           <div className='flex gap-2'>
             <button
-              className='bg-green-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              className='bg-green-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
               onClick={() => handleEditClick(house.uuid)}
             >
               ویرایش
             </button>
             <button
-              className='bg-gray-400 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              className='bg-gray-400 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
               onClick={() => handleViewClick(house.uuid)}
             >
               مشاهده
             </button>
             <button
-              className='bg-red-500 max-w-36 text-white px-2 py-2 rounded-lg mt-2'
+              className='bg-red-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
               onClick={() => handleDeleteClick(house.uuid)}
             >
               {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
             </button>
           </div>
           </div>
-          <img src={house.image} className='hidden sm:block w-2/5 max-h-44 object-cover rounded-tl-xl rounded-bl-xl' alt="" />
+          <img src={house.image} className='hidden sm:block w-2/5 h-full object-cover rounded-tl-xl rounded-bl-xl' alt="" />
         </div>
       ))}
     </div>
