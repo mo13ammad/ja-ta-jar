@@ -58,6 +58,8 @@ const Houses = ({ token }) => {
           }
         });
 
+        console.log('Fetch Houses Response:', response); // Log the response here
+
         if (response.status === 200) {
           setHouses(Array.isArray(response.data.data) ? response.data.data : []);
           setIsDataLoaded(true);
@@ -82,6 +84,8 @@ const Houses = ({ token }) => {
           'Content-Type': 'application/json',
         }
       });
+
+      console.log('Fetch Houses Response:', response); // Log the response here
 
       if (response.status === 200) {
         setHouses(Array.isArray(response.data.data) ? response.data.data : []);
@@ -190,22 +194,23 @@ const Houses = ({ token }) => {
   ) : (
     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
       {houses.map((house) => (
-        <div key={house.uuid} className='border rounded-lg p-4 flex flex-col gap-2'>
-          <div className='flex gap-2'>
+        <div key={house.uuid} className='border rounded-2xl flex justify-between items-center  gap-2 '>
+          <div className='px-3 py-1 w-3/5'>
+          <div className='flex gap-2 mb-1'>
             <p className='font-semibold '>نوع اقامتگاه :</p>
             <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex gap-2 mb-1'>
             <p className='font-semibold '>وضعیت :</p>
             <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex gap-2 mb-1'>
             <p className='font-semibold '>نام :</p>
             <p className=''>{house.name || 'وارد نشده است'}</p>
           </div>
           <div className='flex gap-2'>
             <p className='font-semibold '>آدرس :</p>
-            <p className='max-w-48 sm:max-w-52 md:max-w-60 2xl:max-w-92 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
+            <p className='max-w-24 sm:max-w-36 md:max-w-44 truncate text-sm'>{house.address?.address || 'وارد نشده است'}</p>
           </div>
           <div className='flex gap-2'>
             <button
@@ -227,6 +232,8 @@ const Houses = ({ token }) => {
               {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
             </button>
           </div>
+          </div>
+          <img src={house.image} className='w-2/5 max-h-44 object-cover rounded-tl-xl rounded-bl-xl' alt="" />
         </div>
       ))}
     </div>

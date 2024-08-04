@@ -23,7 +23,7 @@ const EditHousePage = () => {
         },
       });
       setHouseData(response.data.data); // Ensure response.data.data is used
-      toast.success('House data fetched successfully!');
+    
     } catch (error) {
       console.error('Error fetching house data:', error);
       toast.error('Failed to fetch house data.');
