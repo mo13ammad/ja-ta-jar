@@ -4,6 +4,7 @@ import Navbar from "../Navbar";
 import DashboardContent from "./DashboardContent";
 import axios from "axios";
 import Spinner from "../Spinner"; // Import Spinner component
+import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
 
 function Dashboard() {
@@ -68,6 +69,10 @@ function Dashboard() {
   }
 
   return (
+    <>
+     <Helmet>
+        <title>{"پروفایل"}</title>
+      </Helmet>
     <div className="min-h-[100vh] overflow-auto">
       <Navbar userName={data.data.name} />
       <DashboardContent
@@ -78,6 +83,7 @@ function Dashboard() {
         onEditEnd={handleEditEnd}
       />
     </div>
+    </>
   );
 }
 
