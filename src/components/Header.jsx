@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.webp";
+import logo from "../assets/jatajarlogo.webp";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +34,7 @@ function Header() {
   return (
     <div className="relative">
       <div className="h-14 md:h-16 bg-gray-100 flex items-center justify-between shadow-md px-4">
-        <img src={logo} alt="Logo" className="max-w-36" />
+        <img src={logo} alt="Logo" className="max-w-36 max-h-12 mr-5" />
 
         <button
           onClick={toggleMenu}
