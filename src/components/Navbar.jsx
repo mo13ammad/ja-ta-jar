@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.webp";
+import logo from "../assets/jatajarlogo.webp";
 
 function Navbar({ userName }) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -39,7 +39,7 @@ function Navbar({ userName }) {
 
         {/* Logo */}
         <a  href="./index.html">
-          <img className="w-28 md:w-32" src={logo} alt="Logo" />
+          <img className="max-w-28 md:max-w-32 max-h-14 pr-8"  src={logo} alt="Logo" />
         </a>
 
         {/* User Menu (Desktop) */}

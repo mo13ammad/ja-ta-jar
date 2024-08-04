@@ -156,8 +156,7 @@ const Houses = ({ token }) => {
   };
 
   const handlePageClick = (data) => {
-    const selectedPage = data.selected + 1;
-    setCurrentPage(selectedPage);
+    setCurrentPage(data.selected + 1);
   };
 
   return (
