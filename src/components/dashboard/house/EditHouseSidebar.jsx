@@ -81,9 +81,7 @@ const sections = [
   { label: "اطلاعات مالکیت", keys: ["ownershipInfo"], icon: <OwnerShipIcon /> }
 ];
 
-const EditHouseSidebar = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0].key);
-
+const EditHouseSidebar = ({ tabs, activeTab, setActiveTab }) => {
   return (
     <Tab.List>
       <div className="border w-full max-h-72 md:min-h-[80vh] lg:max-h-[80vh] overflow-auto rounded-xl flex flex-col justify-start items-center bg-white py-4 gap-y-2 px-2 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400">

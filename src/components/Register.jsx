@@ -97,7 +97,7 @@ const Register = () => {
           <form onSubmit={handleOtpSubmit}>
             <div className="mb-2">
               <a href="./index.html">
-                <img src={logo} alt="Logo" className="w-22 mx-auto" />
+                <img src={logo} alt="Logo" className="max-w-40 mx-auto" />
               </a>
             </div>
             <div className="opacity-90 text-lg font-bold mb-5">
