@@ -63,8 +63,10 @@ const ProfileSidebar = ({ user, token }) => {
         </svg>
       </a>
       {user.type === "Admin" && (
+        <form  action="https://portal1.jatajar.com/api/auth/login/admin" method="POST">
+          <input type="hidden" className="hidden" name="token"  value={token}/>
         <button
-          onClick={handleAdminPanelClick}
+          type="submit"
           className="text-sm opacity-80 border rounded-xl px-6 py-2 flex justify-center flex-row-reverse items-center hover:text-blue-600 hover:bg-blue-100 transition-all "
         >
           ورود به پنل ادمین
@@ -72,6 +74,7 @@ const ProfileSidebar = ({ user, token }) => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 3.75H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25h12A2.25 2.25 0 0 0 19.5 18V13.5m-9 0 3.75-3.75m0 0L10.5 6m3.75 3.75H21" />
           </svg>
         </button>
+        </form>
       )}
       <Tab.List className="border w-5/6 rounded-xl flex flex-col justify-center items-center p-2 gap-y-2">
         <Tab
