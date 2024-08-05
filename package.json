@@ -37,7 +37,8 @@
     "react-slick": "^0.30.2",
     "react-spinners": "^0.14.1",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.1.9"
+    "swiper": "^11.1.9",
+    "tailwind-scrollbar": "^3.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
