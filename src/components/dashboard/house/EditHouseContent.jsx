@@ -56,19 +56,19 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container relative mx-auto p-4  ">
       {isGeneralLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center   bg-black bg-opacity-50 z-50">
           <Spinner />
         </div>
       )}
       <Tab.Group>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <div className="lg:max-h-[80vh] lg:overflow-auto">
+        <div className="grid grid-cols-1  md:grid-cols-4 gap-4 ">
+          <div className="md:h-[80vh]  md:overflow-auto w-full">
             <EditHouseSidebar tabs={tabs} />
           </div>
-          <div className="col-span-1 lg:col-span-3 lg:max-h-[85vh] overflow-auto border p-4 rounded-xl bg-white">
-            <Tab.Panels>
+          <div className="col-span-1  md:col-span-3 md:max-h-[80vh] overflow-auto border p-4 rounded-xl bg-white scrollbar-thin">
+            <Tab.Panels >
               {tabs.map((tab) => (
                 <Tab.Panel key={tab.key}>
                   {tab.key === "generalInfo" && <GeneralDetails />}
@@ -90,7 +90,14 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
                 </Tab.Panel>
               ))}
             </Tab.Panels>
+            
           </div>
+          <div className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-3   left-5 sm:left-6 md:left-8 w-62 h-20 flex items-center  justify-center  ">
+        <button className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl">
+          ثبت اطلاعات
+        </button>
+      </div>
+
         </div>
       </Tab.Group>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../../Navbar';
 import EditHouseContent from './EditHouseContent';
 import Spinner from '../../Spinner';
@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 const EditHousePage = () => {
   const { uuid } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const token = location.state?.token || '';
 
   const [houseData, setHouseData] = useState(null);
@@ -23,10 +24,10 @@ const EditHousePage = () => {
         },
       });
       setHouseData(response.data.data); // Ensure response.data.data is used
-    
     } catch (error) {
       console.error('Error fetching house data:', error);
-      toast.error('Failed to fetch house data.');
+      toast.error('لطفا ابتدا وارد شوید');
+      navigate('/login'); // Redirect to login page on failure
     } finally {
       setLoading(false);
     }
@@ -46,17 +47,15 @@ const EditHousePage = () => {
   }
 
   if (!houseData) {
-    return (
-      <div className="min-h-[100vh] flex items-center justify-center">
-        <p>No house data available</p>
-      </div>
-    );
+    navigate('/login'); // Redirect to login page if no house data
+    return null; // Return null to avoid rendering anything before redirect
   }
 
   return (
-    <div className="min-h-[100vh] overflow-auto">
+    <div className="min-h-[100vh] ">
       <Navbar userName={houseData.ownerName} />
       <EditHouseContent houseData={houseData} token={token} onUpdate={fetchHouseData} />
+      
     </div>
   );
 };

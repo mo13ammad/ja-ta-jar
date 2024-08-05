@@ -2,7 +2,7 @@ import React from "react";
 
 const GeneralDetails = () => {
   return (
-    <div className="relative">
+    <div className="relative ">
       <div className="overflow-auto max-h-[80vh] pr-2">
         <div className="flex flex-col">
           <label className="text-gray-700">Field 1</label>

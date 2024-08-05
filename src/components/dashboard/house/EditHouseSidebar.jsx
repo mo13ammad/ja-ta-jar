@@ -8,7 +8,7 @@ const ChevronIcon = ({ open }) => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className={`size-5 transition duration-300 ${open ? "transform rotate-180" : ""}`}
+    className={`size-4 md:size-5 ml-2 mt-1 transition duration-300 ${open ? "transform rotate-180" : ""}`}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
   </svg>
@@ -86,17 +86,17 @@ const EditHouseSidebar = ({ tabs }) => {
 
   return (
     <Tab.List>
-      <div className="border w-full max-h-72 lg:min-h-[80vh] lg:max-h-[80vh] overflow-auto rounded-xl flex flex-col justify-start items-center bg-white py-4 gap-y-2 px-2 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400">
+      <div className="border w-full max-h-72 md:min-h-[80vh] lg:max-h-[80vh] overflow-auto rounded-xl flex flex-col justify-start items-center bg-white py-4 gap-y-2 px-2 scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-gray-400">
         {sections.map((section) => {
           const isActiveSection = section.keys.includes(activeTab);
           return (
             <Disclosure key={section.label}>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className={`flex justify-between w-full px-4 py-2 text-sm font-medium text-left bg-gray-100 rounded-lg focus:outline-none ${isActiveSection ? "text-green-600" : ""}`}>
+                  <Disclosure.Button className={`flex justify-between w-full lg:px-4 py-2 text-sm font-medium  bg-gray-100 rounded-lg focus:outline-none ${isActiveSection ? "text-green-600" : ""}`}>
                     <div className="flex items-center gap-2">
                       {section.icon}
-                      <span>{section.label}</span>
+                      <span className="md:text-xs">{section.label}</span>
                     </div>
                     <ChevronIcon open={open} />
                   </Disclosure.Button>
