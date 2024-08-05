@@ -8,7 +8,7 @@ const ChevronIcon = ({ open }) => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className={`size-4 md:size-5 ml-2 mt-1 transition duration-300 ${open ? "transform rotate-180" : ""}`}
+    className={`size-4 lg:size-5 ml-2 md:ml-1  xl:ml-2  transition duration-300 ${open ? "transform rotate-180" : ""}`}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
   </svg>
@@ -93,10 +93,10 @@ const EditHouseSidebar = ({ tabs }) => {
             <Disclosure key={section.label}>
               {({ open }) => (
                 <>
-                  <Disclosure.Button className={`flex justify-between w-full lg:px-4 py-2 text-sm font-medium  bg-gray-100 rounded-lg focus:outline-none ${isActiveSection ? "text-green-600" : ""}`}>
-                    <div className="flex items-center gap-2">
+                  <Disclosure.Button className={`flex justify-between items-center w-full lg:px-4 py-2 text-sm font-medium  bg-gray-100 rounded-lg focus:outline-none ${isActiveSection ? "text-green-600" : ""}`}>
+                    <div className="flex items-center gap-1">
                       {section.icon}
-                      <span className="md:text-xs">{section.label}</span>
+                      <span className="md:text-xs lg:text-sm truncate">{section.label}</span>
                     </div>
                     <ChevronIcon open={open} />
                   </Disclosure.Button>
@@ -108,7 +108,7 @@ const EditHouseSidebar = ({ tabs }) => {
                           <Tab
                             as="li"
                             key={key}
-                            className={`w-full text-right p-2 ${activeTab === key ? "text-green-600" : ""}`}
+                            className={`w-full text-right p-2 md:text-xs xl:text-sm  md:py- lg:p-2 ${activeTab === key ? "text-green-600" : ""}`}
                             onClick={() => setActiveTab(key)}
                           >
                             <button>{tab.label}</button>

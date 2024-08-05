@@ -92,8 +92,8 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
             </Tab.Panels>
             
           </div>
-          <div className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-3   left-5 sm:left-6 md:left-8 w-62 h-20 flex items-center  justify-center  ">
-        <button className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl">
+          <div className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-3   left-5 sm:left-6 md:left-8 lg:left-10 w-62 h-20 flex items-center  justify-center  ">
+        <button className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl">
           ثبت اطلاعات
         </button>
       </div>
