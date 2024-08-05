@@ -34,7 +34,7 @@ function Navbar({ userName }) {
 
         {/* Logo */}
         <a href="/">
-          <img className="max-w-28 md:max-w-32 max-h-14 pr-8" src={logo} alt="Logo" />
+          <img className="max-w-28 md:max-w-32 max-h-10 pr-8" src={logo} alt="Logo" />
         </a>
 
         {/* User Menu (Desktop) */}
@@ -43,7 +43,7 @@ function Navbar({ userName }) {
             className="flex items-center text-gray-700 p-3"
             onClick={toggleUserDropdown}
           >
-            <span>{userName || "User"}</span>
+            <span>{userName}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

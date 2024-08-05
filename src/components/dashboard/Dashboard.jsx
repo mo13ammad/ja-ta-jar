@@ -89,7 +89,7 @@ function Dashboard() {
         <title>{user?.name || "Dashboard"}</title>
       </Helmet>
       <div className="min-h-[100vh] overflow-auto">
-        <Navbar userName={user?.name} />
+        <Navbar userName={data.data.name} />
         <DashboardContent
           data={data}
           token={token}
