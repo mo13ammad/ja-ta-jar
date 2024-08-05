@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import Container from './components/Container';
 import Login from './components/Login';
 import Register from './components/Register';
+import Rules from './components/Rules'
+import Faq from './components/Faq'
 import Dashboard from './components/dashboard/Dashboard';
 import EditHousePage from './components/dashboard/house/EditHousePage'; // Import the new component
 import './index.css';
@@ -16,6 +18,8 @@ const App = () => (
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/rules" element={<Rules />} />
+      <Route path="/faq" element={<Faq />} />
       <Route path="/edit-house/:uuid" element={<EditHousePage />} /> {/* Add the new route */}
     </Routes>
   </div>
