@@ -11,8 +11,8 @@ function Dashboard() {
   const API_BASE_URL = "https://portal1.jatajar.com/api";
   const location = useLocation();
   const navigate = useNavigate();
-  const token = location.state?.token || localStorage.getItem('authToken'); // Get the token from location.state or local storage
-  let user = location.state?.user || localStorage.getItem('user');
+  const token = location.state?.token || localStorage.getItem('userToken'); // Get the user token from location.state or local storage
+  let user = location.state?.user || localStorage.getItem('userData');
 
   try {
     user = user ? JSON.parse(user) : null;
@@ -89,7 +89,7 @@ function Dashboard() {
         <title>{user?.name || "Dashboard"}</title>
       </Helmet>
       <div className="min-h-[100vh] overflow-auto">
-        <Navbar userName={user?.name} avatar={user?.avatar} />
+        <Navbar userName={user?.name} />
         <DashboardContent
           data={data}
           token={token}

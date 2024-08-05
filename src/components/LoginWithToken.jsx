@@ -19,13 +19,13 @@ const LoginWithToken = () => {
       // Send the token in the body of the POST request
       axios.post('https://portal1.jatajar.com/api/auth/login/token', { token })
         .then(response => {
-          const { token, user } = response.data.data;
-          // Save token and user data to local storage
-          localStorage.setItem('authToken', token);
-          localStorage.setItem('user', JSON.stringify(user));
+          const { token: userToken, user } = response.data.data;
+          // Save user token and user data to local storage under different keys
+          localStorage.setItem('userToken', userToken);
+          localStorage.setItem('userData', JSON.stringify(user));
 
           // Navigate to dashboard with token and user data
-          navigate('/dashboard', { state: { token, user } });
+          navigate('/dashboard', { state: { token: userToken, user } });
         })
         .catch(error => {
           console.error('Login with token failed:', error);
@@ -39,7 +39,7 @@ const LoginWithToken = () => {
 
   return (
     <div className="min-h-[100vh] flex items-center justify-center">
-      <Spinner/>
+      <Spinner />
     </div>
   );
 };
