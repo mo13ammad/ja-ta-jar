@@ -3,10 +3,11 @@ import { Routes, Route } from 'react-router-dom';
 import Container from './components/Container';
 import Login from './components/Login';
 import Register from './components/Register';
-import Rules from './components/Rules'
-import Faq from './components/Faq'
+import Rules from './components/Rules';
+import Faq from './components/Faq';
 import Dashboard from './components/dashboard/Dashboard';
 import EditHousePage from './components/dashboard/house/EditHousePage'; // Import the new component
+import LoginWithToken from './components/LoginWithToken'; // Import the new login with token component
 import './index.css';
 import { Toaster } from 'react-hot-toast';
 
@@ -21,6 +22,7 @@ const App = () => (
       <Route path="/rules" element={<Rules />} />
       <Route path="/faq" element={<Faq />} />
       <Route path="/edit-house/:uuid" element={<EditHousePage />} /> {/* Add the new route */}
+      <Route path="/panel/login-with-token" element={<LoginWithToken />} /> {/* Add the login with token route */}
     </Routes>
   </div>
 );

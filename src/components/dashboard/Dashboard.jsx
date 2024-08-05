@@ -11,7 +11,15 @@ function Dashboard() {
   const API_BASE_URL = "https://portal1.jatajar.com/api";
   const location = useLocation();
   const navigate = useNavigate();
-  const token = location.state?.token || ""; // Get the token from location.state
+  const token = location.state?.token || localStorage.getItem('authToken'); // Get the token from location.state or local storage
+  let user = location.state?.user || localStorage.getItem('user');
+
+  try {
+    user = user ? JSON.parse(user) : null;
+  } catch (e) {
+    console.error('Failed to parse user data:', e);
+    user = null;
+  }
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +38,10 @@ function Dashboard() {
       setData(response.data);
     } catch (error) {
       console.error("Error fetching profile data:", error);
-      navigate("/login");
+      if (error.response && error.response.status === 401) {
+        toast.error("Unauthorized access. Please login again.");
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
       setFetching(false); // Reset fetching state
@@ -46,7 +57,11 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    fetchData();
+    if (token) {
+      fetchData();
+    } else {
+      navigate('/login');
+    }
   }, [token, navigate]); // Dependency on token to refetch if it changes
 
   if (loading || fetching || editLoading) {
@@ -70,19 +85,19 @@ function Dashboard() {
 
   return (
     <>
-     <Helmet>
-        <title>{"پروفایل"}</title>
+      <Helmet>
+        <title>{user?.name || "Dashboard"}</title>
       </Helmet>
-    <div className="min-h-[100vh] overflow-auto">
-      <Navbar userName={data.data.name} />
-      <DashboardContent
-        data={data}
-        token={token}
-        onUpdate={fetchData}
-        onEditStart={handleEditStart}
-        onEditEnd={handleEditEnd}
-      />
-    </div>
+      <div className="min-h-[100vh] overflow-auto">
+        <Navbar userName={user?.name} avatar={user?.avatar} />
+        <DashboardContent
+          data={data}
+          token={token}
+          onUpdate={fetchData}
+          onEditStart={handleEditStart}
+          onEditEnd={handleEditEnd}
+        />
+      </div>
     </>
   );
 }
