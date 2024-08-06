@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Debug SSH connection
+        run: ssh -v -p 9011 jatajar@87.248.133.213 'exit'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
