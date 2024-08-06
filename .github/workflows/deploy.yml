@@ -17,6 +17,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
+      - name: Start SSH agent
+        run: |
+            eval $(ssh-agent -s)
+              ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
 
       - name: Install dependencies
         run: npm install
