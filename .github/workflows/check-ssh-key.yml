@@ -1,0 +1,16 @@
+name: Check SSH Key
+
+on: [push]
+
+jobs:
+  check-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Test SSH connection
+      run: ssh -T git@github.com
