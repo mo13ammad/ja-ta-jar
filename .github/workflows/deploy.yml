@@ -35,10 +35,6 @@ jobs:
           echo "[87.248.133.213]:9011 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNxdJsCPOCA1mB0J4TF3DXfdWoVIq6uBT7PnXab/1AjAdibqiGIicoc81+eXA44RK7sg1QqewRXp8/L0o+aIQl0=" >> ~/.ssh/known_hosts
           echo "[87.248.133.213]:9011 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHZDpxmCqmEInNiEf8qFjlJZjXzwCnn35lp5pj9J8IUn" >> ~/.ssh/known_hosts
 
-      - name: Start SSH agent
-        run: |
-          eval $(ssh-agent -s)
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
 
       - name: Deploy to server
         run: |
