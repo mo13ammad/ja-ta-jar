@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../assets/jatajarlogo.webp";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
+import Spinner from './Spinner'; // Import Spinner component
 
 const API_BASE_URL = "https://portal1.jatajar.com/api/auth";
 
@@ -35,6 +36,33 @@ const Register = () => {
   const navigate = useNavigate();
   const phone = location.state?.phone;
   const hasAccount = location.state?.hasAccount;
+
+  // Extract token from URL if present
+  let token = new URLSearchParams(location.search).get('token');
+  if (token) {
+    token = token.replace(/=+$/, '');
+  }
+
+  useEffect(() => {
+    if (token) {
+      // Send the token in the body of the POST request
+      axios.post('https://portal1.jatajar.com/api/auth/login/token', { token })
+        .then(response => {
+          const { token: userToken, user } = response.data.data;
+          // Save user token and user data to local storage under different keys
+          localStorage.setItem('userToken', userToken);
+          localStorage.setItem('userData', JSON.stringify(user));
+
+          // Navigate to dashboard with token and user data
+          navigate('/dashboard', { state: { token: userToken, user } });
+        })
+        .catch(error => {
+          console.error('Login with token failed:', error);
+          toast.error('Login with token failed. Please check the token or contact support.');
+          navigate('/login');
+        });
+    }
+  }, [token, navigate]);
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
@@ -92,6 +120,7 @@ const Register = () => {
         <title>{hasAccount ? "ورود" : "ثبت نام"}</title>
       </Helmet>
       <Toaster />
+      {loading && <Spinner />}
       <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
         <div className="rounded-2xl p-8 bg-gray-50 shadow-sm">
           <form onSubmit={handleOtpSubmit}>
@@ -103,8 +132,6 @@ const Register = () => {
             <div className="opacity-90 text-lg font-bold mb-5">
               {hasAccount ? "ورود" : "ثبت نام"}
             </div>
-            {loading}
-
             {!hasAccount && (
               <>
                 <div className="text-sm my-4 mt-7">نام:</div>
@@ -153,10 +180,8 @@ const Register = () => {
               </button>
             </div>
             <div className="text-xs opacity-80 leading-normal">
-         ورود شما به منظور پذیرش
-             
-                قوانین و مقررات
-              
+              ورود شما به منظور پذیرش
+              قوانین و مقررات
               جات آجار می باشد.
             </div>
           </form>
