@@ -34,13 +34,18 @@ jobs:
           echo "[87.248.133.213]:9011 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsVHSR2sE99UmJM3Cyn885NcGOA0Bd6xj2Q4xI8rVFyDdgKXiEYJM2yj8b65IMM51QWiMB8hmKEBNz/bBiHWIn1voETyz8LHXGGSU4VXItfnH98SXVtKLrRecE+7kZqVODtrkxVyA2wc4w+iHDaPjATf9+UqFMKtFFnZnTBkowQf+zOpg61FKbqXYyXvqW0rm5dtdqcPKCWL/cXPmXusLhKsTjFQk3tuh97UL7VHKF1Dx7BEUu02Y+8IE9JkGSlXzUd7hPyp2oydk/i9jos4oSnf6TPsxH4GwrDZeQtM9xGeWSY9DHGoNYkLcFjSLGV1L+wD3Y6uB4nQ2rtVgIUu27VD/1EiJiRPTfBTbQdDarzF0O7pvTzc1ChQih3SZCIxQFTV8gTic72yyYIQLsYESnVuBD/d6o55+VYtveZlBPBaVqZp87haEA/3RNQF4KnSnI0lKSxMlwpiVSegGLc5W2okRya/Xb3zq3KeP7hG74CoFnMje8rSo2hnJuDcfMVK8=" >> ~/.ssh/known_hosts
           echo "[87.248.133.213]:9011 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNxdJsCPOCA1mB0J4TF3DXfdWoVIq6uBT7PnXab/1AjAdibqiGIicoc81+eXA44RK7sg1QqewRXp8/L0o+aIQl0=" >> ~/.ssh/known_hosts
           echo "[87.248.133.213]:9011 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHZDpxmCqmEInNiEf8qFjlJZjXzwCnn35lp5pj9J8IUn" >> ~/.ssh/known_hosts
-
-
+      - name: Start SSH agent
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+      
       - name: Deploy to server
         run: |
-          ssh -p 9011 jatajar@87.248.133.213 'cd ja-ta-jar/ && git pull && npm install && npm run build'
+          ssh -i ~/.ssh/id_rsa -p 9011 jatajar@87.248.133.213 'cd ja-ta-jar/ && git pull && npm install && npm run build'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+
 
       - name: Debug SSH connection
         run: ssh -v -p 9011 jatajar@87.248.133.213 'exit'
