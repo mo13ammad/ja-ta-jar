@@ -1,6 +1,6 @@
 name: Check SSH Key
 
-on: [push]
+on: [git]
 
 jobs:
   check-ssh:
