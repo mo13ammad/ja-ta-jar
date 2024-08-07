@@ -86,7 +86,7 @@ function Dashboard() {
   return (
     <>
       <Helmet>
-        <title>{user?.name || "Dashboard"}</title>
+        <title>{"پروفایل"}</title>
       </Helmet>
       <div className="min-h-[100vh] overflow-auto">
         <Navbar userName={data.data.name} />
