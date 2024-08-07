@@ -45,8 +45,9 @@ const Register = () => {
 
   useEffect(() => {
     if (token) {
+      setLoading(true); // Show spinner immediately
       // Send the token in the body of the POST request
-      axios.post('https://portal1.jatajar.com/api/auth/login/token', { token })
+      axios.post(`${API_BASE_URL}/login/token`, { token })
         .then(response => {
           const { token: userToken, user } = response.data.data;
           // Save user token and user data to local storage under different keys
@@ -60,7 +61,8 @@ const Register = () => {
           console.error('Login with token failed:', error);
           toast.error('Login with token failed. Please check the token or contact support.');
           navigate('/login');
-        });
+        })
+        .finally(() => setLoading(false)); // Hide spinner when done
     }
   }, [token, navigate]);
 
@@ -114,13 +116,20 @@ const Register = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-[100vh] flex items-center justify-center">
+        <Spinner /> {/* Show spinner */}
+      </div>
+    );
+  }
+
   return (
     <>
       <Helmet>
         <title>{hasAccount ? "ورود" : "ثبت نام"}</title>
       </Helmet>
       <Toaster />
-      {loading && <Spinner />}
       <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
         <div className="rounded-2xl p-8 bg-gray-50 shadow-sm">
           <form onSubmit={handleOtpSubmit}>
@@ -180,9 +189,7 @@ const Register = () => {
               </button>
             </div>
             <div className="text-xs opacity-80 leading-normal">
-              ورود شما به منظور پذیرش
-              قوانین و مقررات
-              جات آجار می باشد.
+              ورود شما به منظور پذیرش قوانین و مقررات جات آجار می باشد.
             </div>
           </form>
         </div>

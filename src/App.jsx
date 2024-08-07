@@ -21,6 +21,7 @@ const App = () => (
       <Route path="/rules" element={<Rules />} />
       <Route path="/faq" element={<Faq />} />
       <Route path="/edit-house/:uuid" element={<EditHousePage />} /> {/* Add the new route */}
+      <Route path="/panel/login-with-token" element={<Register />} />
     </Routes>
   </div>
 );
