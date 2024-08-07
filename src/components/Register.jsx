@@ -174,7 +174,7 @@ const Register = () => {
               id="code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="1234"
+              placeholder="6758"
               disabled={loading}
             />
             <div className="text-center mt-5 mb-3">
