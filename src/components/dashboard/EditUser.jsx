@@ -1,3 +1,4 @@
+// EditUser.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -156,6 +157,9 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
     );
   };
 
+  const isVendor = user.type === "Vendor";
+  const isDisabled = (field) => isVendor && !["bio", "avatar", "secondPhone", "email"].includes(field);
+
   return (
     <div className="relative">
       {loadingFetch && (
@@ -175,6 +179,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             onBlur={() => setFocusedField('')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.first_name ? 'border-red-500' : ''} ${focusedField === 'firstName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             required
+            disabled={isDisabled("firstName")}
           />
           {renderErrorMessages(errors.first_name)}
         </div>
@@ -190,6 +195,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             onBlur={() => setFocusedField('')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.last_name ? 'border-red-500' : ''} ${focusedField === 'lastName' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             required
+            disabled={isDisabled("lastName")}
           />
           {renderErrorMessages(errors.last_name)}
         </div>
@@ -205,6 +211,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             onBlur={() => setFocusedField('')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.national_code ? 'border-red-500' : ''} ${focusedField === 'nationalCode' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             required
+            disabled={isDisabled("nationalCode")}
           />
           {renderErrorMessages(errors.national_code)}
         </div>
@@ -219,6 +226,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             onFocus={() => setFocusedField('email')}
             onBlur={() => setFocusedField('')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.email ? 'border-red-500' : ''} ${focusedField === 'email' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+            disabled={isDisabled("email")}
           />
           {renderErrorMessages(errors.email)}
         </div>
@@ -255,7 +263,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700">شهر</label>
-          <Listbox value={selectedCity} onChange={setSelectedCity} open={cityOpen} onClick={() => setCityOpen(!cityOpen)} disabled={!selectedProvince}>
+          <Listbox value={selectedCity} onChange={setSelectedCity} open={cityOpen} onClick={() => setCityOpen(!cityOpen)} disabled={!selectedProvince || isDisabled("city")}>
             {({ open }) => (
               <>
                 <div className="relative mt-1">
@@ -293,6 +301,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
               onBlur={() => setFocusedField('')}
               className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthYear' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
               placeholder="سال 1367"
+              disabled={isDisabled("birthYear")}
             />
             <input
               type="text"
@@ -302,6 +311,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
               onBlur={() => setFocusedField('')}
               className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthMonth' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
               placeholder="ماه"
+              disabled={isDisabled("birthMonth")}
             />
             <input
               type="text"
@@ -311,6 +321,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
               onBlur={() => setFocusedField('')}
               className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDay' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
               placeholder="روز"
+              disabled={isDisabled("birthDay")}
             />
           </div>
           {renderErrorMessages(errors.birth_date)}
@@ -319,7 +330,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* Gender */}
         <div>
           <label className="block text-sm font-medium text-gray-700">جنسیت</label>
-          <Listbox value={gender} onChange={setGender} open={genderOpen} onClick={() => setGenderOpen(!genderOpen)}>
+          <Listbox value={gender} onChange={setGender} open={genderOpen} onClick={() => setGenderOpen(!genderOpen)} disabled={isDisabled("gender")}>
             {({ open }) => (
               <>
                 <div className="relative mt-1">
@@ -355,6 +366,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             onFocus={() => setFocusedField('secondPhone')}
             onBlur={() => setFocusedField('')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.second_phone ? 'border-red-500' : ''} ${focusedField === 'secondPhone' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+            disabled={isDisabled("secondPhone")}
           />
           {renderErrorMessages(errors.second_phone)}
         </div>

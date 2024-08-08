@@ -1,3 +1,4 @@
+// DashboardContent.jsx
 import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import ProfileSidebar from "./ProfileSidebar";
@@ -43,22 +44,20 @@ const DashboardContent = ({ data, token, onUpdate, onEditStart, onEditEnd }) => 
           </div>
           <div className="col-span-1 lg:col-span-3 lg:max-h-[85vh] overflow-auto scrollbar-thin border p-4 rounded-xl bg-white">
             <Tab.Panels>
-              <Tab.Panel>
+              <Tab.Panel key="profile">
                 <PersonalInfo user={userData} token={token} onUpdate={onUpdate} />
               </Tab.Panel>
-              {userData.type !== "Vendor" && (
-                <Tab.Panel>
-                  <EditUser
-                    user={userData}
-                    token={token}
-                    onUpdate={handleUpdateSuccess}
-                    onEditStart={handleEditStart}
-                    onEditEnd={handleEditEnd}
-                  />
-                </Tab.Panel>
-              )}
+              <Tab.Panel key="edit">
+                <EditUser
+                  user={userData}
+                  token={token}
+                  onUpdate={handleUpdateSuccess}
+                  onEditStart={handleEditStart}
+                  onEditEnd={handleEditEnd}
+                />
+              </Tab.Panel>
               {userData.type === "Vendor" && (
-                <Tab.Panel>
+                <Tab.Panel key="houses">
                   <Houses token={token} user={userData} />
                 </Tab.Panel>
               )}
