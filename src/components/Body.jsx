@@ -3,10 +3,10 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import Mizban from '../assets/mizban.jpg';
-import Beach from '../assets/1.png';
-import Mountain from '../assets/4.png';
-import Forest from '../assets/2.png';
-import Desert from '../assets/3.png';
+import Beach from '../assets/1.webp';
+import Mountain from '../assets/4.webp';
+import Forest from '../assets/2.webp';
+import Desert from '../assets/3.webp';
 
 function Body() {
   const settings = {
