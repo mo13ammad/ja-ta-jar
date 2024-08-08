@@ -26,8 +26,8 @@ const EditHousePage = () => {
       setHouseData(response.data.data); // Ensure response.data.data is used
     } catch (error) {
       console.error('Error fetching house data:', error);
-      toast.error('لطفا ابتدا وارد شوید');
-      navigate('/login'); // Redirect to login page on failure
+      toast.error("مشکلی پیش آمده لطفا به پشتیبانی اطلاع دهید");
+      navigate('/dashboard'); // Redirect to login page on failure
     } finally {
       setLoading(false);
     }
