@@ -1,12 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import Header from "./Header";
+import Navbar from "./Navbar";
 import Body from "./Body";
 
 function Container() {
   return (
-    <div className="">
-      <Header />
+    <div className="w-full overflow-x-hidden h-screen">
+      <Navbar />
       <Body />
     </div>
   );

@@ -18,7 +18,7 @@ function Body() {
   };
 
   return (
-    <div className="container min-h-96 mx-auto p-4 max-w-5xl bg- pt-8 ">
+    <div className=" container min-h-96 mx-auto p-4 max-w-5xl  pt-8 px-8 ">
       <img src={Mizban} alt="Mizban" className="w-full min-h-40  rounded-3xl" />
       
       <Slider {...settings} className="">

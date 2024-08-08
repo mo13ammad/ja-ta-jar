@@ -1,29 +1,36 @@
 import React, { useState } from "react";
 import logo from "../assets/jatajarlogo.webp";
 
-function Navbar({ userName }) {
+function Navbar() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const toggleMobileMenu = () => {
     setShowMobileMenu(!showMobileMenu);
   };
 
-  const toggleUserDropdown = () => {
-    setShowUserDropdown(!showUserDropdown);
-  };
-
   return (
-    <div>
-      <nav className="relative px-5 py-2 flex bg-gray-100 shadow-md flex-row-reverse lg:flex-row flex-wrap justify-between items-center">
+    <div className="w-full">
+      <nav className="relative w-full px-5 py-2 flex bg-gray-100 shadow-md flex-wrap justify-between items-center">
+        {/* Logo */}
+        <a href="/" className="ml-auto">
+          <img className="max-w-28 md:max-w-32 max-h-10" src={logo} alt="Logo" />
+        </a>
+
+        {/* Links in lg size */}
+        <div className="hidden lg:flex lg:items-center lg:mr-auto lg:space-x-4 lg:space-x-reverse">
+          <a href="/login" className="text-gray-700 hover:text-green-600">ورود | ثبت نام</a>
+ 
+      
+        </div>
+
         {/* Mobile Menu Button */}
-        <div className="order-1 lg:hidden">
+        <div className="lg:hidden">
           <button
-            className="navbar-burger flex items-center text-green-600 p-3"
+            className="text-green-600 p-3"
             onClick={toggleMobileMenu}
           >
             <svg
-              className="block h-4 w-4 fill-current"
+              className="block h-4 w-4"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -31,53 +38,18 @@ function Navbar({ userName }) {
             </svg>
           </button>
         </div>
-
-        {/* Logo */}
-        <a href="/">
-          <img className="max-w-28 md:max-w-32 max-h-10 pr-8" src={logo} alt="Logo" />
-        </a>
-
-        {/* User Menu (Desktop) */}
-        <div className="relative">
-          <button
-            className="flex items-center text-gray-700 p-3"
-            onClick={toggleUserDropdown}
-          >
-            <span>{userName}</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className={`w-4 h-4 inline-block mr-1 transition-all duration-300 ${
-                showUserDropdown ? "transform rotate-180" : ""
-              }`}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-          {showUserDropdown && (
-            <div className="absolute right-0 mt-2 w-36 bg-white rounded-lg shadow-md py-1 text-sm text-gray-800 rtl">
-              <ul className="list-reset">
-                <li className="px-4 py-2 hover:bg-green-50">
-                  <a href="/">صفحه اصلی</a>
-                </li>
-              </ul>
-            </div>
-          )}
-        </div>
       </nav>
 
       {/* Mobile Menu (Dropdowns) */}
       {showMobileMenu && (
-        <div className="lg:hidden">
-          <div className="flex flex-col items-center text-gray-700 bg-white w-full py-2 rtl">
-            {/* Add additional items as needed */}
+        <div className="lg:hidden w-full">
+          <div className="flex flex-col items-end text-gray-700 bg-white w-full overflow-hidden">
+            <a href="/login" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
+              ورود
+            </a>
+            <a href="/" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
+              صفحه اصلی
+            </a>
           </div>
         </div>
       )}
