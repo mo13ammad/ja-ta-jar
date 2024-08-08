@@ -88,7 +88,7 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
           {activeTab === "address" && <AddressDetails />}
           {activeTab === "location" && <LocationDetails />}
         </div>
-        <div className="absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-3 left-5 sm:left-6 md:left-8 lg:left-10 w-62 h-20 flex items-center justify-center">
+        <div className="hidden md:absolute bottom-0 sm:bottom-1 md:bottom-2 lg:bottom-3 left-5 sm:left-6 md:left-8 lg:left-10 w-62 h-20 md:flex items-center justify-center">
           <button className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl" onClick={handleUpdateSuccess}>
             ثبت اطلاعات
           </button>

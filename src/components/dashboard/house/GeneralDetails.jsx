@@ -11,7 +11,7 @@ const GeneralDetails = () => {
   const [description, setDescription] = useState('');
 
   return (
-    <div className="relative w-5/6 h-5/6">
+    <div className="relative md:w-5/6 md:h-5/6">
       <div className="overflow-auto scrollbar-thin max-h-[80vh] pr-2 w-full min-h-[70vh]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Name */}

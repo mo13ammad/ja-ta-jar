@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Listbox } from "@headlessui/react";
+import { Listbox, Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -24,6 +25,7 @@ const LocationDetails = () => {
   const [errors, setErrors] = useState({ province_id: null, city_id: null });
   const [location, setLocation] = useState({ lat: 35.6892, lng: 51.3890 }); // Default to Tehran
   const [markerPosition, setMarkerPosition] = useState(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -70,14 +72,16 @@ const LocationDetails = () => {
     return markerPosition ? <Marker position={markerPosition}></Marker> : null;
   };
 
+  const handleMapModalClose = () => setIsMapModalOpen(false);
+
   return (
-    <div className="relative w-5/6 h-5/6">
+    <div className="relative lg:w-5/6 lg:h-5/6">
       <Toaster />
-      <div className="overflow-auto scrollbar-thin max-h-[80vh] pr-2 w-full min-h-[70vh]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-1">
           {/* Province */}
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">استان</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">استان</label>
             <Listbox value={selectedProvince} onChange={setSelectedProvince} open={provinceOpen} onClick={() => setProvinceOpen(!provinceOpen)}>
               {({ open }) => (
                 <>
@@ -133,17 +137,84 @@ const LocationDetails = () => {
           </div>
         </div>
         {/* Map */}
-        <div className="mt-10">
+        <div className="mt-10 z-0">
           <label className="block text-sm font-medium text-gray-700 mb-2">انتخاب موقعیت</label>
-          <MapContainer center={location} zoom={13} scrollWheelZoom={false} className="h-64 rounded-xl">
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <LocationMarker />
-          </MapContainer>
+          <div className="block md:hidden">
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
+              onClick={() => setIsMapModalOpen(true)}
+            >
+              باز کردن نقشه
+            </button>
+          </div>
+          <div className="hidden md:block">
+            <MapContainer center={location} zoom={13} scrollWheelZoom={false} className="h-64 rounded-xl mb-4">
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <LocationMarker />
+            </MapContainer>
+          </div>
         </div>
       </div>
+
+      <Transition show={isMapModalOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={handleMapModalClose}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-10 overflow-y-auto">
+            <div className="flex items-center justify-center min-h-full p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl bg-white p-6 text-right align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    انتخاب موقعیت
+                  </Dialog.Title>
+                  <div className="mt-4">
+                    <MapContainer center={location} zoom={13} scrollWheelZoom={false} className="h-64 rounded-xl">
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <LocationMarker />
+                    </MapContainer>
+                  </div>
+                  <div className="mt-6">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center w-full rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm"
+                      onClick={handleMapModalClose}
+                    >
+                      بستن نقشه
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 };
