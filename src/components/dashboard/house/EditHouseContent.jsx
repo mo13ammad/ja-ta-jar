@@ -99,3 +99,4 @@ const EditHouseContent = ({ houseData, token, onUpdate }) => {
 };
 
 export default EditHouseContent;
+

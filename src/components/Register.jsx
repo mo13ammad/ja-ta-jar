@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import OtpInput from "react-otp-input";
 import logo from "../assets/jatajarlogo.webp";
 import { Helmet } from "react-helmet-async";
 import toast, { Toaster } from "react-hot-toast";
@@ -26,7 +27,7 @@ const InputField = ({ id, value, onChange, placeholder, disabled }) => (
 );
 
 const Register = () => {
-  const [code, setCode] = useState("");
+  const [otp, setOtp] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [nationalCode, setNationalCode] = useState("");
@@ -66,13 +67,18 @@ const Register = () => {
     }
   }, [token, navigate]);
 
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (otp.length === 4) {
+      handleOtpSubmit();
+    }
+  }, [otp]);
+
+  const handleOtpSubmit = async () => {
     setLoading(true);
 
     console.log("Submitting form with data:", {
       phone,
-      code,
+      code: otp,
       firstName,
       lastName,
       nationalCode,
@@ -84,12 +90,12 @@ const Register = () => {
       if (hasAccount) {
         response = await axios.post(`${API_BASE_URL}/login`, {
           phone,
-          code,
+          code: otp,
         });
       } else {
         response = await axios.post(`${API_BASE_URL}/register`, {
           phone,
-          code,
+          code: otp,
           first_name: firstName,
           last_name: lastName,
           national_code: nationalCode,
@@ -132,7 +138,7 @@ const Register = () => {
       <Toaster />
       <div className="flex justify-center items-center text-right h-screen w-80 sm:w-96 mx-auto">
         <div className="rounded-2xl p-8 bg-gray-50 shadow-sm">
-          <form onSubmit={handleOtpSubmit}>
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="mb-2">
               <a href="./index.html">
                 <img src={logo} alt="Logo" className="max-w-40 mx-auto" />
@@ -169,14 +175,33 @@ const Register = () => {
                 />
               </>
             )}
-            <div className="text-sm my-4 mt-7">کد تایید را وارد کنید:</div>
-            <InputField
-              id="code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="1234"
-              disabled={loading}
-            />
+            <div className="text-sm my-4 mt-7 w-full flex flex-col items-center">
+              <p className="self-start mb-3">لطفا کد تایید خود را وارد کنید :</p>
+              <div style={{ direction: 'ltr' }}>
+                <OtpInput
+                  value={otp}
+                  onChange={setOtp}
+                  numInputs={4}
+                  
+                  renderInput={(props) => (
+                    <input
+                      {...props}
+                      className="otp-input"
+                      style={{
+                        width: "2.5rem",
+                        height: "2.5rem",
+                        margin: "0 0.8rem",
+                        fontSize: "1rem",
+                        borderRadius: "12px",
+                        border: "1px solid #ced4da",
+                        textAlign: 'center',
+                        outline: "none"
+                      }}
+                    />
+                  )}
+                />
+              </div>
+            </div>
             <div className="text-center mt-5 mb-3">
               <button
                 className={`bg-green-500 font-bold hover:bg-green-600 transition-all duration-300 text-white rounded-2xl w-full py-2 ${
@@ -184,6 +209,7 @@ const Register = () => {
                 }`}
                 type="submit"
                 disabled={loading}
+                onClick={handleOtpSubmit}
               >
                 {loading ? "در حال ارسال..." : hasAccount ? "ورود" : "ارسال"}
               </button>
