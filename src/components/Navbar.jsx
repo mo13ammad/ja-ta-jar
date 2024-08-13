@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/jatajarlogo.webp";
 
-function Navbar() {
+function Navbar({userName}) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -18,10 +18,14 @@ function Navbar() {
 
         {/* Links in lg size */}
         <div className="hidden lg:flex lg:items-center lg:mr-auto lg:space-x-4 lg:space-x-reverse">
-          <a href="/login" className="text-gray-700 hover:text-green-600">ورود | ثبت نام</a>
- 
-      
-        </div>
+  {userName ? (
+    <p className="text-gray-700">{userName}</p>
+  ) : (
+    <a href="/login" className="text-gray-700 hover:text-green-600">
+      ورود | ثبت نام
+    </a>
+  )}
+</div>
 
         {/* Mobile Menu Button */}
         <div className="lg:hidden">

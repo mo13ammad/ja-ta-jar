@@ -88,13 +88,13 @@ const EditHouseSidebar = ({ activeTab, setActiveTab }) => {
         newOpenSections[section.label] = true;
       }
     });
-    setOpenSections(newOpenSections);
+    setOpenSections((prev) => ({ ...prev, ...newOpenSections }));
   }, [activeTab]);
 
   const handleToggle = (label) => {
     setOpenSections((prev) => ({
       ...prev,
-      [label]: !prev[label],
+      [label]: !prev[label], // Toggle the specific section's open state without affecting others
     }));
   };
 
