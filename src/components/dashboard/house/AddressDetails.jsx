@@ -1,15 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 
-const AddressDetails = () => {
-  const [address, setAddress] = useState('');
-  const [neighborhood, setNeighborhood] = useState('');
-  const [floor, setFloor] = useState('');
-  const [plaqueNumber, setPlaqueNumber] = useState('');
-  const [errors, setErrors] = useState({ address: null, neighborhood: null, floor: null, plaqueNumber: null });
+const AddressDetails = ({ data, onChange, errors, renderErrorMessages }) => {
+ 
+  // Initialize the state with direct string values
+  const [address, setAddress] = useState(data?.address?.address || '');
+  const [neighborhood, setNeighborhood] = useState(data?.address?.village_name || '');
+  const [floor, setFloor] = useState(data?.address?.floor || '');
+  const [plaqueNumber, setPlaqueNumber] = useState(data?.address?.house_number || '');
+  const [postalCode, setPostalCode] = useState(data?.address?.postal_code || '');
 
-  const renderErrorMessages = (error) => {
-    return error ? <div className="text-red-500 text-sm">{error}</div> : null;
+  const handleAddressChange = (e) => {
+    const newValue = e.target.value;
+    setAddress(newValue);
+    onChange("address", newValue);
+  };
+
+  const handleNeighborhoodChange = (e) => {
+    const newValue = e.target.value;
+    setNeighborhood(newValue);
+    onChange("village_name", newValue);
+  };
+
+  const handleFloorChange = (e) => {
+    const newValue = e.target.value;
+    setFloor(newValue);
+    onChange("floor", newValue);
+  };
+
+  const handlePlaqueNumberChange = (e) => {
+    const newValue = e.target.value;
+    setPlaqueNumber(newValue);
+    onChange("house_number", newValue);
+  };
+
+  const handlePostalCodeChange = (e) => {
+    const newValue = e.target.value;
+    setPostalCode(newValue);
+    onChange("postal_code", newValue);
   };
 
   return (
@@ -23,8 +51,8 @@ const AddressDetails = () => {
             <input
               type="text"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="block p-2 border outline-none focus:border-2 rounded-xl w-full "
+              onChange={handleAddressChange}
+              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
               placeholder="آدرس اقامتگاه"
             />
             {renderErrorMessages(errors.address)}
@@ -36,11 +64,11 @@ const AddressDetails = () => {
             <input
               type="text"
               value={neighborhood}
-              onChange={(e) => setNeighborhood(e.target.value)}
+              onChange={handleNeighborhoodChange}
               className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
               placeholder="روستا / محله"
             />
-            {renderErrorMessages(errors.neighborhood)}
+            {renderErrorMessages(errors.village_name)}
           </div>
 
           {/* Floor */}
@@ -49,7 +77,7 @@ const AddressDetails = () => {
             <input
               type="text"
               value={floor}
-              onChange={(e) => setFloor(e.target.value)}
+              onChange={handleFloorChange}
               className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
               placeholder="اقامتگاه در طبقه"
             />
@@ -62,11 +90,24 @@ const AddressDetails = () => {
             <input
               type="text"
               value={plaqueNumber}
-              onChange={(e) => setPlaqueNumber(e.target.value)}
+              onChange={handlePlaqueNumberChange}
               className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
               placeholder="شماره پلاک"
             />
-            {renderErrorMessages(errors.plaqueNumber)}
+            {renderErrorMessages(errors.house_number)}
+          </div>
+
+          {/* Postal Code */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">کد پستی</label>
+            <input
+              type="text"
+              value={postalCode}
+              onChange={handlePostalCodeChange}
+              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
+              placeholder="کد پستی"
+            />
+            {renderErrorMessages(errors.postal_code)}
           </div>
         </div>
       </div>

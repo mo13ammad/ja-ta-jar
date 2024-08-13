@@ -8,14 +8,13 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 
 const EditHousePage = () => {
-  const { uuid } = useParams();  // Get the uuid from the URL parameters
+  const { uuid } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const token = location.state?.token || '';
 
   const [houseData, setHouseData] = useState(null);
   const [loading, setLoading] = useState(true);
-
 
   const fetchHouseData = async () => {
     try {
@@ -42,7 +41,7 @@ const EditHousePage = () => {
     } else {
       navigate('/dashboard'); // Redirect to dashboard if uuid is not available
     }
-  }, [token, uuid]);
+  }, [uuid]);
 
   if (loading) {
     return (
