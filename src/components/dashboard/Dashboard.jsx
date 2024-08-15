@@ -11,7 +11,17 @@ function Dashboard() {
   const API_BASE_URL = "https://portal1.jatajar.com/api";
   const location = useLocation();
   const navigate = useNavigate();
-  const token = location.state?.token || localStorage.getItem('userToken'); // Get the user token from location.state or local storage
+  
+  // Check for the token from location.state or local storage
+  const token = location.state?.token || localStorage.getItem('userToken'); 
+
+  // If no token is found, redirect to login immediately
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
   let user = location.state?.user || localStorage.getItem('userData');
 
   try {
@@ -55,14 +65,19 @@ function Dashboard() {
   const handleEditEnd = () => {
     setEditLoading(false); // Reset editLoading to false when done
   };
- 
+
   useEffect(() => {
     if (token) {
       fetchData();
-    } else {
-      navigate('/login');
     }
   }, [token, navigate]); // Dependency on token to refetch if it changes
+
+  // Navigate to login if data is not available after loading
+  useEffect(() => {
+    if (!loading && !data) {
+      navigate('/login');
+    }
+  }, [loading, data, navigate]);
 
   if (loading || fetching || editLoading) {
     // Show spinner while loading or fetching or editing
@@ -74,22 +89,13 @@ function Dashboard() {
     );
   }
 
-  if (!data || !data.data) {
-    // Handle the case where data or data.data is null
-    return (
-      <div className="min-h-[100vh] flex items-center justify-center">
-        <p>No data available</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <Helmet>
         <title>{"پروفایل"}</title>
       </Helmet>
       <div className="min-h-[100vh] overflow-auto">
-        <Navbar userName={data.data.name} />
+        <Navbar userName={data?.data?.name} />
         <DashboardContent
           data={data}
           token={token}

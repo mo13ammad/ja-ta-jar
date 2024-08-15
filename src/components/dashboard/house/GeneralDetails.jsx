@@ -1,6 +1,23 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
+import { Listbox } from "@headlessui/react";
+
+const houseFloorOptions = [
+  { key: "OneFloor", label: "همسطح" },
+  { key: "DoubleFloor", label: "دوبلکس" },
+  { key: "ThirdFloor", label: "تریپلکس" },
+  { key: "Floreone", label: "طبقه اول" },
+  { key: "Secondfloor", label: "طبقه دوم" },
+  { key: "Thirdfloorr", label: "طبقه سوم" }
+];
+
+const privacyOptions = [
+  { key: "FullPrivacy", label: "دربست" },
+  { key: "HalfPrivacy", label: "نیمه دربست" },
+  { key: "NoPrivacy", label: "مشاع" },
+  { key: "Commonyard", label: "حیاط مشترک" }
+];
 
 const GeneralDetails = ({ data, token, houseUuid }) => {
   const [formData, setFormData] = useState({
@@ -9,7 +26,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
     structure_size: data?.structure_size || "",
     house_floor: data?.house_floor || "",
     number_stairs: data?.number_stairs || "",
-    description: data?.description || ""
+    description: data?.description || "",
+    tip: data?.tip?.key || houseFloorOptions[0].key,
+    privacy: data?.privacy?.key || privacyOptions[0].key // default to the first option if no initial value
   });
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -78,9 +97,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
   };
 
   return (
-    <div className="relative md:w-5/6 md:h-5/6">
+    <div className="relative lg:w-5/6 lg:h-5/6">
       <Toaster />
-      <div className="overflow-auto scrollbar-thin max-h-[80vh] pr-2 w-full min-h-[70vh]">
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">نام اقامتگاه</label>
@@ -124,18 +143,62 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
             {renderErrorMessages(errors.structure_size)}
           </div>
 
+          {/* Tip (House Floor Type) Dropdown */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">تعداد طبقات</label>
-            <input
-              type="text"
-              value={formData.house_floor}
-              onChange={(e) => handleInputChange("house_floor", e.target.value)}
-              onFocus={() => setFocusedField('house_floor')}
-              onBlur={() => setFocusedField('')}
-              className={`block p-2 border rounded-xl w-full ${errors.house_floor ? 'border-red-500' : ''} ${focusedField === 'house_floor' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-              placeholder="تعداد طبقات"
-            />
-            {renderErrorMessages(errors.house_floor)}
+            <Listbox value={formData.tip} onChange={(value) => handleInputChange('tip', value)}>
+              {({ open }) => (
+                <div className="relative">
+                  <div className="relative w-full cursor-pointer">
+                    <Listbox.Button
+                      className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.tip ? 'border-red-500' : ''} ${focusedField === 'tip' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                    >
+                      {houseFloorOptions.find(option => option.key === formData.tip)?.label || 'انتخاب نوع'}
+                      <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Listbox.Button>
+                    <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                      {houseFloorOptions.map(option => (
+                        <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.tip ? 'bg-gray-100' : ''}`}>
+                          {option.label}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </div>
+              )}
+            </Listbox>
+            {renderErrorMessages(errors.tip)}
+          </div>
+
+          {/* Privacy Dropdown */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">وضعیت حریم</label>
+            <Listbox value={formData.privacy} onChange={(value) => handleInputChange('privacy', value)}>
+              {({ open }) => (
+                <div className="relative">
+                  <div className="relative w-full cursor-pointer">
+                    <Listbox.Button
+                      className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.privacy ? 'border-red-500' : ''} ${focusedField === 'privacy' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                    >
+                      {privacyOptions.find(option => option.key === formData.privacy)?.label || 'انتخاب حریم'}
+                      <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Listbox.Button>
+                    <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                      {privacyOptions.map(option => (
+                        <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.privacy ? 'bg-gray-100' : ''}`}>
+                          {option.label}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </div>
+              )}
+            </Listbox>
+            {renderErrorMessages(errors.privacy)}
           </div>
 
           <div className="mt-4">
