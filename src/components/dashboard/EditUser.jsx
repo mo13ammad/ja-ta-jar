@@ -4,7 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import jalaali from "jalaali-js";
 import { Listbox } from "@headlessui/react";
-import Spinner from "../Spinner"; 
+import Spinner from "../Spinner";
 
 const genderOptions = [
   { key: 'Male', label: 'مرد' },
@@ -45,10 +45,6 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const [focusedField, setFocusedField] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [bio, setBio] = useState(user.bio || "");
-
-  const [genderOpen, setGenderOpen] = useState(false);
-  const [provinceOpen, setProvinceOpen] = useState(false);
-  const [cityOpen, setCityOpen] = useState(false);
 
   useEffect(() => {
     const { year, month, day } = gregorianToPersian(user.birth_date);
@@ -234,14 +230,14 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* Province */}
         <div>
           <label className="block text-sm font-medium text-gray-700">استان</label>
-          <Listbox value={selectedProvince} onChange={setSelectedProvince} open={provinceOpen} onClick={() => setProvinceOpen(!provinceOpen)}>
+          <Listbox value={selectedProvince} onChange={setSelectedProvince}>
             {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
+              <div className="relative">
+                <div className="relative w-full cursor-pointer">
+                  <Listbox.Button
+                    className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.province_id ? 'border-red-500' : ''} ${focusedField === 'province_id' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                  >
                     {provinces.find(province => province.id === selectedProvince)?.name || 'انتخاب استان'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
                     <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -254,7 +250,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
                     ))}
                   </Listbox.Options>
                 </div>
-              </>
+              </div>
             )}
           </Listbox>
           {renderErrorMessages(errors.province_id)}
@@ -263,14 +259,14 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700">شهر</label>
-          <Listbox value={selectedCity} onChange={setSelectedCity} open={cityOpen} onClick={() => setCityOpen(!cityOpen)} disabled={!selectedProvince || isDisabled("city")}>
+          <Listbox value={selectedCity} onChange={setSelectedCity} disabled={!selectedProvince || isDisabled("city")}>
             {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
+              <div className="relative">
+                <div className="relative w-full cursor-pointer">
+                  <Listbox.Button
+                    className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.city_id ? 'border-red-500' : ''} ${focusedField === 'city_id' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                  >
                     {cities.find(city => city.id === selectedCity)?.name || 'انتخاب شهر'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
                     <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -283,7 +279,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
                     ))}
                   </Listbox.Options>
                 </div>
-              </>
+              </div>
             )}
           </Listbox>
           {renderErrorMessages(errors.city_id)}
@@ -330,14 +326,14 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* Gender */}
         <div>
           <label className="block text-sm font-medium text-gray-700">جنسیت</label>
-          <Listbox value={gender} onChange={setGender} open={genderOpen} onClick={() => setGenderOpen(!genderOpen)} disabled={isDisabled("gender")}>
+          <Listbox value={gender} onChange={setGender}>
             {({ open }) => (
-              <>
-                <div className="relative mt-1">
-                  <span className="block p-2 border rounded-xl w-full cursor-pointer">
+              <div className="relative">
+                <div className="relative w-full cursor-pointer">
+                  <Listbox.Button
+                    className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.sex ? 'border-red-500' : ''} ${focusedField === 'sex' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                  >
                     {genderOptions.find(option => option.key === gender)?.label || 'انتخاب جنسیت'}
-                  </span>
-                  <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
                     <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -350,7 +346,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
                     ))}
                   </Listbox.Options>
                 </div>
-              </>
+              </div>
             )}
           </Listbox>
           {renderErrorMessages(errors.sex)}
