@@ -8,7 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
 
 const EditHousePage = () => {
-  const { uuid } = useParams();
+  const { uuid } = useParams();  // Get the UUID from the URL
   const location = useLocation();
   const navigate = useNavigate();
   const token = location.state?.token || '';
@@ -59,18 +59,14 @@ const EditHousePage = () => {
 
   return (
     <>
-     <Helmet>
+      <Helmet>
         <title>{"ویرایش اقامتگاه"}</title>
       </Helmet>
-    <div className="min-h-[100vh] ">
-      <Navbar userName={houseData.vendor.name} />
-      <EditHouseContent houseData={houseData} token={token} onUpdate={fetchHouseData} />
-      <div className="fixed md:hidden z-50 bottom-0 bg-white shadow-2xl rounded-t-xl w-full h-16 flex justify-end">
-          <button className="bg-green-600 self-end cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl my-auto ml-4">
-            ثبت اطلاعات
-          </button>
-        </div>
-    </div>
+      <div className="min-h-[100vh] ">
+        <Navbar userName={houseData.vendor.name} />
+        <EditHouseContent houseData={houseData} token={token} onUpdate={fetchHouseData} houseUuid={uuid} /> {/* Pass UUID as prop */}
+     
+      </div>
     </>
   );
 };

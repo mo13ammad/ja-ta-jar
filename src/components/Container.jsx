@@ -8,7 +8,7 @@ function Container() {
   return (
     <>
     <Helmet><title>جا تا جار</title></Helmet>
-    <div className="w-full overflow-x-hidden h-screen">
+    <div className="w-full  h-screen">
       <Header />
       <Body />
     </div>

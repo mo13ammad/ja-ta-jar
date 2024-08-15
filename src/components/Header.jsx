@@ -32,7 +32,7 @@ function Header() {
   };
 
   return (
-    <div className="relative">
+    <div className="fixed top-0 w-full z-50">
       <div className="h-14 md:h-16 bg-gray-100 flex items-center justify-between shadow-md px-4">
         <img src={logo} alt="Logo" className="max-w-36 max-h-12 mr-5" />
 

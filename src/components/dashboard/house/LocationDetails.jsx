@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Listbox, Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
@@ -19,7 +19,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-const LocationDetails = ({ data, onSave }) => {
+const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
@@ -28,33 +28,48 @@ const LocationDetails = ({ data, onSave }) => {
   const [longitude, setLongitude] = useState(data?.address?.geography?.longitude || null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false); // New loading state for saving
 
   // Format latitude and longitude to 5 decimal places
   const formatCoord = (coord) => (coord !== null ? parseFloat(coord).toFixed(5) : "");
 
-  // Fetch provinces and cities when component mounts or selectedProvince changes
+  // Fetch provinces and cities when the component mounts
   useEffect(() => {
-    const fetchProvincesAndCities = async () => {
+    const fetchProvinces = async () => {
       try {
-        setIsLoading(true);
+        setIsLoading(true); // Set loading state initially when fetching provinces
         const provinceResponse = await axios.get("https://portal1.jatajar.com/api/assets/province");
         setProvinces(provinceResponse.data.data);
-
-        if (selectedProvince) {
-          const cityResponse = await axios.get(`https://portal1.jatajar.com/api/assets/province/${selectedProvince}/cities`);
-          setCities(cityResponse.data.data.cities || []);
-        } else {
-          setCities([]);
-        }
       } catch (error) {
-        console.error("Error fetching provinces or cities:", error);
-        toast.error("خطا در بارگذاری استان‌ها یا شهرها");
+        console.error("Error fetching provinces:", error);
+        toast.error("خطا در بارگذاری استان‌ها");
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); // Stop loading after provinces are fetched
       }
     };
 
-    fetchProvincesAndCities();
+    fetchProvinces();
+  }, []);
+
+  // Fetch cities when the selected province changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (selectedProvince) {
+        try {
+          const cityResponse = await axios.get(
+            `https://portal1.jatajar.com/api/assets/province/${selectedProvince}/cities`
+          );
+          setCities(cityResponse.data.data.cities || []);
+        } catch (error) {
+          console.error("Error fetching cities:", error);
+          toast.error("خطا در بارگذاری شهرها");
+        }
+      } else {
+        setCities([]);
+      }
+    };
+
+    fetchCities();
   }, [selectedProvince]);
 
   const MapEventHandler = () => {
@@ -85,8 +100,44 @@ const LocationDetails = ({ data, onSave }) => {
     setIsMapModalOpen(false);
   };
 
+  const handleSaveChanges = async () => {
+    setIsSaving(true); // Start the loading state when saving begins
+    const requestData = {
+      city_id: selectedCity,
+      latitude,
+      longitude,
+      _method: "PUT",
+    };
+
+    console.log("Data being sent to backend:", requestData);
+
+    try {
+      const response = await axios.post(
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
+        requestData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("تغییرات با موفقیت ثبت شد");
+      } else {
+        toast.error("خطایی رخ داده است");
+      }
+    } catch (error) {
+      console.error("Error saving location:", error);
+      toast.error("خطا در ثبت تغییرات");
+    } finally {
+      setIsSaving(false); // End the loading state after saving is complete
+    }
+  };
+
   return (
-    <div className="relative lg:w-5/6 lg:h-5/6">
+    <div className="relative">
       <Toaster />
       {isLoading ? (
         <div className="flex justify-center items-center h-full">
@@ -160,7 +211,7 @@ const LocationDetails = ({ data, onSave }) => {
           </div>
           <div className="mt-10">
             <label className="block text-sm font-medium text-gray-700 mb-2">انتخاب موقعیت</label>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl" onClick={handleMapModalOpen}>
+            <button className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl" onClick={handleMapModalOpen}>
               باز کردن نقشه
             </button>
           </div>
@@ -176,11 +227,11 @@ const LocationDetails = ({ data, onSave }) => {
           <div className="fixed inset-0 z-10 overflow-y-auto">
             <div className="flex items-center justify-center min-h-full p-4 text-center">
               <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl bg-white p-6 text-right align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-xl transform overflow-hidden rounded-xl bg-white p-6 text-right align-middle shadow-xl transition-all">
                   <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     انتخاب موقعیت
                   </Dialog.Title>
-                  <div className="relative mt-4">
+                  <div className="relative">
                     <MapContainer center={{ lat: parseFloat(latitude) || 35.6892, lng: parseFloat(longitude) || 51.389 }} zoom={13} scrollWheelZoom={false} className="h-[60vh] w-full rounded-xl">
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
                       <MapEventHandler />
@@ -189,12 +240,9 @@ const LocationDetails = ({ data, onSave }) => {
                       </div>
                     </MapContainer>
                   </div>
-                  <div className="mt-6 flex justify-between">
-                    <button type="button" className="inline-flex justify-center w-1/2 mr-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:text-sm" onClick={handleSaveLocation}>
+                  <div className="mt-6 flex justify-end">       
+                    <button type="button" className="inline-flex justify-center w- ml-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm" onClick={handleMapModalClose}>
                       ثبت موقعیت
-                    </button>
-                    <button type="button" className="inline-flex justify-center w-1/2 ml-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-gray-600 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm" onClick={handleMapModalClose}>
-                      بستن نقشه
                     </button>
                   </div>
                 </Dialog.Panel>
@@ -203,6 +251,25 @@ const LocationDetails = ({ data, onSave }) => {
           </div>
         </Dialog>
       </Transition>
+
+      {/* Save Changes Button */}
+      {!isLoading && (
+        <div className="absolute flex justify-end w-full">
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl w-36"
+            onClick={handleSaveChanges}
+          >
+            ثبت تغییرات
+          </button>
+        </div>
+      )}
+
+      {/* Full-Page Loading Overlay */}
+      {isSaving && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
 };
