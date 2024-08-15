@@ -230,7 +230,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* Province */}
         <div>
           <label className="block text-sm font-medium text-gray-700">استان</label>
-          <Listbox value={selectedProvince} onChange={setSelectedProvince}>
+          <Listbox value={selectedProvince} onChange={setSelectedProvince} disabled={isVendor} >
             {({ open }) => (
               <div className="relative">
                 <div className="relative w-full cursor-pointer">
@@ -326,7 +326,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
         {/* Gender */}
         <div>
           <label className="block text-sm font-medium text-gray-700">جنسیت</label>
-          <Listbox value={gender} onChange={setGender}>
+          <Listbox value={gender} onChange={setGender} disabled={isVendor}>
             {({ open }) => (
               <div className="relative">
                 <div className="relative w-full cursor-pointer">
