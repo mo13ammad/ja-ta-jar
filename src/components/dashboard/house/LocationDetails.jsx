@@ -1,23 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Listbox, Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import Spinner from "../../Spinner";
-
-// Fix the default marker icon issue with Webpack
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  iconUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-});
+import '@neshan-maps-platform/mapbox-gl/dist/NeshanMapboxGl.css';
+import nmp_mapboxgl from '@neshan-maps-platform/mapbox-gl';
 
 const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [provinces, setProvinces] = useState([]);
@@ -28,7 +16,15 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [longitude, setLongitude] = useState(data?.address?.geography?.longitude || 51.389); // Default to Tehran
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false); // New loading state for saving
+  const [isSaving, setIsSaving] = useState(false);
+
+  const mapContainerRef = useRef(null); // Ref for the map container
+  const mapRef = useRef(null); // Ref to store map instance
+  const markerRef = useRef(null); // Ref to store marker instance
+
+  // Temp state to store selected lat/lng before saving changes
+  const [tempLatitude, setTempLatitude] = useState(latitude);
+  const [tempLongitude, setTempLongitude] = useState(longitude);
 
   // Format latitude and longitude to 5 decimal places
   const formatCoord = (coord) => (coord !== null ? parseFloat(coord).toFixed(5) : "");
@@ -41,7 +37,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         const provinceResponse = await axios.get("https://portal1.jatajar.com/api/assets/province");
         setProvinces(provinceResponse.data.data);
       } catch (error) {
-        console.error("Error fetching provinces:", error);
         toast.error("خطا در بارگذاری استان‌ها");
       } finally {
         setIsLoading(false); // Stop loading after provinces are fetched
@@ -61,7 +56,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           );
           setCities(cityResponse.data.data.cities || []);
         } catch (error) {
-          console.error("Error fetching cities:", error);
           toast.error("خطا در بارگذاری شهرها");
         }
       } else {
@@ -72,31 +66,76 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     fetchCities();
   }, [selectedProvince]);
 
-  const MapEventHandler = () => {
-    useMapEvents({
-      moveend: (event) => {
-        const mapCenter = event.target.getCenter();
-        setLatitude(formatCoord(mapCenter.lat));
-        setLongitude(formatCoord(mapCenter.lng));
-      },
-    });
-    return null;
+  const handleMapModalClose = () => {
+    setIsMapModalOpen(false);
   };
 
-  const handleMapModalClose = () => setIsMapModalOpen(false);
-  const handleMapModalOpen = () => setIsMapModalOpen(true);
+  const initializeMap = () => {
+    if (mapContainerRef.current) {
+      mapRef.current = new nmp_mapboxgl.Map({
+        mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
+        container: mapContainerRef.current, // Use the ref here
+        zoom: 11,
+        pitch: 0,
+        center: [longitude, latitude], // Set center to current coordinates
+        minZoom: 2,
+        maxZoom: 21,
+        trackResize: true,
+        mapKey: "web.a3f7a30528d54b41b3432213e9b8f51f",
+        poi: true,
+        traffic: true,
+        mapTypeControllerOptions: {
+          show: true,
+          position: 'bottom-left'
+        }
+      });
+  
+      // Initialize the marker
+      markerRef.current = new nmp_mapboxgl.Marker()
+        .setLngLat([longitude, latitude]) // Set marker position to the initial coordinates
+        .addTo(mapRef.current); // Add the marker to the map
+  
+      mapRef.current.on('load', () => {
+        console.log("Map loaded successfully");
+      });
+  
+      mapRef.current.on('error', (error) => {
+        console.error("Map error:", error);
+      });
+  
+      mapRef.current.on('click', (e) => {
+        const coords = e.lngLat;
+        setTempLatitude(coords.lat);
+        setTempLongitude(coords.lng);
+
+        // Update marker position
+        markerRef.current.setLngLat([coords.lng, coords.lat]);
+
+        toast.success(`موقعیت انتخاب شد`);
+      });
+  
+    } else {
+      console.error("Map container not found");
+    }
+  };
+
+  useEffect(() => {
+    if (isMapModalOpen) {
+      setTimeout(() => {
+        initializeMap(); // Initialize the map after modal is opened
+      }, 0); // Delay the map initialization to ensure the modal is fully rendered
+    }
+  }, [isMapModalOpen]);
+
+  const handleMapModalOpen = () => {
+    setIsMapModalOpen(true);
+  };
 
   const handleSaveLocation = () => {
-    if (latitude && longitude && selectedCity) {
-      onSave({
-        city_id: selectedCity,
-        latitude,
-        longitude,
-      });
-      toast.success("موقعیت با موفقیت ثبت شد");
-    } else {
-      toast.error("مقادیر موقعیت مکانی معتبر نیستند");
-    }
+    // Save temporary latitude and longitude to the main state
+    setLatitude(tempLatitude);
+    setLongitude(tempLongitude);
+    toast.success("موقعیت با موفقیت ثبت شد");
     setIsMapModalOpen(false);
   };
 
@@ -108,8 +147,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       longitude,
       _method: "PUT",
     };
-
-    console.log("Data being sent to backend:", requestData);
 
     try {
       const response = await axios.post(
@@ -129,7 +166,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         toast.error("خطایی رخ داده است");
       }
     } catch (error) {
-      console.error("Error saving location:", error);
       toast.error("خطا در ثبت تغییرات");
     } finally {
       setIsSaving(false); // End the loading state after saving is complete
@@ -243,17 +279,8 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                   <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     انتخاب موقعیت
                   </Dialog.Title>
-                  <div className="relative">
-                    <MapContainer center={{ lat: parseFloat(latitude) || 35.6892, lng: parseFloat(longitude) || 51.389 }} zoom={13} scrollWheelZoom={false} className="h-[60vh] w-full rounded-xl">
-                      <TileLayer 
-                        url="https://api.neshan.org/v4/base/{z}/{x}/{y}?key=service.fc1b5a6139584b1b91642a03962cf922" 
-                        attribution='&copy; <a href="https://www.neshan.org/">Neshan</a>' 
-                      />
-                      <MapEventHandler />
-                      <div className="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -100%)", zIndex: "1000" }}>
-                        <img src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png" alt="center marker" />
-                      </div>
-                    </MapContainer>
+                  <div className="relative" id="map-container" ref={mapContainerRef} style={{ height: '500px'  }}>
+                    {/* Map will render in this div */}
                   </div>
                   <div className="mt-6 flex justify-end">       
                     <button type="button" className="inline-flex justify-center w- ml-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm" onClick={handleSaveLocation}>
