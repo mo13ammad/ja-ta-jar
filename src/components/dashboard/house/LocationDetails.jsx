@@ -24,8 +24,8 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [cities, setCities] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
   const [selectedCity, setSelectedCity] = useState(data?.address?.city?.id || null);
-  const [latitude, setLatitude] = useState(data?.address?.geography?.latitude || null);
-  const [longitude, setLongitude] = useState(data?.address?.geography?.longitude || null);
+  const [latitude, setLatitude] = useState(data?.address?.geography?.latitude || 35.6892); // Default to Tehran
+  const [longitude, setLongitude] = useState(data?.address?.geography?.longitude || 51.389); // Default to Tehran
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false); // New loading state for saving
@@ -202,11 +202,23 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-5 p-2">
             <div className="">
               <label className="block text-sm font-medium text-gray-700 mb-1">عرض جغرافیایی</label>
-              <input type="number" step="0.00001" value={latitude || ""} onChange={(e) => setLatitude(formatCoord(e.target.value))} className="block w-full p-2 border rounded-xl" />
+              <input 
+                type="number" 
+                step="0.00001" 
+                value={latitude || ""} 
+                disabled 
+                className="block w-full p-2 border rounded-xl bg-gray-200 cursor-not-allowed" 
+              />
             </div>
             <div className="">
               <label className="block text-sm font-medium text-gray-700 mb-1">طول جغرافیایی</label>
-              <input type="number" step="0.00001" value={longitude || ""} onChange={(e) => setLongitude(formatCoord(e.target.value))} className="block w-full p-2 border rounded-xl" />
+              <input 
+                type="number" 
+                step="0.00001" 
+                value={longitude || ""} 
+                disabled 
+                className="block w-full p-2 border rounded-xl bg-gray-200 cursor-not-allowed" 
+              />
             </div>
           </div>
           <div className="mt-10">
@@ -233,7 +245,10 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                   </Dialog.Title>
                   <div className="relative">
                     <MapContainer center={{ lat: parseFloat(latitude) || 35.6892, lng: parseFloat(longitude) || 51.389 }} zoom={13} scrollWheelZoom={false} className="h-[60vh] w-full rounded-xl">
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
+                      <TileLayer 
+                        url="https://api.neshan.org/v4/base/{z}/{x}/{y}?key=service.fc1b5a6139584b1b91642a03962cf922" 
+                        attribution='&copy; <a href="https://www.neshan.org/">Neshan</a>' 
+                      />
                       <MapEventHandler />
                       <div className="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -100%)", zIndex: "1000" }}>
                         <img src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png" alt="center marker" />
@@ -241,7 +256,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                     </MapContainer>
                   </div>
                   <div className="mt-6 flex justify-end">       
-                    <button type="button" className="inline-flex justify-center w- ml-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm" onClick={handleMapModalClose}>
+                    <button type="button" className="inline-flex justify-center w- ml-2 rounded-xl border border-transparent shadow-sm px-4 py-2 bg-green-500 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:text-sm" onClick={handleSaveLocation}>
                       ثبت موقعیت
                     </button>
                   </div>

@@ -4,6 +4,7 @@ import GeneralDetails from "./GeneralDetails";
 import AddressDetails from "./AddressDetails";
 import LocationDetails from "./LocationDetails";
 import EnvironmentDetails from "./EnvironmentDetails"
+import MainFacilityDetails from "./MainFacilityDetails"
 
 
 const tabs = [
@@ -47,6 +48,13 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
           )}
             {activeTab === "environmentInfo" && (
             <EnvironmentDetails
+              data={houseData}  // Passing initial data to LocationDetails
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
+           {activeTab === "mainFacilities" && (
+            <MainFacilityDetails
               data={houseData}  // Passing initial data to LocationDetails
               token={token}
               houseUuid={houseUuid}

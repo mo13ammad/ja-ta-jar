@@ -1,24 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/jatajarlogo.webp";
 
-function Header() {
+function Header({ token, userName }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
-  };
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setUserName("John Doe");
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUserName("");
   };
 
   const handleSearchChange = (e) => {
@@ -27,8 +17,15 @@ function Header() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // Implement the search logic here
     console.log("Search query submitted:", searchQuery);
+  };
+
+  const handleProfileClick = () => {
+    if (userName) {
+      navigate("/dashboard", { state: { token, userName } });
+    } else {
+      navigate("/login");
+    }
   };
 
   return (
@@ -57,12 +54,13 @@ function Header() {
           </svg>
         </button>
 
+        {/* Mobile Menu */}
         <div
           className={`${
             menuOpen ? "block" : "hidden"
           } md:hidden absolute top-12 left-0 w-full bg-white shadow-md transition-all duration-400`}
         >
-          <ul className="flex-col">
+          <ul className="flex flex-col">
             <li className="p-2 border-b">
               <a href="#home" className="block text-xs sm:text-sm">
                 صفحه اصلی
@@ -73,14 +71,23 @@ function Header() {
                 تماس با ما
               </a>
             </li>
-            <li className="p-2">
+            <li className="p-2 border-b">
               <a href="#about" className="block text-xs sm:text-sm">
                 درباره ما
               </a>
             </li>
+            <li className="p-2 border-b">
+              <button
+                onClick={handleProfileClick}
+                className="block text-xs sm:text-sm text-green-700 w-full text-left"
+              >
+                {userName ? "پروفایل" : "ورود | ثبت نام"}
+              </button>
+            </li>
           </ul>
         </div>
 
+        {/* Desktop Menu */}
         <div className="hidden md:flex items-center justify-between md:w-full lg:px-10">
           <ul className="flex space-x-3 lg:space-x-4">
             <li className="p-2">
@@ -102,7 +109,10 @@ function Header() {
               value={searchQuery}
               onChange={handleSearchChange}
             />
-            <button type="submit" className="absolute left-1.5 top-1.5 rounded-full bg-green-500 w-9 h-9 p-1.5 flex items-center justify-center">
+            <button
+              type="submit"
+              className="absolute left-1.5 top-1.5 rounded-full bg-green-500 w-9 h-9 p-1.5 flex items-center justify-center"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -120,13 +130,12 @@ function Header() {
             </button>
           </form>
 
-          {isLoggedIn ? (
-            <span className="text-green-700">{userName}</span>
-          ) : (
-            <a href="/login" className="text-green-700 md:ml-6 ">
-              ورود | ثبت نام
-            </a>
-          )}
+          <button
+            onClick={handleProfileClick}
+            className="text-green-700 md:ml-6"
+          >
+            {userName ? userName : "ورود | ثبت نام"}
+          </button>
         </div>
       </div>
     </div>
