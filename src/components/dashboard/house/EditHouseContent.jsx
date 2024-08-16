@@ -3,11 +3,14 @@ import EditHouseSidebar from "./EditHouseSidebar";
 import GeneralDetails from "./GeneralDetails";
 import AddressDetails from "./AddressDetails";
 import LocationDetails from "./LocationDetails";
+import EnvironmentDetails from "./EnvironmentDetails"
+
 
 const tabs = [
   { key: "address", label: "آدرس" },
   { key: "location", label: "موقعیت مکانی" },
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
+  { key: "environmentInfo", label: "اطلاعات محیطی" },
   // other tabs...
 ];
 
@@ -42,6 +45,14 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
               houseUuid={houseUuid}
             />
           )}
+            {activeTab === "environmentInfo" && (
+            <EnvironmentDetails
+              data={houseData}  // Passing initial data to LocationDetails
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
+         
           {/* Add other tab components here... */}
         </div>
       </div>

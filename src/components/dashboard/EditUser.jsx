@@ -385,7 +385,8 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            className="mt-1 p-2 border rounded-xl w-full"
+            onFocus={() => setFocusedField('bio')}
+            className={`mt-1 p-2 border rounded-xl w-full ${errors.bio ? 'border-red-500' : ''} ${focusedField === 'bio' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             rows="4"
           />
           {renderErrorMessages(errors.bio)}

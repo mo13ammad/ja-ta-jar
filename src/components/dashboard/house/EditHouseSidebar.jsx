@@ -28,6 +28,7 @@ const sections = [
     children: [
       { key: 'generalInfo', label: 'اطلاعات اقامتگاه' },
       { key: 'environmentInfo', label: 'اطلاعات محیطی' },
+    
     ],
   },
   {

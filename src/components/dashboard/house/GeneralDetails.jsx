@@ -22,10 +22,10 @@ const privacyOptions = [
 const GeneralDetails = ({ data, token, houseUuid }) => {
   const [formData, setFormData] = useState({
     name: data?.name || "",
-    land_size: data?.land_size || "",
+    land_size: data?.structure?.size || "",
     structure_size: data?.structure_size || "",
     house_floor: data?.house_floor || "",
-    number_stairs: data?.number_stairs || "",
+    number_stairs: data?.structure?.number_stairs || "",
     description: data?.description || "",
     tip: data?.tip?.key || houseFloorOptions[0].key,
     privacy: data?.privacy?.key || privacyOptions[0].key // default to the first option if no initial value

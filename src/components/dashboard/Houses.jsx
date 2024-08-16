@@ -121,10 +121,14 @@ const Houses = ({ token }) => {
     setError('');
     setSuccess('');
   
+    // Log the data you are about to send
+    const requestData = { structure: selectedOption };
+    console.log('Data being sent to the backend:', requestData);
+  
     try {
       const response = await axios.post(
         'https://portal1.jatajar.com/api/client/house',
-        { structure: selectedOption },
+        requestData,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -133,27 +137,39 @@ const Houses = ({ token }) => {
         }
       );
   
-      console.log('Add House Response:', response); // Log the response
+      // Log the response from the backend
+      console.log('Add House Response:', response);
   
       if (response.status === 201) {
-        const { uuid } = response.data.data; // Assuming the response data contains the house's uuid
+        const { uuid } = response.data.data || {}; // Safely access response.data.data
+        if (!uuid) {
+          throw new Error('Unexpected response structure: Missing uuid');
+        }
         setSuccess('Successfully added.');
         setIsOpen(false);
         toast.success('اقامتگاه اضافه شد'); // Show success toast
         navigate(`/edit-house/${uuid}`, { state: { token } }); // Navigate to the edit-house page with the new uuid
       } else {
-        throw new Error(response.statusText);
+        throw new Error(response.statusText || 'Unexpected response status');
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
+      // Log the error message and any available error response data
+      console.error('Error occurred:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        if (error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError('Failed to add the house.');
+        }
       } else {
-        setError('Failed to add the house.');
+        setError('Failed to add the house: ' + (error.message || 'Unknown error'));
       }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handlePageClick = (data) => {
     setCurrentPage(data.selected + 1);
