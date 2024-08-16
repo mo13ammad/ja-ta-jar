@@ -34,20 +34,20 @@ const accessRouteOptions = [
 const EnvironmentDetails = ({ data, token, houseUuid }) => {
   const [selectedTextures, setSelectedTextures] = useState([]);
   const [selectedViews, setSelectedViews] = useState([]);
-  const [accessMethod, setAccessMethod] = useState(data?.arrival_description || '');
-  const [view, setView] = useState(data?.view_description || '');
+  const [accessMethod, setAccessMethod] = useState(data?.arrivals?.description || '');
+  const [view, setView] = useState(data?.views?.description || '');
   const [selectedNeighbour, setSelectedNeighbour] = useState(data?.neighbour?.key || neighbourOptions[0].key);
   const [selectedRoutes, setSelectedRoutes] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
-    if (data?.areas) {
+    if (Array.isArray(data?.areas)) {
       setSelectedTextures(data.areas.map(area => area.key));
     }
-    if (data?.views) {
+    if (Array.isArray(data?.views)) {
       setSelectedViews(data.views.map(view => view.key));
     }
-    if (data?.arrivals) {
+    if (Array.isArray(data?.arrivals)) {
       setSelectedRoutes(data.arrivals.map(route => route.key));
     }
   }, [data]);

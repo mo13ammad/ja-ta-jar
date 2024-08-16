@@ -18,9 +18,12 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  const mapContainerRef = useRef(null); // Ref for the map container
-  const mapRef = useRef(null); // Ref to store map instance
-  const markerRef = useRef(null); // Ref to store marker instance
+  const mapContainerRef = useRef(null); // Ref for the modal map container
+  const mapContainerLgRef = useRef(null); // Ref for the large-screen map container
+  const modalMapRef = useRef(null); // Ref to store the modal map instance
+  const modalMarkerRef = useRef(null); // Ref to store the modal marker instance
+  const lgMapRef = useRef(null); // Ref to store the large-screen map instance
+  const lgMarkerRef = useRef(null); // Ref to store the large-screen marker instance
 
   // Temp state to store selected lat/lng before saving changes
   const [tempLatitude, setTempLatitude] = useState(latitude);
@@ -70,11 +73,11 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     setIsMapModalOpen(false);
   };
 
-  const initializeMap = () => {
-    if (mapContainerRef.current) {
-      mapRef.current = new nmp_mapboxgl.Map({
+  const initializeMap = (containerRef, mapRef, markerRef) => {
+    if (containerRef.current) {
+      const mapInstance = new nmp_mapboxgl.Map({
         mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
-        container: mapContainerRef.current, // Use the ref here
+        container: containerRef.current, // Use the passed ref here
         zoom: 11,
         pitch: 0,
         center: [longitude, latitude], // Set center to current coordinates
@@ -89,31 +92,37 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           position: 'bottom-left'
         }
       });
-  
-      // Initialize the marker
-      markerRef.current = new nmp_mapboxgl.Marker()
+
+      const markerInstance = new nmp_mapboxgl.Marker()
         .setLngLat([longitude, latitude]) // Set marker position to the initial coordinates
-        .addTo(mapRef.current); // Add the marker to the map
-  
-      mapRef.current.on('load', () => {
+        .addTo(mapInstance); // Add the marker to the map
+
+      mapInstance.on('load', () => {
         console.log("Map loaded successfully");
       });
-  
-      mapRef.current.on('error', (error) => {
+
+      mapInstance.on('error', (error) => {
         console.error("Map error:", error);
       });
-  
-      mapRef.current.on('click', (e) => {
+
+      mapInstance.on('click', (e) => {
         const coords = e.lngLat;
         setTempLatitude(coords.lat);
         setTempLongitude(coords.lng);
 
         // Update marker position
-        markerRef.current.setLngLat([coords.lng, coords.lat]);
+        markerInstance.setLngLat([coords.lng, coords.lat]);
 
         toast.success(`موقعیت انتخاب شد`);
+
+        // Sync state changes
+        setLatitude(coords.lat);
+        setLongitude(coords.lng);
       });
-  
+
+      // Assign the map and marker to the refs
+      mapRef.current = mapInstance;
+      markerRef.current = markerInstance;
     } else {
       console.error("Map container not found");
     }
@@ -122,10 +131,18 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   useEffect(() => {
     if (isMapModalOpen) {
       setTimeout(() => {
-        initializeMap(); // Initialize the map after modal is opened
+        initializeMap(mapContainerRef, modalMapRef, modalMarkerRef); // Initialize the map for modal view
       }, 0); // Delay the map initialization to ensure the modal is fully rendered
     }
   }, [isMapModalOpen]);
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) { // Initialize map on large screens
+      setTimeout(() => {
+        initializeMap(mapContainerLgRef, lgMapRef, lgMarkerRef); // Initialize the map for large screen view
+      }, 0); // Delay the map initialization to ensure the container is fully rendered
+    }
+  }, []);
 
   const handleMapModalOpen = () => {
     setIsMapModalOpen(true);
@@ -176,11 +193,11 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     <div className="relative">
       <Toaster />
       {isLoading ? (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center">
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
+        <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full ">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-5 p-2">
             <div className="">
               <label className="block text-sm font-medium text-gray-700 mb-1">استان</label>
@@ -259,7 +276,8 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           </div>
           <div className="mt-10">
             <label className="block text-sm font-medium text-gray-700 mb-2">انتخاب موقعیت</label>
-            <button className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl" onClick={handleMapModalOpen}>
+            {/* Hide the button on large screens */}
+            <button className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl lg:hidden" onClick={handleMapModalOpen}>
               باز کردن نقشه
             </button>
           </div>
@@ -279,7 +297,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                   <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
                     انتخاب موقعیت
                   </Dialog.Title>
-                  <div className="relative" id="map-container" ref={mapContainerRef} style={{ height: '500px'  }}>
+                  <div className="relative" id="map-container" ref={mapContainerRef} style={{ height: '500px' }}>
                     {/* Map will render in this div */}
                   </div>
                   <div className="mt-6 flex justify-end">       
@@ -293,6 +311,15 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           </div>
         </Dialog>
       </Transition>
+
+      {/* Display map directly on large screens */}
+      <div className="hidden lg:block justify-start mt-5">
+        <div className="w-full lg:w-2/3 rounded-xl overflow-hidden border">
+          <div className="relative" id="map-container-lg" ref={mapContainerLgRef} style={{ height: '300px' }}>
+            {/* Map will render in this div */}
+          </div>
+        </div>
+      </div>
 
       {/* Save Changes Button */}
       {!isLoading && (

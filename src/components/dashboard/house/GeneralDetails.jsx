@@ -22,8 +22,8 @@ const privacyOptions = [
 const GeneralDetails = ({ data, token, houseUuid }) => {
   const [formData, setFormData] = useState({
     name: data?.name || "",
-    land_size: data?.structure?.size || "",
-    structure_size: data?.structure_size || "",
+    land_size: data?.structure?.land_size || "",
+    structure_size: data?.structure?.size || "",
     house_floor: data?.house_floor || "",
     number_stairs: data?.structure?.number_stairs || "",
     description: data?.description || "",
@@ -97,7 +97,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
   };
 
   return (
-    <div className="relative lg:w-5/6 lg:h-5/6">
+    <div className="relative ">
       <Toaster />
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
