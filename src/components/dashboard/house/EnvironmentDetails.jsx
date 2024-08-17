@@ -44,11 +44,11 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
     if (Array.isArray(data?.areas)) {
       setSelectedTextures(data.areas.map(area => area.key));
     }
-    if (Array.isArray(data?.views)) {
-      setSelectedViews(data.views.map(view => view.key));
+    if (Array.isArray(data?.views?.types)) {
+      setSelectedViews(data.views.types.map(view => view.key));
     }
-    if (Array.isArray(data?.arrivals)) {
-      setSelectedRoutes(data.arrivals.map(route => route.key));
+    if (Array.isArray(data?.arrivals?.types)) {
+      setSelectedRoutes(data.arrivals.types.map(route => route.key));
     }
   }, [data]);
 
