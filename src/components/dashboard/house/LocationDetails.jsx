@@ -315,7 +315,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       {/* Display map directly on large screens */}
       <div className="hidden lg:block justify-start mt-5">
         <div className="w-full lg:w-2/3 rounded-xl overflow-hidden border">
-          <div className="relative" id="map-container-lg" ref={mapContainerLgRef} style={{ height: '300px' }}>
+          <div className="relative" id="map-container-lg" ref={mapContainerLgRef} style={{ height: '400px' }}>
             {/* Map will render in this div */}
           </div>
         </div>
