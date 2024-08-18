@@ -57,7 +57,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           const cityResponse = await axios.get(
             `https://portal1.jatajar.com/api/assets/province/${selectedProvince}/cities`
           );
-          setCities(cityResponse.data.data.cities || []);
+          setCities(cityResponse.data.data.cities || []);         
         } catch (error) {
           toast.error("خطا در بارگذاری شهرها");
         }
