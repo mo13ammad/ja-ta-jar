@@ -1,315 +1,260 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Dialog, DialogPanel, DialogTitle, Description, RadioGroup, Label } from '@headlessui/react';
-import toast, { Toaster } from 'react-hot-toast';
-import Spinner from "../Spinner"; 
-import ReactPaginate from 'react-paginate';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast, Toaster } from "react-hot-toast";
+import { Listbox } from "@headlessui/react";
+import Spinner from "../Spinner";  // Assuming you have a Spinner component
 
-const VilaaiIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
-  </svg>
-);
+const GeneralDetails = ({ data, token, houseUuid }) => {
+  const [houseFloorOptions, setHouseFloorOptions] = useState([]);
+  const [privacyOptions, setPrivacyOptions] = useState([]);
+  const [formData, setFormData] = useState({
+    name: data?.name || "",
+    land_size: data?.structure?.land_size || "",
+    structure_size: data?.structure?.size || "",
+    house_floor: data?.house_floor || "",
+    number_stairs: data?.structure?.number_stairs || "",
+    description: data?.description || "",
+    tip: "",
+    privacy: ""
+  });
+  const [loading, setLoading] = useState(true); // State to manage loading
 
-const BoomgardiIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-    <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-  </svg>
-);
-
-const SuiteIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" />
-  </svg>
-);
-
-const ApartmentIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-  </svg>
-);
-
-const options = [
-  { key: 'Boomgardi', label: 'بوم گردی', icon: <BoomgardiIcon />, color: '#4bceff' },
-  { key: 'Vilaii', label: 'ویلایی', icon: <VilaaiIcon />, color: '#42ff00' },
-  { key: 'Swit', label: 'سویت', icon: <SuiteIcon />, color: '#ceff0b' },
-  { key: 'Apartment', label: 'آپارتمان', icon: <ApartmentIcon />, color: '#ff0000' },
-];
-
-const Houses = ({ token }) => {
-  const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(options[0].key);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [houses, setHouses] = useState([]);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [focusedField, setFocusedField] = useState("");
 
   useEffect(() => {
-    fetchHouses(currentPage);
-  }, [token, currentPage]);
+    const fetchOptions = async () => {
+      try {
+        const [houseFloorRes, privacyRes] = await Promise.all([
+          axios.get('https://portal1.jatajar.com/api/assets/types/tip/detail', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }),
+          axios.get('https://portal1.jatajar.com/api/assets/types/privacy/detail', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          })
+        ]);
 
-  const fetchHouses = async (page) => {
-    setIsDataLoaded(false);
-    try {
-      const response = await axios.get(`https://portal1.jatajar.com/api/client/house?page=${page}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+        if (houseFloorRes.status === 200) {
+          setHouseFloorOptions(houseFloorRes.data.data);
         }
-      });
 
-      console.log('Fetch Houses Response:', response); // Log the response here
-
-      if (response.status === 200) {
-        setHouses(Array.isArray(response.data.data) ? response.data.data : []);
-        setTotalPages(response.data.pagination.last_page);
-        setIsDataLoaded(true);
-      } else {
-        throw new Error('Failed to fetch data: ' + response.statusText);
-      }
-    } catch (error) {
-      setError('Failed to fetch data: ' + error.message);
-      setIsDataLoaded(true);
-    }
-  };
-
-  const handleEditClick = async (uuid) => {
-    navigate(`/edit-house/${uuid}`, { state: { token } });
-  };
-
-  const handleViewClick = (uuid) => {
-    navigate(`/house/${uuid}`, { state: { token } });
-  };
-
-  const handleDeleteClick = async (uuid) => {
-    setDeleteLoading((prevState) => ({ ...prevState, [uuid]: true }));
-    setError('');
-    setSuccess('');
-
-    try {
-      const response = await axios.delete(
-        `https://portal1.jatajar.com/api/client/house/${uuid}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
+        if (privacyRes.status === 200) {
+          setPrivacyOptions(privacyRes.data.data);
         }
-      );
 
-      if (response.status === 200) {
-        setSuccess('Successfully deleted.');
-        await fetchHouses(currentPage);
-      } else {
-        throw new Error('Failed to delete: ' + response.statusText);
+        // Set initial values based on fetched options and existing data
+        setFormData((prev) => ({
+          ...prev,
+          tip: data?.tip?.key || "",
+          privacy: data?.privacy?.key || ""
+        }));
+      } catch (error) {
+        toast.error("Error fetching options");
+      } finally {
+        setLoading(false); // Data is loaded, hide the spinner
       }
-    } catch (error) {
-      setError('Failed to delete: ' + error.message);
-    } finally {
-      setDeleteLoading((prevState) => ({ ...prevState, [uuid]: false }));
-    }
+    };
+
+    fetchOptions();
+  }, [token, data]);
+
+  const handleInputChange = (key, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
-    setSuccess('');
-  
-    // Log the data you are about to send
-    const requestData = { structure: selectedOption };
-    console.log('Data being sent to the backend:', requestData);
-  
+    setLoadingSubmit(true);
+    setErrors({});
+
     try {
       const response = await axios.post(
-        'https://portal1.jatajar.com/api/client/house',
-        requestData,
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
+        {
+          ...formData,
+          _method: "PUT",
+        },
         {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
-  
-      // Log the response from the backend
-      console.log('Add House Response:', response);
-  
-      if (response.status === 201) {
-        const { uuid } = response.data.data || {}; // Safely access response.data.data
-        if (!uuid) {
-          throw new Error('Unexpected response structure: Missing uuid');
-        }
-        setSuccess('Successfully added.');
-        setIsOpen(false);
-        toast.success('اقامتگاه اضافه شد'); // Show success toast
-        navigate(`/edit-house/${uuid}`, { state: { token } }); // Navigate to the edit-house page with the new uuid
+
+      if (response.status === 200) {
+        toast.success("اطلاعات با موفقیت ثبت شد");
       } else {
-        throw new Error(response.statusText || 'Unexpected response status');
+        toast.error("خطایی در ثبت اطلاعات پیش آمد");
       }
     } catch (error) {
-      // Log the error message and any available error response data
-      console.error('Error occurred:', error);
       if (error.response) {
-        console.error('Error response data:', error.response.data);
-        if (error.response.data && error.response.data.message) {
-          setError(error.response.data.message);
-        } else {
-          setError('Failed to add the house.');
+        const { data } = error.response;
+        if (data.errors) {
+          setErrors(data.errors.fields || {});
         }
+        toast.error(data.message || "An unexpected error occurred.");
       } else {
-        setError('Failed to add the house: ' + (error.message || 'Unknown error'));
+        toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
       }
     } finally {
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
-  
 
-  const handlePageClick = (data) => {
-    setCurrentPage(data.selected + 1);
+  const renderErrorMessages = (fieldErrors) => {
+    if (!fieldErrors) return null;
+    return (
+      <div className="mt-0.5 text-red-500 text-sm">
+        {Array.isArray(fieldErrors) ? (
+          fieldErrors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))
+        ) : (
+          <p>{fieldErrors}</p>
+        )}
+      </div>
+    );
   };
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <Spinner /> {/* Full-page spinner */}
+      </div>
+    );
+  }
+
   return (
-    <div className='w-full h-full p-4'>
-      <Toaster /> {/* Add the Toaster component to show toast messages */}
-      <div className='w-full flex justify-between items-center mb-2'>
-        <h2 className='text-xl'>اقامتگاه ها :</h2>
+    <div className="relative">
+      <Toaster />
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Input fields */}
+          {/* ... */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">نام اقامتگاه</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              onFocus={() => setFocusedField('name')}
+              onBlur={() => setFocusedField('')}
+              className={`block p-2 border rounded-xl w-full ${errors.name ? 'border-red-500' : ''} ${focusedField === 'name' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+              placeholder="نام اقامتگاه"
+            />
+            {renderErrorMessages(errors.name)}
+          </div>
+          {/* Add other form fields here */}
+
+          {/* Tip (House Floor Type) Dropdown */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">تعداد طبقات</label>
+            <Listbox value={formData.tip} onChange={(value) => handleInputChange('tip', value)}>
+              {({ open }) => (
+                <div className="relative">
+                  <div className="relative w-full cursor-pointer">
+                    <Listbox.Button
+                      className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.tip ? 'border-red-500' : ''} ${focusedField === 'tip' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                    >
+                      {houseFloorOptions.find(option => option.key === formData.tip)?.label || 'انتخاب نوع'}
+                      <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Listbox.Button>
+                    <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                      {houseFloorOptions.map(option => (
+                        <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.tip ? 'bg-gray-100' : ''}`}>
+                          <span>{option.label}</span>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </div>
+              )}
+            </Listbox>
+            {renderErrorMessages(errors.tip)}
+          </div>
+
+          {/* Privacy Dropdown */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">وضعیت حریم</label>
+            <Listbox value={formData.privacy} onChange={(value) => handleInputChange('privacy', value)}>
+              {({ open }) => (
+                <div className="relative">
+                  <div className="relative w-full cursor-pointer">
+                    <Listbox.Button
+                      className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.privacy ? 'border-red-500' : ''} ${focusedField === 'privacy' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+                    >
+                      {privacyOptions.find(option => option.key === formData.privacy)?.label || 'انتخاب حریم'}
+                      <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </Listbox.Button>
+                    <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
+                      {privacyOptions.map(option => (
+                        <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.privacy ? 'bg-gray-100' : ''}`}>
+                          <span>{option.label}</span>
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </div>
+                </div>
+              )}
+            </Listbox>
+            {renderErrorMessages(errors.privacy)}
+          </div>
+
+          {/* Number of Stairs */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">تعداد پله</label>
+            <input
+              type="text"
+              value={formData.number_stairs}
+              onChange={(e) => handleInputChange("number_stairs", e.target.value)}
+              onFocus={() => setFocusedField('number_stairs')}
+              onBlur={() => setFocusedField('')}
+              className={`block p-2 border rounded-xl w-full ${errors.number_stairs ? 'border-red-500' : ''} ${focusedField === 'number_stairs' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+              placeholder="تعداد پله"
+            />
+            {renderErrorMessages(errors.number_stairs)}
+          </div>
+
+          {/* Description */}
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">توضیحات</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              onFocus={() => setFocusedField('description')}
+              onBlur={() => setFocusedField('')}
+              className={`block p-2 border rounded-xl w-full ${errors.description ? 'border-red-500' : ''} ${focusedField === 'description' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+              placeholder="توضیحات"
+            />
+            {renderErrorMessages(errors.description)}
+          </div>
+        </div>
+      </div>
+      <div className="mt-4">
         <button
-          className='bg-green-600 px-4 py-2 rounded-xl text-white'
-          onClick={() => setIsOpen(true)}
+          onClick={handleSubmit}
+          className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+          disabled={loadingSubmit}
         >
-          اضافه کردن اقامتگاه
+          {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
         </button>
       </div>
-      {isDataLoaded ? (
-        houses.length === 0 ? (
-          <p className='p-1'>اقامتگاهی وجود ندارد.</p>
-        ) : (
-          <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-            {houses.map((house) => (
-              <div key={house.uuid} className='border rounded-2xl flex justify-between items-center  gap-2 '>
-                <div className='px-3 py-2 w-full sm:w-3/5'>
-                <div className='flex gap-2 mb-2'>
-                  <p className='font-semibold '>نام :</p>
-                  <p className=''>{house.name || 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2 mb-2'>
-                  <p className='font-semibold '>نوع اقامتگاه :</p>
-                  <p className=''>{house.structure ? house.structure.label : 'وارد نشده است'}</p>
-                </div>
-                <div className='flex gap-2 mb-2'>
-                  <p className='font-semibold '>وضعیت :</p>
-                  <p className=''>{house.status ? house.status.label : 'وارد نشده است'}</p>
-                </div>
-               
-                <div className='flex gap-2'>
-                  <button
-                    className='bg-green-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-                    onClick={() => handleEditClick(house.uuid)}
-                  >
-                    ویرایش
-                  </button>
-                  <button
-                    className='bg-gray-400 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-                    onClick={() => handleViewClick(house.uuid)}
-                  >
-                    مشاهده
-                  </button>
-                  <button
-                    className='bg-red-500 max-w-36 text-white px-2 py-1 rounded-lg mt-2'
-                    onClick={() => handleDeleteClick(house.uuid)}
-                  >
-                    {deleteLoading[house.uuid] ? 'در حال حذف ...' : 'حذف'}
-                  </button>
-                </div>
-                </div>
-                <img src={house.image} className='hidden sm:block w-2/5 h-full object-cover rounded-tl-xl rounded-bl-xl' alt="" />
-              </div>
-            ))}
-          </div>
-        )
-      ) : (
-        <div className='flex justify-center items-center w-full min-h-[50vh]'>
-          <Spinner />
-        </div>
-      )}
-
-      {!loading && isDataLoaded && (
-        <div className="flex justify-center mt-4">
-          <ReactPaginate
-            previousLabel={<span className="ml-3">صفحه قبلی</span>}
-            nextLabel={"صفحه بعدی"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
-            pageCount={totalPages}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            subContainerClassName={"pages pagination"}
-            activeClassName={"active"}
-            className="flex items-center space-x-2"
-            pageClassName="px-3 py-1.5 rounded-2xl bg-gray-200 hover:bg-gray-300 cursor-pointer"
-            activeLinkClassName="text-green-500"
-          />
-        </div>
-      )}
-
-      {/* Add House Dialog */}
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-        {/* Background Blur Effect */}
-        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-xl w-full">
-            <DialogTitle className="font-bold text-xl">افزودن اقامتگاه</DialogTitle>
-            <Description>لطفاً نوع اقامتگاه خود را وارد کنید :</Description>
-
-            <div className="w-full">
-              <RadioGroup value={selectedOption} onChange={setSelectedOption} className="grid grid-cols-2 gap-2">
-                {options.map((option) => (
-                  <RadioGroup.Option key={option.key} value={option.key} className="flex items-center">
-                    {({ checked }) => (
-                      <div className={`flex items-center p-4 border rounded-lg cursor-pointer w-full ${checked ? 'bg-gray-100' : ''}`}>
-                        <div className="flex-shrink-0">
-                          {option.icon}
-                        </div>
-                        <div className="ml-3">
-                          <Label className="text-lg font-medium mr-2">{option.label}</Label>
-                        </div>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </RadioGroup>
-            </div>
-
-            <div className="flex gap-4 mt-4">
-              <button
-                onClick={() => setIsOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded-lg"
-              >
-                لغو
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="bg-green-600 px-4 py-2 rounded-lg text-white"
-              >
-                {loading ? 'در حال اضافه کردن ....' : 'اضافه کردن'}
-              </button>
-            </div>
-
-            {error && <p className="text-red-500">{error}</p>}
-          </DialogPanel>
-        </div>
-      </Dialog>
     </div>
   );
 };
 
-export default Houses;
+export default GeneralDetails;

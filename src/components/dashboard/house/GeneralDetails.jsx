@@ -1,25 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import { Listbox } from "@headlessui/react";
 
-const houseFloorOptions = [
-  { key: "OneFloor", label: "همسطح" },
-  { key: "DoubleFloor", label: "دوبلکس" },
-  { key: "ThirdFloor", label: "تریپلکس" },
-  { key: "Floreone", label: "طبقه اول" },
-  { key: "Secondfloor", label: "طبقه دوم" },
-  { key: "Thirdfloorr", label: "طبقه سوم" }
-];
-
-const privacyOptions = [
-  { key: "FullPrivacy", label: "دربست" },
-  { key: "HalfPrivacy", label: "نیمه دربست" },
-  { key: "NoPrivacy", label: "مشاع" },
-  { key: "Commonyard", label: "حیاط مشترک" }
-];
-
 const GeneralDetails = ({ data, token, houseUuid }) => {
+  const [houseFloorOptions, setHouseFloorOptions] = useState([]);
+  const [privacyOptions, setPrivacyOptions] = useState([]);
+
   const [formData, setFormData] = useState({
     name: data?.name || "",
     land_size: data?.structure?.land_size || "",
@@ -27,13 +14,53 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
     house_floor: data?.house_floor || "",
     number_stairs: data?.structure?.number_stairs || "",
     description: data?.description || "",
-    tip: data?.tip?.key || houseFloorOptions[0].key,
-    privacy: data?.privacy?.key || privacyOptions[0].key // default to the first option if no initial value
+    tip: "", // Initially empty, will be set in useEffect
+    privacy: "" // Initially empty, will be set in useEffect
   });
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState("");
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const [houseFloorRes, privacyRes] = await Promise.all([
+          axios.get('https://portal1.jatajar.com/api/assets/types/tip/detail', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }),
+          axios.get('https://portal1.jatajar.com/api/assets/types/privacy/detail', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          })
+        ]);
+
+        if (houseFloorRes.status === 200) {
+          setHouseFloorOptions(houseFloorRes.data.data);
+        }
+
+        if (privacyRes.status === 200) {
+          setPrivacyOptions(privacyRes.data.data);
+        }
+
+        // Set initial values based on fetched options and existing data
+        setFormData((prev) => ({
+          ...prev,
+          tip: data?.tip?.key || "",
+          privacy: data?.privacy?.key || ""
+        }));
+      } catch (error) {
+        toast.error("Error fetching options");
+      }
+    };
+
+    fetchOptions();
+  }, [token, data]);
 
   const handleInputChange = (key, value) => {
     setFormData((prevData) => ({
@@ -97,7 +124,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
   };
 
   return (
-    <div className="relative ">
+    <div className="relative">
       <Toaster />
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -161,7 +188,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                     <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
                       {houseFloorOptions.map(option => (
                         <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.tip ? 'bg-gray-100' : ''}`}>
-                          {option.label}
+                          <span>{option.label}</span>
                         </Listbox.Option>
                       ))}
                     </Listbox.Options>
@@ -190,7 +217,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                     <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-60 overflow-y-auto`}>
                       {privacyOptions.map(option => (
                         <Listbox.Option key={option.key} value={option.key} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${option.key === formData.privacy ? 'bg-gray-100' : ''}`}>
-                          {option.label}
+                          <span>{option.label}</span>
                         </Listbox.Option>
                       ))}
                     </Listbox.Options>
