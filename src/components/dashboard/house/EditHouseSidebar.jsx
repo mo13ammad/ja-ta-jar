@@ -28,25 +28,15 @@ const sections = [
     children: [
       { key: 'generalInfo', label: 'اطلاعات اقامتگاه' },
       { key: 'environmentInfo', label: 'اطلاعات محیطی' },
-    
     ],
   },
   {
     label: 'مشخصات اقامتگاه',
-    keys: ['rooms', 'bathrooms', 'otherSpaces'],
+    keys: ['mainFacilities', 'rooms', 'bathrooms'],
     children: [
+      { key: 'mainFacilities', label: 'امکانات اقامتگاه' }, // Replaced "سایر فضاها" with "امکانات اقامتگاه"
       { key: 'rooms', label: 'اتاق‌ها و پذیرایی' },
-      { key: 'bathrooms', label: 'سرویس‌های بهداشتی و حمام' },
-      { key: 'otherSpaces', label: 'سایر فضاهای اقامتگاه' },
-    ],
-  },
-  {
-    label: 'امکانات',
-    keys: ['mainFacilities', 'kitchenEquipment', 'specialServices'],
-    children: [
-      { key: 'mainFacilities', label: 'امکانات اصلی' },
-      { key: 'kitchenEquipment', label: 'تجهیزات آشپزخانه' },
-      { key: 'specialServices', label: 'خدمات ویژه' },
+      { key: 'bathrooms', label: 'امکانات بهداشتی' }, // Changed "سرویس‌های بهداشتی و حمام" to "امکانات بهداشتی"
     ],
   },
   {

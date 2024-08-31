@@ -8,7 +8,7 @@ const environmentTexturesOptions = [
   { key: 'Forest', label: 'جنگلی', color: '#42ff00', icon: 'https://portal1.jatajar.com/storage/svg/cache/gmdi-forest-o.svg' },
   { key: 'Beach', label: 'ساحلی', color: '#00f7ff', icon: 'https://portal1.jatajar.com/storage/svg/cache/maki-beach.svg' },
   { key: 'City', label: 'شهری', color: '#f00000', icon: 'https://portal1.jatajar.com/storage/svg/cache/hugeicons-city-01.svg' },
-  { key: 'Mountainous', label: 'کوهستانی', color: '#00ffb3', icon: 'https://portal1.jatajar.com/storage/svg/cache/maki-mountain.svg' },
+  { key: 'Mountainou', label: 'کوهستانی', color: '#00ffb3', icon: 'https://portal1.jatajar.com/storage/svg/cache/maki-mountain.svg' },
   { key: 'Desert', label: 'کویری', color: '#f0e00a', icon: 'https://portal1.jatajar.com/storage/svg/cache/gameicon-desert.svg' },
 ];
 
@@ -16,7 +16,7 @@ const viewOptions = [
   { key: 'MountainView', label: 'رو به کوهستان', color: '#ffa800', icon: 'https://portal1.jatajar.com/storage/svg/cache/phosphor-mountains-light.svg' },
   { key: 'ForestView', label: 'رو به جنگل', color: '#42ff00', icon: 'https://portal1.jatajar.com/storage/svg/cache/gmdi-forest-o.svg' },
   { key: 'SeaView', label: 'رو به دریا', color: '#00f7ff', icon: 'https://portal1.jatajar.com/storage/svg/cache/iconoir-sea-and-sun.svg' },
-  { key: 'FacingRiver', label: 'رو به رودخانه', color: '#1532e0', icon: 'https://portal1.jatajar.com/storage/svg/cache/carbon-chart-river.svg' },
+  { key: 'Facingriver', label: 'رو به رودخانه', color: '#1532e0', icon: 'https://portal1.jatajar.com/storage/svg/cache/carbon-chart-river.svg' },
 ];
 
 const neighbourOptions = [
@@ -120,27 +120,6 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
       <Toaster />
       <div className="flex-1 overflow-y-auto scrollbar-thin max-h-full pl-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Access Method and View in a row on lg+ screens */}
-          <div className="mt-4 lg:mt-0">
-            <label className="block text-sm font-medium text-gray-700 mb-2">شیوه دسترسی به اقامتگاه</label>
-            <textarea
-              value={accessMethod}
-              onChange={(e) => setAccessMethod(e.target.value)}
-              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
-              placeholder="شیوه دسترسی به اقامتگاه"
-            />
-          </div>
-
-          <div className="mt-4 lg:mt-0">
-            <label className="block text-sm font-medium text-gray-700 mb-2">منظره اقامتگاه</label>
-            <textarea
-              value={view}
-              onChange={(e) => setView(e.target.value)}
-              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
-              placeholder="منظره اقامتگاه"
-            />
-          </div>
-
           {/* Environment Texture */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">بافت محیط</label>
@@ -203,6 +182,17 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
             </div>
           </div>
 
+          {/* View Text Area */}
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">توضیحات منظره اقامتگاه</label>
+            <textarea
+              value={view}
+              onChange={(e) => setView(e.target.value)}
+              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
+              placeholder="توضیحات منظره اقامتگاه"
+            />
+          </div>
+
           {/* Neighbour Dropdown */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">نوع همسایگی</label>
@@ -259,6 +249,17 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                 </Switch.Group>
               ))}
             </div>
+          </div>
+
+          {/* Access Method Text Area */}
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">توضیحات شیوه دسترسی به اقامتگاه</label>
+            <textarea
+              value={accessMethod}
+              onChange={(e) => setAccessMethod(e.target.value)}
+              className="block p-2 border outline-none focus:border-2 rounded-xl w-full"
+              placeholder="توضیحات شیوه دسترسی به اقامتگاه"
+            />
           </div>
         </div>
       </div>

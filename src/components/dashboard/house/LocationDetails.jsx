@@ -12,44 +12,60 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [cities, setCities] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
   const [selectedCity, setSelectedCity] = useState(data?.address?.city?.id || null);
-  const [latitude, setLatitude] = useState(data?.address?.geography?.latitude || 35.6892); // Default to Tehran
-  const [longitude, setLongitude] = useState(data?.address?.geography?.longitude || 51.389); // Default to Tehran
+  
+  const [latitude, setLatitude] = useState(() => {
+    if (data?.address?.geography?.latitude) {
+      return data.address.geography.latitude;
+    } else if (data?.address?.city?.province?.latitude) {
+      return data.address.city.province.latitude;
+    } else {
+      return 35.6892; // Default to Tehran's latitude
+    }
+  });
+
+  const [longitude, setLongitude] = useState(() => {
+    if (data?.address?.geography?.longitude) {
+      return data.address.geography.longitude;
+    } else if (data?.address?.city?.province?.longitude) {
+      return data.address.city.province.longitude;
+    } else {
+      return 51.389; // Default to Tehran's longitude
+    }
+  });
+
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const mapContainerRef = useRef(null); // Ref for the modal map container
-  const mapContainerLgRef = useRef(null); // Ref for the large-screen map container
-  const modalMapRef = useRef(null); // Ref to store the modal map instance
-  const modalMarkerRef = useRef(null); // Ref to store the modal marker instance
-  const lgMapRef = useRef(null); // Ref to store the large-screen map instance
-  const lgMarkerRef = useRef(null); // Ref to store the large-screen marker instance
+  const mapContainerRef = useRef(null);
+  const mapContainerLgRef = useRef(null);
+  const modalMapRef = useRef(null);
+  const modalMarkerRef = useRef(null);
+  const lgMapRef = useRef(null);
+  const lgMarkerRef = useRef(null);
 
-  // Temp state to store selected lat/lng before saving changes
   const [tempLatitude, setTempLatitude] = useState(latitude);
   const [tempLongitude, setTempLongitude] = useState(longitude);
 
-  // Format latitude and longitude to 5 decimal places
   const formatCoord = (coord) => (coord !== null ? parseFloat(coord).toFixed(5) : "");
 
-  // Fetch provinces and cities when the component mounts
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        setIsLoading(true); // Set loading state initially when fetching provinces
+        setIsLoading(true);
         const provinceResponse = await axios.get("https://portal1.jatajar.com/api/assets/province");
         setProvinces(provinceResponse.data.data);
       } catch (error) {
         toast.error("خطا در بارگذاری استان‌ها");
       } finally {
-        setIsLoading(false); // Stop loading after provinces are fetched
+        setIsLoading(false);
       }
     };
 
     fetchProvinces();
   }, []);
 
-  // Fetch cities when the selected province changes
   useEffect(() => {
     const fetchCities = async () => {
       if (selectedProvince) {
@@ -57,7 +73,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           const cityResponse = await axios.get(
             `https://portal1.jatajar.com/api/assets/province/${selectedProvince}/cities`
           );
-          setCities(cityResponse.data.data.cities || []);         
+          setCities(cityResponse.data.data.cities || []);
         } catch (error) {
           toast.error("خطا در بارگذاری شهرها");
         }
@@ -69,6 +85,27 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     fetchCities();
   }, [selectedProvince]);
 
+  // Effect to update the latitude and longitude when the province changes
+  useEffect(() => {
+    if (selectedProvince) {
+      const selectedProvinceData = provinces.find(prov => prov.id === selectedProvince);
+      if (selectedProvinceData) {
+        setLatitude(selectedProvinceData.latitude);
+        setLongitude(selectedProvinceData.longitude);
+
+        // Update map position if map is already initialized
+        if (lgMapRef.current) {
+          lgMapRef.current.setCenter([selectedProvinceData.longitude, selectedProvinceData.latitude]);
+          lgMarkerRef.current.setLngLat([selectedProvinceData.longitude, selectedProvinceData.latitude]);
+        }
+        if (modalMapRef.current) {
+          modalMapRef.current.setCenter([selectedProvinceData.longitude, selectedProvinceData.latitude]);
+          modalMarkerRef.current.setLngLat([selectedProvinceData.longitude, selectedProvinceData.latitude]);
+        }
+      }
+    }
+  }, [selectedProvince]);
+
   const handleMapModalClose = () => {
     setIsMapModalOpen(false);
   };
@@ -77,10 +114,10 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     if (containerRef.current) {
       const mapInstance = new nmp_mapboxgl.Map({
         mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
-        container: containerRef.current, // Use the passed ref here
+        container: containerRef.current,
         zoom: 11,
         pitch: 0,
-        center: [longitude, latitude], // Set center to current coordinates
+        center: [longitude, latitude],
         minZoom: 2,
         maxZoom: 21,
         trackResize: true,
@@ -94,33 +131,22 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       });
 
       const markerInstance = new nmp_mapboxgl.Marker()
-        .setLngLat([longitude, latitude]) // Set marker position to the initial coordinates
-        .addTo(mapInstance); // Add the marker to the map
-
-      mapInstance.on('load', () => {
-        console.log("Map loaded successfully");
-      });
-
-      mapInstance.on('error', (error) => {
-        console.error("Map error:", error);
-      });
+        .setLngLat([longitude, latitude])
+        .addTo(mapInstance);
 
       mapInstance.on('click', (e) => {
         const coords = e.lngLat;
         setTempLatitude(coords.lat);
         setTempLongitude(coords.lng);
 
-        // Update marker position
         markerInstance.setLngLat([coords.lng, coords.lat]);
 
         toast.success(`موقعیت انتخاب شد`);
 
-        // Sync state changes
         setLatitude(coords.lat);
         setLongitude(coords.lng);
       });
 
-      // Assign the map and marker to the refs
       mapRef.current = mapInstance;
       markerRef.current = markerInstance;
     } else {
@@ -131,16 +157,16 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   useEffect(() => {
     if (isMapModalOpen) {
       setTimeout(() => {
-        initializeMap(mapContainerRef, modalMapRef, modalMarkerRef); // Initialize the map for modal view
-      }, 0); // Delay the map initialization to ensure the modal is fully rendered
+        initializeMap(mapContainerRef, modalMapRef, modalMarkerRef);
+      }, 0);
     }
   }, [isMapModalOpen]);
 
   useEffect(() => {
-    if (window.innerWidth >= 1024) { // Initialize map on large screens
+    if (window.innerWidth >= 1024) {
       setTimeout(() => {
-        initializeMap(mapContainerLgRef, lgMapRef, lgMarkerRef); // Initialize the map for large screen view
-      }, 0); // Delay the map initialization to ensure the container is fully rendered
+        initializeMap(mapContainerLgRef, lgMapRef, lgMarkerRef);
+      }, 0);
     }
   }, []);
 
@@ -149,7 +175,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   };
 
   const handleSaveLocation = () => {
-    // Save temporary latitude and longitude to the main state
     setLatitude(tempLatitude);
     setLongitude(tempLongitude);
     toast.success("موقعیت با موفقیت ثبت شد");
@@ -157,7 +182,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   };
 
   const handleSaveChanges = async () => {
-    setIsSaving(true); // Start the loading state when saving begins
+    setIsSaving(true);
     const requestData = {
       city_id: selectedCity,
       latitude,
@@ -185,8 +210,23 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     } catch (error) {
       toast.error("خطا در ثبت تغییرات");
     } finally {
-      setIsSaving(false); // End the loading state after saving is complete
+      setIsSaving(false);
     }
+  };
+
+  const renderErrorMessages = (fieldErrors) => {
+    if (!fieldErrors) return null;
+    return (
+      <div className="mt-0.5 text-red-500 text-sm">
+        {Array.isArray(fieldErrors) ? (
+          fieldErrors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))
+        ) : (
+          <p>{fieldErrors}</p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -197,64 +237,69 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full ">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-5 p-2">
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-1">استان</label>
+        <div className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2">
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">استان</label>
               <Listbox value={selectedProvince} onChange={setSelectedProvince}>
                 {({ open }) => (
-                  <>
-                    <div className="relative mt-1">
-                      <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                  <div className="relative">
+                    <div className="relative w-full cursor-pointer">
+                      <Listbox.Button
+                        className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.province ? 'border-red-500' : ''}`}
+                      >
                         {provinces.find((province) => province.id === selectedProvince)?.name || "انتخاب استان"}
-                      </span>
-                      <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
-                        <svg className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                         </svg>
                       </Listbox.Button>
-                      <Listbox.Options className={`absolute mt-2 w-full border z-50 rounded-xl bg-white shadow-lg scrollbar-thin ${open ? "block z-10" : "hidden"} max-h-60 overflow-y-auto`}>
-                        {provinces.map((province) => (
-                          <Listbox.Option key={province.id} value={province.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${province.id === selectedProvince ? "bg-gray-100" : ""}`}>
+                      <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-40 overflow-y-auto`}>
+                        {provinces.map(province => (
+                          <Listbox.Option key={province.id} value={province.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${province.id === selectedProvince ? 'bg-gray-100' : ''}`}>
                             {province.name}
                           </Listbox.Option>
                         ))}
                       </Listbox.Options>
                     </div>
-                  </>
+                  </div>
                 )}
               </Listbox>
+              {renderErrorMessages(errors.province)}
             </div>
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700">شهر</label>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">شهر</label>
               <Listbox value={selectedCity} onChange={setSelectedCity} disabled={!selectedProvince}>
                 {({ open }) => (
-                  <>
-                    <div className="relative mt-1">
-                      <span className="block p-2 border rounded-xl w-full cursor-pointer">
+                  <div className="relative">
+                    <div className="relative w-full cursor-pointer">
+                      <Listbox.Button
+                        className={`block p-2 border rounded-xl w-full text-left flex justify-between items-center ${errors.city ? 'border-red-500' : ''}`}
+                        disabled={!selectedProvince}
+                      >
                         {cities.find((city) => city.id === selectedCity)?.name || "انتخاب شهر"}
-                      </span>
-                      <Listbox.Button className="absolute inset-y-0 left-4 flex items-center pr-2">
-                        <svg className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                         </svg>
                       </Listbox.Button>
-                      <Listbox.Options className={`absolute scrollbar-thin mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? "block z-10" : "hidden"} max-h-60 overflow-y-auto`}>
-                        {cities.map((city) => (
-                          <Listbox.Option key={city.id} value={city.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${city.id === selectedCity ? "bg-gray-100" : ""}`}>
+                      <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-40 overflow-y-auto`}>
+                        {cities.map(city => (
+                          <Listbox.Option key={city.id} value={city.id} className={`cursor-pointer px-4 py-2 hover:bg-gray-200 ${city.id === selectedCity ? 'bg-gray-100' : ''}`}>
                             {city.name}
                           </Listbox.Option>
                         ))}
                       </Listbox.Options>
                     </div>
-                  </>
+                  </div>
                 )}
               </Listbox>
+              {renderErrorMessages(errors.city)}
             </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-5 p-2">
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-1">عرض جغرافیایی</label>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 p-2">
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">عرض جغرافیایی</label>
               <input 
                 type="number" 
                 step="0.00001" 
@@ -263,8 +308,8 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                 className="block w-full p-2 border rounded-xl bg-gray-200 cursor-not-allowed" 
               />
             </div>
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-1">طول جغرافیایی</label>
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">طول جغرافیایی</label>
               <input 
                 type="number" 
                 step="0.00001" 
@@ -274,9 +319,9 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
               />
             </div>
           </div>
+
           <div className="mt-10">
             <label className="block text-sm font-medium text-gray-700 mb-2">انتخاب موقعیت</label>
-            {/* Hide the button on large screens */}
             <button className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl lg:hidden" onClick={handleMapModalOpen}>
               باز کردن نقشه
             </button>
@@ -312,7 +357,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         </Dialog>
       </Transition>
 
-      {/* Display map directly on large screens */}
       <div className="hidden lg:block justify-start mt-5">
         <div className="w-full lg:w-2/3 rounded-xl overflow-hidden border">
           <div className="relative" id="map-container-lg" ref={mapContainerLgRef} style={{ height: '400px' }}>
@@ -321,7 +365,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         </div>
       </div>
 
-      {/* Save Changes Button */}
       {!isLoading && (
         <div className="absolute flex justify-end w-full">
           <button
@@ -333,7 +376,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         </div>
       )}
 
-      {/* Full-Page Loading Overlay */}
       {isSaving && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <Spinner />

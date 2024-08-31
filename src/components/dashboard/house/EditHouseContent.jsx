@@ -3,15 +3,15 @@ import EditHouseSidebar from "./EditHouseSidebar";
 import GeneralDetails from "./GeneralDetails";
 import AddressDetails from "./AddressDetails";
 import LocationDetails from "./LocationDetails";
-import EnvironmentDetails from "./EnvironmentDetails"
-import MainFacilityDetails from "./MainFacilityDetails"
-
+import EnvironmentDetails from "./EnvironmentDetails";
+import MainFacilityDetails from "./MainFacilityDetails";
 
 const tabs = [
   { key: "address", label: "آدرس" },
   { key: "location", label: "موقعیت مکانی" },
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
   { key: "environmentInfo", label: "اطلاعات محیطی" },
+  { key: "mainFacilities", label: "امکانات اقامتگاه" }, // Updated tab to "امکانات اقامتگاه"
   // other tabs...
 ];
 
@@ -46,21 +46,20 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
               houseUuid={houseUuid}
             />
           )}
-            {activeTab === "environmentInfo" && (
+          {activeTab === "environmentInfo" && (
             <EnvironmentDetails
-              data={houseData}  // Passing initial data to LocationDetails
+              data={houseData}  // Passing initial data to EnvironmentDetails
               token={token}
               houseUuid={houseUuid}
             />
           )}
-           {activeTab === "mainFacilities" && (
+          {activeTab === "mainFacilities" && (
             <MainFacilityDetails
-              data={houseData}  // Passing initial data to LocationDetails
+              data={houseData}  // Passing initial data to MainFacilityDetails
               token={token}
               houseUuid={houseUuid}
             />
           )}
-         
           {/* Add other tab components here... */}
         </div>
       </div>
