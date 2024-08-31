@@ -144,26 +144,28 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {environmentTexturesOptions.map((option) => (
                     <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
-                      <Switch
-                        checked={selectedTextures.includes(option.key)}
-                        onChange={() => toggleTexture(option.key)}
-                        className={`relative inline-flex ml-1.5 items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 
-                          ${selectedTextures.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                        `}
-                      >
-                        {selectedTextures.includes(option.key) && (
-                          <svg
-                            className="w-4 h-4 text-white absolute inset-0 m-auto"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </Switch>
-                      <Switch.Label className="ml-3 text-sm font-medium text-gray-700">{option.label}</Switch.Label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <Switch
+                          checked={selectedTextures.includes(option.key)}
+                          onChange={() => toggleTexture(option.key)}
+                          className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
+                            ${selectedTextures.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
+                          `}
+                        >
+                          {selectedTextures.includes(option.key) && (
+                            <svg
+                              className="w-4 h-4 text-white absolute inset-0 m-auto"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </Switch>
+                        <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                      </label>
                     </Switch.Group>
                   ))}
                 </div>
@@ -175,26 +177,28 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {viewOptions.map((option) => (
                     <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
-                      <Switch
-                        checked={selectedViews.includes(option.key)}
-                        onChange={() => toggleView(option.key)}
-                        className={`relative inline-flex ml-1.5 items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 
-                          ${selectedViews.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                        `}
-                      >
-                        {selectedViews.includes(option.key) && (
-                          <svg
-                            className="w-4 h-4 text-white absolute inset-0 m-auto"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </Switch>
-                      <Switch.Label className="ml-3 text-sm font-medium text-gray-700">{option.label}</Switch.Label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <Switch
+                          checked={selectedViews.includes(option.key)}
+                          onChange={() => toggleView(option.key)}
+                          className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
+                            ${selectedViews.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
+                          `}
+                        >
+                          {selectedViews.includes(option.key) && (
+                            <svg
+                              className="w-4 h-4 text-white absolute inset-0 m-auto"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </Switch>
+                        <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                      </label>
                     </Switch.Group>
                   ))}
                 </div>
@@ -244,26 +248,28 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                   {accessRouteOptions.map((option) => (
                     <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
-                      <Switch
-                        checked={selectedRoutes.includes(option.key)}
-                        onChange={() => toggleRoute(option.key)}
-                        className={`relative inline-flex ml-1.5 items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 
-                          ${selectedRoutes.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                        `}
-                      >
-                        {selectedRoutes.includes(option.key) && (
-                          <svg
-                            className="w-4 h-4 text-white absolute inset-0 m-auto"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </Switch>
-                      <Switch.Label className="ml-3 text-sm font-medium text-gray-700">{option.label}</Switch.Label>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <Switch
+                          checked={selectedRoutes.includes(option.key)}
+                          onChange={() => toggleRoute(option.key)}
+                          className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
+                            ${selectedRoutes.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
+                          `}
+                        >
+                          {selectedRoutes.includes(option.key) && (
+                            <svg
+                              className="w-4 h-4 text-white absolute inset-0 m-auto"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </Switch>
+                        <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                      </label>
                     </Switch.Group>
                   ))}
                 </div>
