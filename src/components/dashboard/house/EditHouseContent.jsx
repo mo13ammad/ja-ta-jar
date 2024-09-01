@@ -5,13 +5,15 @@ import AddressDetails from "./AddressDetails";
 import LocationDetails from "./LocationDetails";
 import EnvironmentDetails from "./EnvironmentDetails";
 import MainFacilityDetails from "./MainFacilityDetails";
+import Sanitaries from "./Sanitaries"; // Importing the Sanitaries component
 
 const tabs = [
   { key: "address", label: "آدرس" },
   { key: "location", label: "موقعیت مکانی" },
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
   { key: "environmentInfo", label: "اطلاعات محیطی" },
-  { key: "mainFacilities", label: "امکانات اقامتگاه" }, // Updated tab to "امکانات اقامتگاه"
+  { key: "mainFacilities", label: "امکانات اقامتگاه" },
+  { key: "sanitaries", label: "امکانات بهداشتی" }, // Updated key and label
   // other tabs...
 ];
 
@@ -56,6 +58,13 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
           {activeTab === "mainFacilities" && (
             <MainFacilityDetails
               data={houseData}  // Passing initial data to MainFacilityDetails
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
+          {activeTab === "sanitaries" && ( // Added Sanitaries component for the new key
+            <Sanitaries
+              data={houseData}  // Passing initial data to Sanitaries
               token={token}
               houseUuid={houseUuid}
             />
