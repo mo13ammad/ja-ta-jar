@@ -73,6 +73,13 @@ const Register = () => {
     }
   }, [otp]);
 
+  const handleOtpChange = (value) => {
+    // Ensure only numeric values are allowed
+    if (/^\d*$/.test(value)) {
+      setOtp(value);
+    }
+  };
+
   const handleOtpSubmit = async () => {
     setLoading(true);
 
@@ -180,9 +187,8 @@ const Register = () => {
               <div style={{ direction: 'ltr' }}>
                 <OtpInput
                   value={otp}
-                  onChange={setOtp}
+                  onChange={handleOtpChange}
                   numInputs={4}
-                  
                   renderInput={(props) => (
                     <input
                       {...props}

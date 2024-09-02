@@ -5,9 +5,10 @@ import Navbar from '../../Navbar';
 import EditHouseContent from './EditHouseContent';
 import Spinner from '../../Spinner';
 import toast, { Toaster } from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 
 const EditHousePage = () => {
-  const { uuid } = useParams();
+  const { uuid } = useParams();  // Get the UUID from the URL
   const location = useLocation();
   const navigate = useNavigate();
   const token = location.state?.token || '';
@@ -24,18 +25,23 @@ const EditHousePage = () => {
         },
       });
       setHouseData(response.data.data); // Ensure response.data.data is used
+      console.log(response.data.data);
     } catch (error) {
       console.error('Error fetching house data:', error);
-      toast.error('لطفا ابتدا وارد شوید');
-      navigate('/login'); // Redirect to login page on failure
+      toast.error("مشکلی پیش آمده لطفا به پشتیبانی اطلاع دهید");
+      navigate('/dashboard'); // Redirect to dashboard on failure
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchHouseData();
-  }, [token, uuid]);
+    if (uuid) {
+      fetchHouseData();
+    } else {
+      navigate('/dashboard'); // Redirect to dashboard if uuid is not available
+    }
+  }, [uuid]);
 
   if (loading) {
     return (
@@ -52,11 +58,16 @@ const EditHousePage = () => {
   }
 
   return (
-    <div className="min-h-[100vh] ">
-      <Navbar userName={houseData.ownerName} />
-      <EditHouseContent houseData={houseData} token={token} onUpdate={fetchHouseData} />
-      
-    </div>
+    <>
+      <Helmet>
+        <title>{"ویرایش اقامتگاه"}</title>
+      </Helmet>
+      <div className="min-h-[100vh] ">
+        <Navbar userName={houseData.vendor.name} />
+        <EditHouseContent houseData={houseData} token={token} onUpdate={fetchHouseData} houseUuid={uuid} /> {/* Pass UUID as prop */}
+     
+      </div>
+    </>
   );
 };
 

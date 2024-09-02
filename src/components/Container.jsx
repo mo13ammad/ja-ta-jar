@@ -1,14 +1,18 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import Header from "./Header";
+import Navbar from "./Navbar";
 import Body from "./Body";
+import Header from "./Header";
+import { Helmet } from "react-helmet-async";
 
 function Container() {
   return (
-    <div className="">
+    <>
+    <Helmet><title>جا تا جار</title></Helmet>
+    <div className="w-full  h-screen">
       <Header />
       <Body />
     </div>
+    </>
   );
 }
 

@@ -32,20 +32,11 @@ const sections = [
   },
   {
     label: 'مشخصات اقامتگاه',
-    keys: ['rooms', 'bathrooms', 'otherSpaces'],
+    keys: ['mainFacilities', 'rooms', 'sanitaries'], // Updated key for sanitaries
     children: [
+      { key: 'mainFacilities', label: 'امکانات اقامتگاه' }, // Replaced "سایر فضاها" with "امکانات اقامتگاه"
       { key: 'rooms', label: 'اتاق‌ها و پذیرایی' },
-      { key: 'bathrooms', label: 'سرویس‌های بهداشتی و حمام' },
-      { key: 'otherSpaces', label: 'سایر فضاهای اقامتگاه' },
-    ],
-  },
-  {
-    label: 'امکانات',
-    keys: ['mainFacilities', 'kitchenEquipment', 'specialServices'],
-    children: [
-      { key: 'mainFacilities', label: 'امکانات اصلی' },
-      { key: 'kitchenEquipment', label: 'تجهیزات آشپزخانه' },
-      { key: 'specialServices', label: 'خدمات ویژه' },
+      { key: 'sanitaries', label: 'امکانات بهداشتی' }, // Changed to sanitaries
     ],
   },
   {
@@ -88,13 +79,13 @@ const EditHouseSidebar = ({ activeTab, setActiveTab }) => {
         newOpenSections[section.label] = true;
       }
     });
-    setOpenSections(newOpenSections);
+    setOpenSections((prev) => ({ ...prev, ...newOpenSections }));
   }, [activeTab]);
 
   const handleToggle = (label) => {
     setOpenSections((prev) => ({
       ...prev,
-      [label]: !prev[label],
+      [label]: !prev[label], // Toggle the specific section's open state without affecting others
     }));
   };
 
