@@ -19,6 +19,7 @@ const tabs = [
 
 const EditHouseContent = ({ houseData, token, houseUuid }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
+ 
 
   return (
     <div className="container relative mx-auto p-4">
@@ -57,14 +58,14 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
           )}
           {activeTab === "mainFacilities" && (
             <MainFacilityDetails
-              data={houseData}  // Passing initial data to MainFacilityDetails
+             facilities={houseData.facilities}  // Passing initial data to MainFacilityDetails
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "sanitaries" && ( // Added Sanitaries component for the new key
             <Sanitaries
-              data={houseData}  // Passing initial data to Sanitaries
+              houseData={houseData}  // Passing initial data to Sanitaries
               token={token}
               houseUuid={houseUuid}
             />
