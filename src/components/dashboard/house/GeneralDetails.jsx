@@ -15,7 +15,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
     number_stairs: data?.structure?.number_stairs || "",
     description: data?.description || "",
     tip: "", // Initially empty, will be set in useEffect
-    privacy: "" // Initially empty, will be set in useEffect
+    privacy: "", // Initially empty, will be set in useEffect
+    rentType: data?.rentType || "House", // Default to "House" or fetched data
+    price_handle_by: data?.price_handle_by || "PerNight", // Default to "PerNight" or fetched data
   });
 
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -253,6 +255,64 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
               placeholder="توضیحات"
             />
             {renderErrorMessages(errors.description)}
+          </div>
+
+          {/* Rent Type (اجاره بر اساس) Radio Group */}
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="rentType"
+                  value="House"
+                  checked={formData.rentType === "House"}
+                  onChange={() => handleInputChange("rentType", "House")}
+                  className="form-radio text-green-600"
+                />
+                <span className="ml-2">اقامتگاه</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="rentType"
+                  value="Rooms"
+                  checked={formData.rentType === "Rooms"}
+                  onChange={() => handleInputChange("rentType", "Rooms")}
+                  className="form-radio text-green-600"
+                />
+                <span className="ml-2">اتاق</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Price Handle By (قیمت گذاری بر اساس) Radio Group */}
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="price_handle_by"
+                  value="PerNight"
+                  checked={formData.price_handle_by === "PerNight"}
+                  onChange={() => handleInputChange("price_handle_by", "PerNight")}
+                  className="form-radio text-green-600"
+                />
+                <span className="ml-2">شبانه</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  name="price_handle_by"
+                  value="PerPerson"
+                  checked={formData.price_handle_by === "PerPerson"}
+                  onChange={() => handleInputChange("price_handle_by", "PerPerson")}
+                  className="form-radio text-green-600"
+                />
+                <span className="ml-2">نفر</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
