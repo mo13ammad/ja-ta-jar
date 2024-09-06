@@ -162,7 +162,7 @@ function MainFacilityDetails({ token, houseUuid, facilities }) {
                     </svg>
                   )}
                 </Switch>
-                <span className="ml-3 text-sm font-medium text-gray-700">
+                <span className="ml-3 text-lg lg:text-xl mb-1 font-medium text-gray-700">
                   {facility.label}
                 </span>
               </label>
@@ -183,6 +183,17 @@ function MainFacilityDetails({ token, houseUuid, facilities }) {
                             <span className="ml-3 text-sm font-medium text-gray-700">
                               {field.title}
                             </span>
+                            {selectedFacilities[facility.key]?.fields?.[field.title.trim()] && (
+                                <svg
+                                  className="w-4 h-4 text-white absolute inset-0 m-auto"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
                             <Switch
                               checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
                               onChange={() =>
@@ -200,17 +211,7 @@ function MainFacilityDetails({ token, houseUuid, facilities }) {
                                 }
                               `}
                             >
-                              {selectedFacilities[facility.key]?.fields?.[field.title.trim()] && (
-                                <svg
-                                  className="w-4 h-4 text-white absolute inset-0 m-auto"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
+                              
                             </Switch>
                           </label>
                         </Switch.Group>

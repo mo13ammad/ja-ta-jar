@@ -7,3 +7,5 @@ function RoomDetails() {
 }
 
 export default RoomDetails
+
+https://portal1.jatajar.com/api/assets/types/roomFacilities/detail

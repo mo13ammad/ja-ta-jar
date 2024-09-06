@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
-import { Listbox, RadioGroup } from "@headlessui/react";
+import { Listbox } from "@headlessui/react";
 import Spinner from "./Spinner"; // Assuming you have a Spinner component
 
 const GeneralDetails = ({ data, token, houseUuid }) => {
@@ -19,7 +19,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
     description: data?.description || "",
     tip: "", // Initially empty, will be set in useEffect
     privacy: "", // Initially empty, will be set in useEffect
-    rentType: data?.rentType || "House", // Default to "House" or fetched data
+    rentType: data?.is_rent_room ? "Rooms" : "House", // Based on is_rent_room flag
     price_handle_by: data?.price_handle_by?.key || "PerNight", // Set based on fetched data or default
   });
 
@@ -94,6 +94,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
   const handleSubmit = async () => {
     setLoadingSubmit(true);
 
+    // Log the data we are sending
+    console.log("Data being sent:", formData);
+
     try {
       const response = await axios.post(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
@@ -108,6 +111,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
           },
         }
       );
+
+      // Log the response after update
+      console.log("Response received:", response.data);
 
       if (response.status === 200) {
         toast.success("اطلاعات با موفقیت ثبت شد");
