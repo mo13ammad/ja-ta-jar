@@ -5,6 +5,7 @@ import AddressDetails from "./AddressDetails";
 import LocationDetails from "./LocationDetails";
 import EnvironmentDetails from "./EnvironmentDetails";
 import MainFacilityDetails from "./MainFacilityDetails";
+import StayRuleDetails from "./StayRuleDetails";
 import Sanitaries from "./Sanitaries"; // Importing the Sanitaries component
 
 const tabs = [
@@ -13,13 +14,14 @@ const tabs = [
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
   { key: "environmentInfo", label: "اطلاعات محیطی" },
   { key: "mainFacilities", label: "امکانات اقامتگاه" },
-  { key: "sanitaries", label: "امکانات بهداشتی" }, // Updated key and label
+  { key: "sanitaries", label: "امکانات بهداشتی" }, 
+  { key: "stayRules", label: "قوانین اقامت" }, 
   // other tabs...
 ];
 
 const EditHouseContent = ({ houseData, token, houseUuid }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
-
+ 
   return (
     <div className="container relative mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -57,17 +59,27 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
           )}
           {activeTab === "mainFacilities" && (
             <MainFacilityDetails
-              data={houseData}  // Passing initial data to MainFacilityDetails
+             facilities={houseData.facilities}  // Passing initial data to MainFacilityDetails
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "sanitaries" && ( // Added Sanitaries component for the new key
             <Sanitaries
-              data={houseData}  // Passing initial data to Sanitaries
+              houseData={houseData}  // Passing initial data to Sanitaries
               token={token}
               houseUuid={houseUuid}
             />
+          )}
+          {activeTab === "stayRules" && ( // Added StayRuleDetails component for the new key
+            <>
+              
+              <StayRuleDetails
+                houseData={houseData}  // Passing initial data to StayRuleDetails
+                token={token}
+                houseUuid={houseUuid}
+              />
+            </>
           )}
           {/* Add other tab components here... */}
         </div>
