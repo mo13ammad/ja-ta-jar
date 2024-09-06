@@ -62,26 +62,22 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
   };
 
   const handleSubmit = async () => {
+    console.log(requestData);
     setLoadingSubmit(true);
     try {
-      const requestData = Object.keys(selectedRules).map((key, index) => ({
-        [`rules[${index}][key]`]: key,
-        [`rules[${index}][status]`]: selectedRules[key],
-      }));
-
-      const flattenedRequestData = requestData.reduce((acc, item) => {
-        Object.entries(item).forEach(([k, v]) => {
-          acc[k] = v;
-        });
+      // Create the data structure to match your desired format
+      const requestData = Object.keys(selectedRules).reduce((acc, key, index) => {
+        acc[`rules[${index}][${key}]`] = selectedRules[key];  // Rule key and status in separate lines
+        acc[`rules[${index}][${selectedRules[key]}]`] = ""; // Add another entry for the status
         return acc;
       }, {});
-
+  
       // Log the request data
-      console.log('Request Data:', JSON.stringify(flattenedRequestData, null, 2));
-
+      console.log('Request Data:', requestData);
+  
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
-        flattenedRequestData,
+        requestData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,10 +85,10 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
           },
         }
       );
-
+  
       // Log the response data
       console.log('Response Data:', response.data);
-
+  
       if (response.status === 200) {
         toast.success('اطلاعات با موفقیت ثبت شد');
       } else {
@@ -105,6 +101,7 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
       setLoadingSubmit(false);
     }
   };
+  
 
   if (loading) {
     return (
@@ -118,7 +115,7 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
     <div>
       <h2 className="text-xl font-semibold mb-4">قوانین اقامتگاه</h2>
       <div className="space-y-2">
-        {rules.map((rule) => (
+        {rules.map((rule, index) => (
           <div key={rule.key} className="border p-2 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{rule.label}</span>

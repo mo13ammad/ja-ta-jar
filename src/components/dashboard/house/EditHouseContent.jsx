@@ -6,7 +6,9 @@ import LocationDetails from "./LocationDetails";
 import EnvironmentDetails from "./EnvironmentDetails";
 import MainFacilityDetails from "./MainFacilityDetails";
 import StayRuleDetails from "./StayRuleDetails";
-import Sanitaries from "./Sanitaries"; // Importing the Sanitaries component
+import Sanitaries from "./Sanitaries";
+import PricingDetails from "./PricingDetails";
+import ReservationRuleDetails from "./ReservationRuleDetails"; // Importing the new ReservationRuleDetails component
 
 const tabs = [
   { key: "address", label: "آدرس" },
@@ -14,14 +16,15 @@ const tabs = [
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
   { key: "environmentInfo", label: "اطلاعات محیطی" },
   { key: "mainFacilities", label: "امکانات اقامتگاه" },
-  { key: "sanitaries", label: "امکانات بهداشتی" }, 
-  { key: "stayRules", label: "قوانین اقامت" }, 
-  // other tabs...
+  { key: "sanitaries", label: "امکانات بهداشتی" },
+  { key: "stayRules", label: "قوانین اقامت" },
+  { key: "pricing", label: "قیمت گذاری" },
+  { key: "reservationRules", label: "قوانین رزرو" }, // New tab for ReservationRuleDetails
 ];
 
 const EditHouseContent = ({ houseData, token, houseUuid }) => {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
- 
+
   return (
     <div className="container relative mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -31,57 +34,67 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
         <div className="col-span-1 md:col-span-3 md:max-h-[80vh] overflow-auto border p-4 rounded-xl bg-white scrollbar-thin">
           {activeTab === "generalInfo" && (
             <GeneralDetails
-              data={houseData}  // Passing initial data to GeneralDetails
+              data={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "address" && (
             <AddressDetails
-              data={houseData}  // Passing initial data to AddressDetails
+              data={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "location" && (
             <LocationDetails
-              data={houseData}  // Passing initial data to LocationDetails
+              data={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "environmentInfo" && (
             <EnvironmentDetails
-              data={houseData}  // Passing initial data to EnvironmentDetails
+              data={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
           {activeTab === "mainFacilities" && (
             <MainFacilityDetails
-             facilities={houseData.facilities}  // Passing initial data to MainFacilityDetails
+              facilities={houseData.facilities}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
-          {activeTab === "sanitaries" && ( // Added Sanitaries component for the new key
+          {activeTab === "sanitaries" && (
             <Sanitaries
-              houseData={houseData}  // Passing initial data to Sanitaries
+              houseData={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
           )}
-          {activeTab === "stayRules" && ( // Added StayRuleDetails component for the new key
-            <>
-              
-              <StayRuleDetails
-                houseData={houseData}  // Passing initial data to StayRuleDetails
-                token={token}
-                houseUuid={houseUuid}
-              />
-            </>
+          {activeTab === "stayRules" && (
+            <StayRuleDetails
+              houseData={houseData}  
+              token={token}
+              houseUuid={houseUuid}
+            />
           )}
-          {/* Add other tab components here... */}
+          {activeTab === "pricing" && (
+            <PricingDetails
+              houseData={houseData}  
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
+          {activeTab === "reservationRules" && ( 
+            <ReservationRuleDetails
+              houseData={houseData}  
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
         </div>
       </div>
     </div>
