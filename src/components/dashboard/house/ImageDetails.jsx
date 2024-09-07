@@ -8,24 +8,30 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
   const [loading, setLoading] = useState(false);
   const [medias, setMedias] = useState([]);
   const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [title, setTitle] = useState('');
   const [isMain, setIsMain] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState({});
   const [makeMainLoading, setMakeMainLoading] = useState({});
   const [buttonText, setButtonText] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    if (houseData && houseData.medias) {
-      setMedias(houseData.medias || []);
-      console.log('Medias:', houseData.medias);
-    } else {
-      console.log('No medias found in houseData');
+    if (houseData?.medias) {
+      setMedias(houseData.medias);
     }
   }, [houseData]);
 
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddImage = async () => {
@@ -37,15 +43,9 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
     const formData = new FormData();
     formData.append('image', imageFile);
     formData.append('title', title);
-
-    if (isMain) {
-      formData.append('main', 1);
-    }
-
-    console.log('Add Image - FormData:', { image: imageFile, title, main: isMain });
+    if (isMain) formData.append('main', 1);
 
     setLoading(true);
-
     try {
       const response = await axios.post(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}/media`,
@@ -58,29 +58,25 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
         }
       );
 
-      console.log('Add Image Response:', response.data.data.medias);
-
       if (response.status === 200 || response.status === 201) {
-        setMedias(response.data.data.medias || []); // Re-render images from medias
+        setMedias(response.data.data.medias);
         toast.success('تصویر با موفقیت اضافه شد');
         setIsOpen(false);
       } else {
         throw new Error('Unexpected response status: ' + response.status);
       }
     } catch (error) {
-      console.error('Error adding image:', error);
-      toast.error('خطایی در ارسال تصویر رخ داد.');
+      const errMsg = error.response?.data?.message || 'خطایی در ارسال تصویر رخ داد.';
+      setErrorMessage(errMsg);
+      toast.error(errMsg);
+      console.error('Error adding image:', errMsg);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteClick = async (imageId) => {
-    setDeleteLoading((prevState) => ({ ...prevState, [imageId]: true }));
-
-    console.log('Delete Image - House UUID:', houseUuid);
-    console.log('Delete Image - Image UUID:', imageId);
-
+    setDeleteLoading(prev => ({ ...prev, [imageId]: true }));
     try {
       const response = await axios.delete(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageId}`,
@@ -92,84 +88,41 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
         }
       );
 
-      console.log('Delete Image Response:', response);
-
       if (response.status === 200) {
-        // Remove the deleted image from the media list
-        setMedias((prev) => prev.filter((image) => image.id !== imageId));
+        setMedias(prev => prev.filter(image => image.id !== imageId));
         toast.success('تصویر با موفقیت حذف شد');
       } else {
         throw new Error('Failed to delete image.');
       }
     } catch (error) {
-      console.error('Error deleting image:', error);
-      toast.error('خطایی در حذف تصویر رخ داد.');
+      const errMsg = error.response?.data?.message || 'خطایی در حذف تصویر رخ داد.';
+      setErrorMessage(errMsg);
+      toast.error(errMsg);
+      console.error('Error deleting image:', errMsg);
     } finally {
-      setDeleteLoading((prevState) => ({ ...prevState, [imageId]: false }));
-    }
-  };
-
-  const handleUpdateImage = async () => {
-    if (!selectedImage) {
-      toast.error('لطفا تصویری برای ویرایش انتخاب کنید.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('title', title);
-
-    if (isMain) {
-      formData.append('main', 1);
-    }
-
-    console.log('Update Image - FormData:', { title, main: isMain });
-
-    setLoading(true);
-
-    try {
-      const response = await axios.put(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${selectedImage}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      console.log('Update Image Response:', response);
-
-      if (response.status === 200) {
-        setMedias(response.data.data.medias || []); // Re-render images from medias
-        toast.success('تصویر با موفقیت به‌روزرسانی شد');
-        setIsOpen(false);
-      } else {
-        throw new Error('Failed to update image.');
-      }
-    } catch (error) {
-      toast.error('خطایی در به‌روزرسانی تصویر رخ داد.');
-      console.error('Error updating image:', error);
-    } finally {
-      setLoading(false);
+      setDeleteLoading(prev => ({ ...prev, [imageId]: false }));
     }
   };
 
   const handleMakeMain = async (imageId) => {
-    if (!imageId) {
-      console.error('Image ID is undefined or null.');
+    if (!imageId) return;
+
+    const imageToMakeMain = medias.find(img => img.id === imageId);
+    if (!imageToMakeMain) {
+      toast.error('تصویر یافت نشد');
       return;
     }
-  
-    setMakeMainLoading((prevState) => ({ ...prevState, [imageId]: true }));
-    setButtonText((prev) => ({ ...prev, [imageId]: 'در حال تبدیل ...' }));
-  
-    console.log('Make Main Image - Image ID:', imageId);
-  
+
+    setMakeMainLoading(prev => ({ ...prev, [imageId]: true }));
+    setButtonText(prev => ({ ...prev, [imageId]: 'در حال تبدیل ...' }));
+
     try {
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageId}`,
-        { main: 1 }, // Only send the main field
+        {
+          title: imageToMakeMain.title, // Send the latest title
+          main: 1 // Set main to 1
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -177,24 +130,30 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
           },
         }
       );
-  
-      console.log('Make Main Image Response:', response);
-  
+
       if (response.status === 200) {
-        setMedias(response.data.data.medias || []); // Re-render images from medias
+        setMedias(prevMedias => prevMedias.map(img => {
+          if (img.id === imageId) {
+            return { ...img, main: true }; // Mark this image as main
+          } else if (img.main) {
+            return { ...img, main: false }; // Unmark previous main image
+          }
+          return img;
+        }));
         toast.success('تصویر به عنوان تصویر اصلی تنظیم شد');
       } else {
         throw new Error('Failed to make image main.');
       }
     } catch (error) {
-      console.error('Error making image main:', error);
-      toast.error('خطایی در تبدیل به تصویر اصلی رخ داد.');
+      const errMsg = error.response?.data?.message || 'خطایی در تبدیل به تصویر اصلی رخ داد.';
+      setErrorMessage(errMsg);
+      toast.error(errMsg);
+      console.error('Error making image main:', errMsg);
     } finally {
-      setMakeMainLoading((prevState) => ({ ...prevState, [imageId]: false }));
-      setButtonText((prev) => ({ ...prev, [imageId]: 'تبدیل به تصویر اصلی' }));
+      setMakeMainLoading(prev => ({ ...prev, [imageId]: false }));
+      setButtonText(prev => ({ ...prev, [imageId]: 'تبدیل به تصویر اصلی' }));
     }
   };
-  
 
   return (
     <div className="w-full h-full p-4">
@@ -212,47 +171,34 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       {medias.length > 0 ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {medias.map((image) => (
-            <div key={image.id || image.media} className="border rounded-2xl flex justify-between items-center gap-2 relative">
-              <div className="px-3 py-2 w-full sm:w-3/5">
+            <div key={image.id || image.media} className="border rounded-2xl flex flex-col md:flex-row justify-between items-center gap-2 relative">
+              <div className="px-3 py-2 w-full md:w-3/5 flex flex-col">
                 <p className="font-semibold mb-2">عنوان: {image.title || 'بدون عنوان'}</p>
                 {image.main && (
-                  <span className="absolute top-2 left-2 bg-green-600 text-white px-3 py-1 text-sm rounded truncate">
-                    اصلی
-                  </span>
+                  <span className="absolute top-2 left-2 bg-green-600 text-white px-3 py-1 text-sm rounded truncate">اصلی</span>
                 )}
                 <div className="flex gap-2 mt-2">
                   <button
-                    className="bg-green-600 max-w-36 text-white px-2 py-1 rounded-lg"
-                    onClick={() => {
-                      setSelectedImage(image.id);
-                      setTitle(image.title || '');
-                      setIsMain(image.main);
-                      setIsOpen(true);
-                    }}
-                  >
-                    ویرایش
-                  </button>
-                  <button
-                    className="bg-red-500 max-w-36 text-white px-2 py-1 rounded-lg"
+                    className="bg-red-500 text-white px-1 py-0.5 truncate rounded-lg"
                     onClick={() => handleDeleteClick(image.id)}
                     disabled={deleteLoading[image.id]}
                   >
-                    {deleteLoading[image.id] ? 'در حال حذف ...' : 'حذف'}
+                    {deleteLoading[image.id] ? 'در حال حذف...' : 'حذف'}
                   </button>
                   {!image.main && (
                     <button
-                      className="truncate max-w-xs bg-blue-500 text-white px-2 py-1 rounded-lg text-xs"
+                      className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs"
                       onClick={() => handleMakeMain(image.id)}
                       disabled={makeMainLoading[image.id]}
                     >
-                      {makeMainLoading[image.id] ? buttonText[image.id] || 'تبدیل به تصویر اصلی' : 'تبدیل به تصویر اصلی'}
+                      {makeMainLoading[image.id] ? buttonText[image.id] || 'در حال تبدیل ...' : 'تبدیل به تصویر اصلی'}
                     </button>
                   )}
                 </div>
               </div>
               <img
                 src={image.media}
-                className="hidden sm:block w-2/5 h-full object-cover rounded-tl-xl rounded-bl-xl"
+                className="w-full md:w-2/5 h-40 md:h-full object-cover rounded-tl-xl rounded-bl-xl"
                 alt={image.title || 'Image'}
               />
             </div>
@@ -261,78 +207,61 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       ) : (
         <p className="p-1">تصویری وجود ندارد.</p>
       )}
-
-      {/* Add/Edit Image Dialog */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-xl w-full">
-            <DialogTitle className="font-bold text-xl">
-              {selectedImage ? 'ویرایش تصویر' : 'اضافه کردن تصویر'}
-            </DialogTitle>
-            <Description>لطفاً عنوان و تصویر را وارد کنید :</Description>
-
-            <div className="w-full">
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="w-full p-2 mb-2 border rounded-lg"
-              />
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="عنوان تصویر"
-                className="w-full p-2 border rounded-lg outline-none"
-              />
-              {selectedImage === null && (
-                <div className="flex items-center mt-2">
-                  <input
-                    type="checkbox"
-                    checked={isMain}
-                    onChange={(e) => setIsMain(e.target.checked)}
-                    className="sr-only"
-                    id="main-checkbox"
-                  />
-                  <div
-                    className={`h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 
-                      ${isMain ? 'bg-green-500' : 'bg-gray-200'}
-                    `}
-                  >
-                    {isMain && (
-                      <svg
-                        className="w-4 h-4 text-white absolute inset-0 m-auto"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <label
-                    htmlFor="main-checkbox"
-                    className="ml-2 cursor-pointer select-none"
-                  >
-                    تبدیل به عکس اصلی
-                  </label>
+            <DialogTitle className="font-bold text-xl">اضافه کردن تصویر</DialogTitle>
+            <Description>لطفاً عنوان و تصویر را وارد کنید.</Description>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full border rounded-lg p-2"
+            />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover mt-4 border rounded-lg" />
+            )}
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="عنوان تصویر"
+              className="w-full border rounded-lg p-2 outline-none"
+            />
+            <div className="flex items-center gap-2">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isMain}
+                  onChange={() => setIsMain(!isMain)}
+                  className="sr-only"
+                />
+                <div className={`w-5 h-5 rounded-full border ${isMain ? 'bg-green-500' : 'bg-gray-200'} flex items-center justify-center`}>
+                  {isMain && (
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fillRule="evenodd" d="M4.293 9.293a1 1 0 011.414 0L10 11.586l4.293-4.293a1 1 0 111.414 1.414l-5 5a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  )}
                 </div>
-              )}
+                <span className="text-sm">{isMain ? 'تبدیل به تصویر اصلی' : 'تبدیل به تصویر اصلی'}</span>
+              </label>
             </div>
-
-            <div className="flex gap-4 mt-4">
+            <div className="flex justify-end mt-4 gap-2">
               <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="bg-gray-300 px-4 py-2 rounded-lg"
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg"
               >
-                لغو
+                انصراف
               </button>
               <button
-                onClick={selectedImage ? handleUpdateImage : handleAddImage}
-                className="bg-green-600 px-4 py-2 rounded-lg text-white"
+                type="button"
+                onClick={handleAddImage}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                disabled={loading}
               >
-                {loading ? 'در حال ذخیره ...' : selectedImage ? 'ویرایش' : 'اضافه کردن'}
+                {loading ? 'در حال بارگذاری ...' : 'اضافه کردن'}
               </button>
             </div>
           </DialogPanel>
