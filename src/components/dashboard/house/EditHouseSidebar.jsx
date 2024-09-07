@@ -32,18 +32,18 @@ const sections = [
   },
   {
     label: 'مشخصات اقامتگاه',
-    keys: ['mainFacilities', 'rooms', 'sanitaries'], // Updated key for sanitaries
+    keys: ['mainFacilities', 'rooms', 'sanitaries'],
     children: [
-      { key: 'mainFacilities', label: 'امکانات اقامتگاه' }, // Replaced "سایر فضاها" with "امکانات اقامتگاه"
+      { key: 'mainFacilities', label: 'امکانات اقامتگاه' },
       { key: 'rooms', label: 'اتاق‌ها و پذیرایی' },
-      { key: 'sanitaries', label: 'امکانات بهداشتی' }, // Changed to sanitaries
+      { key: 'sanitaries', label: 'امکانات بهداشتی' },
     ],
   },
   {
     label: 'قوانین اقامتگاه',
     keys: ['reservationRules', 'stayRules'],
     children: [
-      { key: 'reservationRules', label: 'قوانین رزرو' },
+      { key: 'reservationRules', label: 'قوانین رزرو' }, // Added new tab here
       { key: 'stayRules', label: 'قوانین اقامت' },
     ],
   },
