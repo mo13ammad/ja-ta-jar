@@ -8,7 +8,8 @@ import MainFacilityDetails from "./MainFacilityDetails";
 import StayRuleDetails from "./StayRuleDetails";
 import Sanitaries from "./Sanitaries";
 import PricingDetails from "./PricingDetails";
-import ReservationRuleDetails from "./ReservationRuleDetails"; // Importing the new ReservationRuleDetails component
+import ReservationRuleDetails from "./ReservationRuleDetails";
+import ImageDetails from "./ImageDetails"; // Importing the new ImageDetails component
 
 const tabs = [
   { key: "address", label: "آدرس" },
@@ -19,7 +20,8 @@ const tabs = [
   { key: "sanitaries", label: "امکانات بهداشتی" },
   { key: "stayRules", label: "قوانین اقامت" },
   { key: "pricing", label: "قیمت گذاری" },
-  { key: "reservationRules", label: "قوانین رزرو" }, // New tab for ReservationRuleDetails
+  { key: "reservationRules", label: "قوانین رزرو" },
+  { key: "images", label: "تصاویر اقامتگاه" }, // New tab for ImageDetails
 ];
 
 const EditHouseContent = ({ houseData, token, houseUuid }) => {
@@ -88,9 +90,16 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
               houseUuid={houseUuid}
             />
           )}
-          {activeTab === "reservationRules" && ( 
+          {activeTab === "reservationRules" && (
             <ReservationRuleDetails
               houseData={houseData}  
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
+          {activeTab === "images" && ( // ImageDetails component for images tab
+            <ImageDetails
+            houseData={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
