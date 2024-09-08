@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 
-const PricingDetails = ({ token, houseUuid }) => {
+const PricingDetails = ({ token, houseUuid, houseData }) => {
   const [formData, setFormData] = useState({
     nowruz: "",
     normal_spring: "",
@@ -27,11 +27,40 @@ const PricingDetails = ({ token, houseUuid }) => {
     extra_people_winter: "",
   });
 
+  const [errors, setErrors] = useState({}); // Track validation errors
+  const [errorList, setErrorList] = useState([]); // To show errors as a list near the submit button
+  const [loading, setLoading] = useState(false); // Track loading state
+
+  useEffect(() => {
+    if (houseData?.prices) {
+      setFormData({
+        nowruz: houseData.prices.nowruz || "",
+        normal_spring: houseData.prices.spring?.normal || "",
+        weekend_spring: houseData.prices.spring?.weekend || "",
+        holiday_spring: houseData.prices.spring?.holiday || "",
+        peak_spring: houseData.prices.spring?.peak || "",
+        extra_people_spring: houseData.prices.spring?.extra_people || "",
+        normal_summer: houseData.prices.summer?.normal || "",
+        weekend_summer: houseData.prices.summer?.weekend || "",
+        holiday_summer: houseData.prices.summer?.holiday || "",
+        peak_summer: houseData.prices.summer?.peak || "",
+        extra_people_summer: houseData.prices.summer?.extra_people || "",
+        normal_autumn: houseData.prices.autumn?.normal || "",
+        weekend_autumn: houseData.prices.autumn?.weekend || "",
+        holiday_autumn: houseData.prices.autumn?.holiday || "",
+        peak_autumn: houseData.prices.autumn?.peak || "",
+        extra_people_autumn: houseData.prices.autumn?.extra_people || "",
+        normal_winter: houseData.prices.winter?.normal || "",
+        weekend_winter: houseData.prices.winter?.weekend || "",
+        holiday_winter: houseData.prices.winter?.holiday || "",
+        peak_winter: houseData.prices.winter?.peak || "",
+        extra_people_winter: houseData.prices.winter?.extra_people || "",
+      });
+    }
+  }, [houseData]);
+
   const formatNumber = (value) => {
-    // Remove non-numeric characters
-    value = value.replace(/\D/g, '');
-    // Format with slashes
-    return value.replace(/\B(?=(\d{3})+(?!\d))/g, '/');
+    return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '/');
   };
 
   const handleInputChange = (key, value) => {
@@ -40,20 +69,26 @@ const PricingDetails = ({ token, houseUuid }) => {
       ...prevData,
       [key]: formattedValue,
     }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: null, // Clear error when user changes the input
+    }));
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // Start loading
     try {
-      // Remove slashes before sending the request
       const formattedData = Object.fromEntries(
-        Object.entries(formData).map(([key, value]) => [key, value.replace(/\//g, '')])
+        Object.entries(formData)
+          .filter(([key, value]) => value !== "")
+          .map(([key, value]) => [key, String(value).replace(/\//g, '')])
       );
   
-      // Log the formatted data before sending the request
+      // Log the formatted data before making the API request
       console.log("Data being sent to the API:", formattedData);
   
       const response = await axios.put(
-        `https://portal1.jatajar.com/client/house/${houseUuid}/prices`,
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}/prices`,
         formattedData,
         {
           headers: {
@@ -62,14 +97,29 @@ const PricingDetails = ({ token, houseUuid }) => {
           },
         }
       );
-      
+  
       if (response.status === 200) {
         toast.success("قیمت‌ها با موفقیت به روز شد");
-      } else {
-        toast.error("خطا در به‌روزرسانی قیمت‌ها");
+        setErrorList([]); // Clear errors on success
       }
     } catch (error) {
-      toast.error("مشکلی پیش آمده است");
+      // Log the full error response to get details about the 422 error
+      if (error.response) {
+        console.log("Error response data:", error.response.data);
+        if (error.response.status === 422) {
+          // Extract error messages
+          const errorsArray = Object.values(error.response.data.errors.fields || {}).flat();
+          setErrorList(errorsArray);
+          toast.error("خطا در ورود اطلاعات، لطفاً بررسی کنید");
+        } else {
+          toast.error("مشکلی پیش آمده است");
+        }
+      } else {
+        console.error("Error updating prices:", error);
+        toast.error("مشکلی پیش آمده است");
+      }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -83,10 +133,12 @@ const PricingDetails = ({ token, houseUuid }) => {
               {label}
             </label>
             <input
-              type="text" // Change type to text to handle formatted input
+              type="text"
               value={formData[key]}
               onChange={(e) => handleInputChange(key, e.target.value)}
-              className="block p-2 border rounded-xl w-full outline-none"
+              className={`block p-2 border rounded-xl w-full outline-none ${
+                errors[key] ? "border-red-500" : ""
+              }`}
               placeholder="قیمت را به تومان وارد کنید"
             />
           </div>
@@ -111,7 +163,7 @@ const PricingDetails = ({ token, houseUuid }) => {
         { key: "weekend_spring", label: "روز های آخر هفته" },
         { key: "holiday_spring", label: "روز های تعطیل" },
         { key: "peak_spring", label: "روز های اوج شلوغی" },
-        { key: "extra_people_spring",label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
+        { key: "extra_people_spring", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
       ])}
 
       {/* Section for Summer */}
@@ -129,7 +181,7 @@ const PricingDetails = ({ token, houseUuid }) => {
         { key: "weekend_autumn", label: "روز های آخر هفته" },
         { key: "holiday_autumn", label: "روز های تعطیل" },
         { key: "peak_autumn", label: "روز های اوج شلوغی" },
-        { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)"  },
+        { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
       ])}
 
       {/* Section for Winter */}
@@ -138,16 +190,29 @@ const PricingDetails = ({ token, houseUuid }) => {
         { key: "weekend_winter", label: "روز های آخر هفته" },
         { key: "holiday_winter", label: "روز های تعطیل" },
         { key: "peak_winter", label: "روز های اوج شلوغی" },
-        { key: "extra_people_winter",label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)"  },
+        { key: "extra_people_winter", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
       ])}
+
+      {/* Error List Display */}
+      {errorList.length > 0 && (
+        <div className="mt-4 text-red-600">
+          <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+          <ul className="list-disc ml-5">
+            {errorList.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Submit Button */}
       <div className="mt-4">
         <button
           onClick={handleSubmit}
           className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
+          disabled={loading} // Disable button while loading
         >
-          ثبت قیمت‌ها
+          {loading ? "در حال ثبت ..." : "ثبت قیمت‌ها"}
         </button>
       </div>
     </div>
