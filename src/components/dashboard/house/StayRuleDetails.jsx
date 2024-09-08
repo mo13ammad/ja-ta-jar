@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { RadioGroup } from '@headlessui/react';
 import { toast } from 'react-hot-toast';
 import Spinner from './Spinner'; // Import your Spinner component
 
@@ -29,12 +30,14 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
         if (response.status === 200) {
           const rulesData = response.data.data;
 
-          // Initialize selectedRules with existing house data
+          // Initialize selectedRules with houseData.rules if it exists
           const initialSelectedRules = rulesData.reduce((acc, rule) => {
             const existingRule = Array.isArray(houseData.rules)
               ? houseData.rules.find((r) => r.key === rule.key)
               : null;
-            acc[rule.key] = existingRule ? existingRule.status : 'NotAllowed'; // Default to 'NotAllowed'
+
+            // Set the status based on houseData.rules or default to 'NotAllowed'
+            acc[rule.key] = existingRule && existingRule.status ? existingRule.status.key : 'NotAllowed'; 
             return acc;
           }, {});
 
@@ -62,19 +65,19 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
   };
 
   const handleSubmit = async () => {
-    console.log(requestData);
     setLoadingSubmit(true);
     try {
-      // Create the data structure to match your desired format
-      const requestData = Object.keys(selectedRules).reduce((acc, key, index) => {
-        acc[`rules[${index}][${key}]`] = selectedRules[key];  // Rule key and status in separate lines
-        acc[`rules[${index}][${selectedRules[key]}]`] = ""; // Add another entry for the status
-        return acc;
-      }, {});
-  
-      // Log the request data
+      // Ensure requestData is properly defined here
+      const requestData = {
+        rules: Object.keys(selectedRules).map((key) => ({
+          key: key,
+          status: selectedRules[key],
+        })),
+      };
+    
+      // Now you can log requestData since it's defined
       console.log('Request Data:', requestData);
-  
+    
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
         requestData,
@@ -85,12 +88,29 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
           },
         }
       );
-  
-      // Log the response data
+    
+      // Log the response data after successful submission
       console.log('Response Data:', response.data);
-  
+    
       if (response.status === 200) {
         toast.success('اطلاعات با موفقیت ثبت شد');
+    
+        const updatedRules = response.data.data.rules;
+  
+        // Check if updatedRules is an array
+        if (Array.isArray(updatedRules)) {
+          // Map the updated rules to selectedRules
+          const updatedSelectedRules = updatedRules.reduce((acc, rule) => {
+            acc[rule.key] = rule.status.key;
+            return acc;
+          }, {});
+  
+          // Update the state with the latest rules
+          setSelectedRules(updatedSelectedRules);
+        } else {
+          console.error('Expected an array for updatedRules but got:', updatedRules);
+          toast.error('Invalid data format returned from server.');
+        }
       } else {
         toast.error('خطایی در ثبت اطلاعات پیش آمد');
       }
@@ -101,6 +121,7 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
       setLoadingSubmit(false);
     }
   };
+  
   
 
   if (loading) {
@@ -114,26 +135,37 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">قوانین اقامتگاه</h2>
-      <div className="space-y-2">
-        {rules.map((rule, index) => (
-          <div key={rule.key} className="border p-2 rounded-lg">
-            <div className="flex items-center justify-between">
+      <div className="space-y-4">
+        {rules.map((rule) => (
+          <div key={rule.key} className="border p-4 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">{rule.label}</span>
-              <select
-                className="border rounded-lg p-1 bg-white focus:ring-0 focus:outline-none"
-                value={selectedRules[rule.key]}
-                onChange={(e) => handleStatusChange(rule.key, e.target.value)}
-              >
-                {statusOptions.map((option) => (
-                  <option key={option.key} value={option.key}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
             </div>
+
+            <RadioGroup
+              value={selectedRules[rule.key] || 'NotAllowed'}
+              onChange={(status) => handleStatusChange(rule.key, status)}
+            >
+              <div className="grid grid-cols-4 gap-4">
+                {statusOptions.map((option) => (
+                  <RadioGroup.Option key={option.key} value={option.key}>
+                    {({ checked }) => (
+                      <div
+                        className={`cursor-pointer p-2 border rounded-lg flex justify-center items-center text-sm font-medium ${
+                          checked ? 'bg-green-600 text-white' : 'bg-gray-100'
+                        }`}
+                      >
+                        {option.label}
+                      </div>
+                    )}
+                  </RadioGroup.Option>
+                ))}
+              </div>
+            </RadioGroup>
           </div>
         ))}
       </div>
+
       <div className="mt-4">
         <button
           onClick={handleSubmit}

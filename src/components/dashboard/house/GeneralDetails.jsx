@@ -187,18 +187,18 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
 
             {/* Description Input */}
             <div className="mt-4 lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">توضیحات</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">درباره اقامتگاه</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="توضیحات"
+                placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
               />
             </div>
 
             {/* Tip (House Floor Type) Dropdown */}
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">تعداد طبقات</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">تیپ سازه</label>
               <Listbox value={formData.tip} onChange={(value) => handleInputChange("tip", value)}>
                 {({ open }) => (
                   <div className="relative">

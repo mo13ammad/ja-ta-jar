@@ -27,21 +27,34 @@ const PricingDetails = ({ token, houseUuid }) => {
     extra_people_winter: "",
   });
 
+  const formatNumber = (value) => {
+    // Remove non-numeric characters
+    value = value.replace(/\D/g, '');
+    // Format with slashes
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, '/');
+  };
+
   const handleInputChange = (key, value) => {
+    const formattedValue = formatNumber(value);
     setFormData((prevData) => ({
       ...prevData,
-      [key]: value,
+      [key]: formattedValue,
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      // Log the formData before sending the request
-      console.log("Data being sent to the API:", formData);
+      // Remove slashes before sending the request
+      const formattedData = Object.fromEntries(
+        Object.entries(formData).map(([key, value]) => [key, value.replace(/\//g, '')])
+      );
+  
+      // Log the formatted data before sending the request
+      console.log("Data being sent to the API:", formattedData);
   
       const response = await axios.put(
-        `/client/house/${houseUuid}/prices`,
-        formData, // Sending the formData directly as a JSON object with key-value pairs
+        `https://portal1.jatajar.com/client/house/${houseUuid}/prices`,
+        formattedData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +72,7 @@ const PricingDetails = ({ token, houseUuid }) => {
       toast.error("مشکلی پیش آمده است");
     }
   };
-  
+
   const renderInputSection = (title, keys) => (
     <div className="mt-4">
       <h2 className="text-lg font-semibold mt-7">{title}</h2>
@@ -70,11 +83,11 @@ const PricingDetails = ({ token, houseUuid }) => {
               {label}
             </label>
             <input
-              type="number"
+              type="text" // Change type to text to handle formatted input
               value={formData[key]}
               onChange={(e) => handleInputChange(key, e.target.value)}
               className="block p-2 border rounded-xl w-full outline-none"
-              placeholder="قیمت را وارد کنید"
+              placeholder="قیمت را به تومان وارد کنید"
             />
           </div>
         ))}
@@ -94,38 +107,38 @@ const PricingDetails = ({ token, houseUuid }) => {
 
       {/* Section for Spring */}
       {renderInputSection("قیمت در بهار", [
-        { key: "normal_spring", label: "روز های هفته" },
+        { key: "normal_spring", label: "روز های اول هفته" },
         { key: "weekend_spring", label: "روز های آخر هفته" },
         { key: "holiday_spring", label: "روز های تعطیل" },
         { key: "peak_spring", label: "روز های اوج شلوغی" },
-        { key: "extra_people_spring", label: "به ازای هر نفر اضافه" },
+        { key: "extra_people_spring",label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
       ])}
 
       {/* Section for Summer */}
       {renderInputSection("قیمت در تابستان", [
-        { key: "normal_summer", label: "روز های هفته" },
+        { key: "normal_summer", label: "روز های اول هفته" },
         { key: "weekend_summer", label: "روز های آخر هفته" },
         { key: "holiday_summer", label: "روز های تعطیل" },
         { key: "peak_summer", label: "روز های اوج شلوغی" },
-        { key: "extra_people_summer", label: "به ازای هر نفر اضافه" },
+        { key: "extra_people_summer", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
       ])}
 
       {/* Section for Autumn */}
       {renderInputSection("قیمت در پاییز", [
-        { key: "normal_autumn", label: "روز های هفته" },
+        { key: "normal_autumn", label: "روز های اول هفته" },
         { key: "weekend_autumn", label: "روز های آخر هفته" },
         { key: "holiday_autumn", label: "روز های تعطیل" },
         { key: "peak_autumn", label: "روز های اوج شلوغی" },
-        { key: "extra_people_autumn", label: "به ازای هر نفر اضافه" },
+        { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)"  },
       ])}
 
       {/* Section for Winter */}
       {renderInputSection("قیمت در زمستان", [
-        { key: "normal_winter", label: "روز های هفته" },
+        { key: "normal_winter", label: "روز های اول هفته" },
         { key: "weekend_winter", label: "روز های آخر هفته" },
         { key: "holiday_winter", label: "روز های تعطیل" },
         { key: "peak_winter", label: "روز های اوج شلوغی" },
-        { key: "extra_people_winter", label: "به ازای هر نفر اضافه" },
+        { key: "extra_people_winter",label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)"  },
       ])}
 
       {/* Submit Button */}
