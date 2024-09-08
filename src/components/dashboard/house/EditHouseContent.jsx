@@ -78,7 +78,7 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
           )}
           {activeTab === "stayRules" && (
             <StayRuleDetails
-              houseData={houseData}  
+              rules={houseData.rules.types}  
               token={token}
               houseUuid={houseUuid}
             />

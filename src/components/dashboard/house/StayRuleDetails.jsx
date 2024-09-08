@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { RadioGroup } from '@headlessui/react';
 import { toast } from 'react-hot-toast';
-import Spinner from './Spinner'; // Import your Spinner component
+import Spinner from './Spinner'; // Assuming this component exists
 
 const statusOptions = [
   { key: 'NotAllowed', label: 'غیر مجاز' },
@@ -11,13 +10,14 @@ const statusOptions = [
   { key: 'NotNeeded', label: 'نیاز نیست' },
 ];
 
-const StayRuleDetails = ({ houseData, token, houseUuid }) => {
-  const [rules, setRules] = useState([]);
-  const [selectedRules, setSelectedRules] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+const StayRuleDetails = ({ token, houseUuid, rules }) => {
+  const [fetchedRules, setFetchedRules] = useState([]); // Fetched rules from the server
+  const [selectedRules, setSelectedRules] = useState({}); // Selected rule statuses
+  const [loading, setLoading] = useState(true); // Loading state for fetching rules
+  const [loadingSubmit, setLoadingSubmit] = useState(false); // Loading state for submission
 
   useEffect(() => {
+    // Fetch rules from backend
     const fetchRules = async () => {
       try {
         const response = await axios.get(
@@ -28,35 +28,32 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
         );
 
         if (response.status === 200) {
-          const rulesData = response.data.data;
+          const fetchedRulesData = response.data.data; // Assuming response.data.data contains the rules
+          setFetchedRules(fetchedRulesData); // Store fetched rules in the state
 
-          // Initialize selectedRules with houseData.rules if it exists
-          const initialSelectedRules = rulesData.reduce((acc, rule) => {
-            const existingRule = Array.isArray(houseData.rules)
-              ? houseData.rules.find((r) => r.key === rule.key)
-              : null;
-
-            // Set the status based on houseData.rules or default to 'NotAllowed'
-            acc[rule.key] = existingRule && existingRule.status ? existingRule.status.key : 'NotAllowed'; 
+          // Initialize selected rules based on fetched rules and the `rules` prop
+          const initialSelectedRules = fetchedRulesData.reduce((acc, rule) => {
+            const matchedRule = rules.find((r) => r.key === rule.key);
+            acc[rule.key] = matchedRule ? matchedRule.status.key : null; // Set status if exists, otherwise null
             return acc;
           }, {});
 
-          setRules(rulesData);
           setSelectedRules(initialSelectedRules);
         } else {
-          toast.error('Failed to fetch rules data');
+          toast.error('Failed to fetch rules from server');
         }
       } catch (error) {
-        console.error('Error fetching rules data:', error);
-        toast.error('Error fetching rules data');
+        toast.error('Error fetching rules from server');
+        console.error('Error:', error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Stop loading once the data is processed
       }
     };
 
     fetchRules();
-  }, [token, houseData]);
+  }, [token, rules]);
 
+  // Function to handle radio button status changes
   const handleStatusChange = (key, status) => {
     setSelectedRules((prevSelected) => ({
       ...prevSelected,
@@ -64,20 +61,17 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
     }));
   };
 
+  // Function to handle form submission
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     try {
-      // Ensure requestData is properly defined here
       const requestData = {
         rules: Object.keys(selectedRules).map((key) => ({
           key: key,
-          status: selectedRules[key],
+          status: selectedRules[key] || 'NotAllowed', // Default to 'NotAllowed' only if it's explicitly selected or null
         })),
       };
-    
-      // Now you can log requestData since it's defined
-      console.log('Request Data:', requestData);
-    
+
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
         requestData,
@@ -88,29 +82,9 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
           },
         }
       );
-    
-      // Log the response data after successful submission
-      console.log('Response Data:', response.data);
-    
+
       if (response.status === 200) {
         toast.success('اطلاعات با موفقیت ثبت شد');
-    
-        const updatedRules = response.data.data.rules;
-  
-        // Check if updatedRules is an array
-        if (Array.isArray(updatedRules)) {
-          // Map the updated rules to selectedRules
-          const updatedSelectedRules = updatedRules.reduce((acc, rule) => {
-            acc[rule.key] = rule.status.key;
-            return acc;
-          }, {});
-  
-          // Update the state with the latest rules
-          setSelectedRules(updatedSelectedRules);
-        } else {
-          console.error('Expected an array for updatedRules but got:', updatedRules);
-          toast.error('Invalid data format returned from server.');
-        }
       } else {
         toast.error('خطایی در ثبت اطلاعات پیش آمد');
       }
@@ -118,12 +92,11 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
       console.error('Error submitting data:', error);
       toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
     } finally {
-      setLoadingSubmit(false);
+      setLoadingSubmit(false); // Stop loading after submission
     }
   };
-  
-  
 
+  // Display spinner while loading data
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
@@ -132,38 +105,53 @@ const StayRuleDetails = ({ houseData, token, houseUuid }) => {
     );
   }
 
+  // Display the rules form after loading is complete
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">قوانین اقامتگاه</h2>
-      <div className="space-y-4">
-        {rules.map((rule) => (
-          <div key={rule.key} className="border p-4 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">{rule.label}</span>
-            </div>
+    <div className="relative flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto scrollbar-thin max-h-full pl-4">
+        <h2 className="text-xl font-semibold mb-4">قوانین اقامتگاه</h2>
+        <div className="space-y-4">
+          {fetchedRules.map((rule) => (
+            <div key={rule.key} className="flex flex-col">
+              <div className="flex items-center mb-2">
+                <span className="text-sm font-medium">{rule.label}</span>
+              </div>
 
-            <RadioGroup
-              value={selectedRules[rule.key] || 'NotAllowed'}
-              onChange={(status) => handleStatusChange(rule.key, status)}
-            >
-              <div className="grid grid-cols-4 gap-4">
+              <div className="flex space-x-4">
                 {statusOptions.map((option) => (
-                  <RadioGroup.Option key={option.key} value={option.key}>
-                    {({ checked }) => (
-                      <div
-                        className={`cursor-pointer p-2 border rounded-lg flex justify-center items-center text-sm font-medium ${
-                          checked ? 'bg-green-600 text-white' : 'bg-gray-100'
-                        }`}
-                      >
-                        {option.label}
-                      </div>
-                    )}
-                  </RadioGroup.Option>
+                  <label key={option.key} className="flex items-center cursor-pointer space-x-2">
+                    <input
+                      type="radio"
+                      name={`rule-${rule.key}`}
+                      value={option.key}
+                      checked={selectedRules[rule.key] === option.key}
+                      onChange={() => handleStatusChange(rule.key, option.key)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`h-6 w-6 flex items-center justify-center rounded-full transition-colors ease-in-out duration-200 
+                        ${selectedRules[rule.key] === option.key ? 'bg-green-500' : 'bg-gray-200'}
+                      `}
+                    >
+                      {selectedRules[rule.key] === option.key && (
+                        <svg
+                          className="w-3 h-3 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="ml-2 text-sm font-medium text-gray-700">{option.label}</span>
+                  </label>
                 ))}
               </div>
-            </RadioGroup>
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-4">
