@@ -12,7 +12,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [cities, setCities] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
   const [selectedCity, setSelectedCity] = useState(data?.address?.city?.id || null);
-  
+
   const [latitude, setLatitude] = useState(() => {
     if (data?.address?.geography?.latitude) {
       return data.address.geography.latitude;
@@ -47,6 +47,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
 
   const [tempLatitude, setTempLatitude] = useState(latitude);
   const [tempLongitude, setTempLongitude] = useState(longitude);
+  const [zoomLevel, setZoomLevel] = useState(11); // Add zoom level
 
   const formatCoord = (coord) => (coord !== null ? parseFloat(coord).toFixed(5) : "");
 
@@ -106,6 +107,27 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     }
   }, [selectedProvince]);
 
+  // Effect to update the map when city changes
+  useEffect(() => {
+    if (selectedCity) {
+      const selectedCityData = cities.find(city => city.id === selectedCity);
+      if (selectedCityData) {
+        setLatitude(selectedCityData.latitude);
+        setLongitude(selectedCityData.longitude);
+
+        // Update map position if map is already initialized
+        if (lgMapRef.current) {
+          lgMapRef.current.setCenter([selectedCityData.longitude, selectedCityData.latitude]);
+          lgMarkerRef.current.setLngLat([selectedCityData.longitude, selectedCityData.latitude]);
+        }
+        if (modalMapRef.current) {
+          modalMapRef.current.setCenter([selectedCityData.longitude, selectedCityData.latitude]);
+          modalMarkerRef.current.setLngLat([selectedCityData.longitude, selectedCityData.latitude]);
+        }
+      }
+    }
+  }, [selectedCity]);
+
   const handleMapModalClose = () => {
     setIsMapModalOpen(false);
   };
@@ -115,7 +137,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       const mapInstance = new nmp_mapboxgl.Map({
         mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
         container: containerRef.current,
-        zoom: 11,
+        zoom: zoomLevel, // use zoom level from state
         pitch: 0,
         center: [longitude, latitude],
         minZoom: 2,
@@ -179,6 +201,26 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     setLongitude(tempLongitude);
     toast.success("موقعیت با موفقیت ثبت شد");
     setIsMapModalOpen(false);
+  };
+
+  const handleZoomIn = () => {
+    setZoomLevel((prevZoom) => Math.min(prevZoom + 1, 21)); // Zoom in with max limit of 21
+    if (lgMapRef.current) {
+      lgMapRef.current.zoomIn();
+    }
+    if (modalMapRef.current) {
+      modalMapRef.current.zoomIn();
+    }
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prevZoom) => Math.max(prevZoom - 1, 2)); // Zoom out with min limit of 2
+    if (lgMapRef.current) {
+      lgMapRef.current.zoomOut();
+    }
+    if (modalMapRef.current) {
+      modalMapRef.current.zoomOut();
+    }
   };
 
   const handleSaveChanges = async () => {
@@ -326,6 +368,8 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
               باز کردن نقشه
             </button>
           </div>
+          
+          
         </div>
       )}
 
@@ -365,10 +409,16 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         </div>
       </div>
 
+      {/* Zoom Buttons */}
+      <div className="mt-4 flex gap-2">
+            <button onClick={handleZoomOut} className="px-4 py-2 bg-gray-600 text-white rounded-xl">-</button>
+            <button onClick={handleZoomIn} className="px-4 py-2 bg-gray-600 text-white rounded-xl">+</button>
+          </div>
+
       {!isLoading && (
         <div className="absolute flex justify-end w-full">
           <button
-            className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl w-36"
+            className="bg-green-600 text-white px-4 py-2 mb-2 rounded-xl shadow-xl w-36"
             onClick={handleSaveChanges}
           >
             ثبت تغییرات
