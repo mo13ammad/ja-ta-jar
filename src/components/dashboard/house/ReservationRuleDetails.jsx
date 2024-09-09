@@ -95,63 +95,63 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
         {/* Short Term Booking Length */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            مد زمان رزرو کوتاه مدت
+            تعداد شب اقامت کوتاه مدت
           </label>
           <input
             type="number"
             value={formData.short_term_booking_length}
             onChange={(e) => handleInputChange("short_term_booking_length", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
-            placeholder="مد زمان رزرو کوتاه مدت"
+            placeholder="تعداد شب رزرو کوتاه مدت که تخفیف داده میشود "
           />
         </div>
 
         {/* Short Term Booking Discount */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            تخفیف رزرو کوتاه مدت به درصد
+            درصد تخفیف
           </label>
           <input
             type="number"
             value={formData.short_term_booking_discount}
             onChange={(e) => handleInputChange("short_term_booking_discount", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
-            placeholder="تخفیف رزرو کوتاه مدت"
+            placeholder="درصد تخفیف"
           />
         </div>
 
         {/* Long Term Booking Length */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            مد زمان رزرو بلند مدت
+          تعداد شب اقامت بلند مدت
           </label>
           <input
             type="number"
             value={formData.long_term_booking_length}
             onChange={(e) => handleInputChange("long_term_booking_length", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
-            placeholder="مد زمان رزرو بلند مدت"
+             placeholder="تعداد شب رزرو بلند مدت که تخفیف داده میشود "
           />
         </div>
 
         {/* Long Term Booking Discount */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            تخفیف رزرو بلند مدت به درصد
+          درصد تخفیف
           </label>
           <input
             type="number"
             value={formData.long_term_booking_discount}
             onChange={(e) => handleInputChange("long_term_booking_discount", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
-            placeholder="تخفیف رزرو بلند مدت"
+             placeholder="درصد تخفیف"
           />
         </div>
 
         {/* Minimum Length Stay */}
         <div className="mt-4 lg:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            کمینه تعداد شب رزرو
+            حداقل شب اقامت
           </label>
           {formData.minimum_length_stay.map((stay, index) => (
             <div key={index} className="flex items-center space-x-2 mb-2">
@@ -160,7 +160,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
                 value={stay}
                 onChange={(e) => handleMinimumStayChange(index, e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="کمینه تعداد شب رزرو"
+                placeholder="حداقل شبی که اقامتگاه قابل رزرو است"
               />
             </div>
           ))}
