@@ -410,7 +410,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       </div>
 
       {/* Zoom Buttons */}
-      <div className="mt-4 flex gap-2">
+      <div className="hidden  mt-4 lg:flex gap-2">
             <button onClick={handleZoomOut} className="px-4 py-2 bg-gray-600 text-white rounded-xl">-</button>
             <button onClick={handleZoomIn} className="px-4 py-2 bg-gray-600 text-white rounded-xl">+</button>
           </div>
