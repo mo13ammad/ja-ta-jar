@@ -16,7 +16,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
     long_term_booking_length: "",
     long_term_booking_discount: "",
     minimum_length_stay: {
-      all: "", // New key for minimum stay for all days
+      all: "", // Key for minimum stay for all days
       Saturday: "",
       Sunday: "",
       Monday: "",
@@ -42,7 +42,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
         long_term_booking_length: houseData.reservation?.discount?.long_term?.minimum_length_stay || "",
         long_term_booking_discount: houseData.reservation?.discount?.long_term?.discount || "",
         minimum_length_stay: houseData.reservation?.minimum_length_stay || {
-          all: "", // Initialize new key
+          all: "", // Initialize the key
           Saturday: "",
           Sunday: "",
           Monday: "",
@@ -138,8 +138,6 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
       <h1 className="text-2xl font-bold mb-4">قوانین رزرو</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-      
-
         {/* Short Term Booking Length */}
         <div className="mt-4">
           <label className={`block text-sm font-medium mb-2 ${errors.short_term_booking_length ? 'text-red-600' : 'text-gray-700'}`}>
@@ -200,8 +198,8 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           {errors.long_term_booking_discount && <p className="text-red-600 text-sm">{errors.long_term_booking_discount[0]}</p>}
         </div>
 
-  {/* Minimum Stay for All Days */}
-  <div className="mt-4">
+        {/* Minimum Stay for All Days */}
+        <div className="mt-4">
           <label className="block text-sm font-medium mb-2">حداقل شب اقامت</label>
           <input
             type="number"
@@ -296,8 +294,8 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
                   <td className="border p-1">
                     <input
                       type="number"
-                      value={Object.values(formData.minimum_length_stay)[index]}
-                      onChange={(e) => handleMinimumStayChange(Object.keys(formData.minimum_length_stay)[index], e.target.value)}
+                      value={formData.minimum_length_stay[day] || ""}
+                      onChange={(e) => handleMinimumStayChange(day, e.target.value)}
                       className="p-1 border rounded-xl w-full outline-none"
                       placeholder={`تعداد شب برای ${day}`}
                     />

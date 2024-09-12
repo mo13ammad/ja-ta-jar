@@ -9,7 +9,8 @@ import StayRuleDetails from "./StayRuleDetails";
 import Sanitaries from "./Sanitaries";
 import PricingDetails from "./PricingDetails";
 import ReservationRuleDetails from "./ReservationRuleDetails";
-import ImageDetails from "./ImageDetails"; // Importing the new ImageDetails component
+import ImageDetails from "./ImageDetails";
+import RoomDetails from "./RoomDetails"; // Import the new RoomDetails component
 
 const tabs = [
   { key: "address", label: "آدرس" },
@@ -17,11 +18,12 @@ const tabs = [
   { key: "generalInfo", label: "اطلاعات اقامتگاه" },
   { key: "environmentInfo", label: "اطلاعات محیطی" },
   { key: "mainFacilities", label: "امکانات اقامتگاه" },
+  { key: "rooms", label: "اتاق‌ها" }, // Added RoomDetails tab
   { key: "sanitaries", label: "امکانات بهداشتی" },
   { key: "stayRules", label: "قوانین اقامت" },
   { key: "pricing", label: "قیمت گذاری" },
   { key: "reservationRules", label: "قوانین رزرو" },
-  { key: "images", label: "تصاویر اقامتگاه" }, // New tab for ImageDetails
+  { key: "images", label: "تصاویر اقامتگاه" },
 ];
 
 const EditHouseContent = ({ houseData, token, houseUuid }) => {
@@ -69,6 +71,13 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
               houseUuid={houseUuid}
             />
           )}
+          {activeTab === "rooms" && ( // Add RoomDetails here
+            <RoomDetails
+              houseData={houseData}  
+              token={token}
+              houseUuid={houseUuid}
+            />
+          )}
           {activeTab === "sanitaries" && (
             <Sanitaries
               houseData={houseData}  
@@ -97,9 +106,9 @@ const EditHouseContent = ({ houseData, token, houseUuid }) => {
               houseUuid={houseUuid}
             />
           )}
-          {activeTab === "images" && ( // ImageDetails component for images tab
+          {activeTab === "images" && (
             <ImageDetails
-            houseData={houseData}  
+              houseData={houseData}  
               token={token}
               houseUuid={houseUuid}
             />
