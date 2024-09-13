@@ -122,7 +122,7 @@ const EditHouseContent = ({ token, houseUuid }) => {
             <MainFacilityDetails facilities={houseData.facilities} token={token} houseUuid={houseUuid} />
           )}
           {activeTab === "rooms" && (
-            <RoomDetails data={houseData} onSubmit={handleSubmit} />
+            <RoomDetails houseData={houseData} token={token} houseUuid={houseUuid} onSubmit={handleSubmit}/>
           )}
           {activeTab === "sanitaries" && (
             <Sanitaries data={houseData}  token={token} houseUuid={houseUuid}  />

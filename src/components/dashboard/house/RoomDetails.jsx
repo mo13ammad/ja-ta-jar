@@ -1,18 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
-import { Switch, Disclosure } from '@headlessui/react';
+import { Switch, Disclosure, Dialog } from '@headlessui/react';
 import Spinner from './Spinner'; // Assuming you have a Spinner component
 
-const RoomDetails = ({ token, houseUuid ,houseData}) => {
+const RoomDetails = ({ token, houseUuid, houseData, onSubmit }) => {
   const [loading, setLoading] = useState(true); // Manage loading state
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); // Manage delete loading state
   const [rooms, setRooms] = useState([]); // Manage multiple room forms
-
   const [facilitiesOptions, setFacilitiesOptions] = useState([]);
   const [airConditionOptions, setAirConditionOptions] = useState([]);
+  const [hasLivingRoom, setHasLivingRoom] = useState(false); // Track if a living room has been created
+  const [deleteIndex, setDeleteIndex] = useState(null); // Store the index of the room to delete
+  const [isModalOpen, setIsModalOpen] = useState(false); // Manage modal visibility
 
   useEffect(() => {
+    // Initialize rooms based on houseData.room
+    if (houseData && houseData.room) {
+      const initialRooms = houseData.room.map((r) => ({
+        roomName: r.name || '',
+        isMasterRoom: r.is_master || false,
+        numberSingleBeds: r.number_single_beds || 0,
+        numberDoubleBeds: r.number_double_beds || 0,
+        numberSofaBeds: r.number_sofa_beds || 0,
+        numberFloorService: r.number_floor_service || 0,
+        description: r.description || '',
+        selectedFacilities: r.facilities?.map((facility) => facility.key) || [], // Map facility keys
+        selectedAirConditions: r.airConditions?.map((airCondition) => airCondition.key) || [], // Map air condition keys
+        isLivingRoom: r.is_living_room || false,
+        uuid: r.uuid || null,
+      }));
+      setRooms(initialRooms);
+
+      // If there's already a living room, disable the button
+      setHasLivingRoom(initialRooms.some((room) => room.isLivingRoom));
+    }
+
+    // Check if token is available
+    if (!token) {
+      toast.error('توکن معتبر نیست');
+      return;
+    }
+
     // Fetch facilities and air conditioning options
     const fetchOptions = async () => {
       try {
@@ -40,10 +70,10 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
     };
 
     fetchOptions();
-  }, [token]);
+  }, [token, houseData]);
 
   // Add new room dropdown
-  const addRoom = () => {
+  const addRoom = (isLivingRoom = false) => {
     setRooms((prevRooms) => [
       ...prevRooms,
       {
@@ -56,8 +86,14 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
         description: '',
         selectedFacilities: [],
         selectedAirConditions: [],
+        isLivingRoom,
+        uuid: null,
       },
     ]);
+
+    if (isLivingRoom) {
+      setHasLivingRoom(true); // Disable the button once a living room is created
+    }
   };
 
   const handleInputChange = (index, key, value) => {
@@ -103,26 +139,87 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
   const handleSubmit = async (index) => {
     setLoadingSubmit(true);
     const roomData = rooms[index];
-  
+
     const requestData = {
       name: roomData.roomName,
       is_master: roomData.isMasterRoom,
+      is_living_room: roomData.isLivingRoom ? 1 : 0, // Set based on the room type
       number_single_beds: roomData.numberSingleBeds,
       number_double_beds: roomData.numberDoubleBeds,
       number_sofa_beds: roomData.numberSofaBeds,
       number_floor_service: roomData.numberFloorService,
       description: roomData.description,
-      facilities: roomData.selectedFacilities,
-      airConditions: roomData.selectedAirConditions,
+      facilities: roomData.selectedFacilities, // Send the selected facility keys
+      airConditions: roomData.selectedAirConditions, // Send the selected air condition keys
     };
-  
-    // Log the sending data
+
+    // Log the data being sent
     console.log('Sending room data:', requestData);
-  
+
     try {
-      const response = await axios.post(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}/room`,
-        requestData,
+      let response;
+      if (roomData.uuid) {
+        // PUT request for updating existing room
+        response = await axios.put(
+          `https://portal1.jatajar.com/api/client/house/${houseUuid}/room/${roomData.uuid}`,
+          requestData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } else {
+        // POST request for creating new room
+        response = await axios.post(
+          `https://portal1.jatajar.com/api/client/house/${houseUuid}/room`,
+          requestData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      }
+
+      // Log the response
+      console.log('Received response data:', response.data);
+
+      if (response.status === 200) {
+        toast.success('اتاق با موفقیت ثبت شد');
+        onSubmit(); // Call the onSubmit prop to update the houseData
+      } else {
+        toast.error('خطا در ثبت اطلاعات');
+      }
+    } catch (error) {
+      toast.error('متاسفانه مشکلی پیش آمده است');
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  const confirmDelete = (index) => {
+    setDeleteIndex(index); // Set the room index to delete
+    setIsModalOpen(true); // Open the confirmation modal
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true); // Start the delete loading state
+    const roomData = rooms[deleteIndex];
+
+    if (!roomData.uuid) {
+      // Remove from frontend if the room has not been created yet
+      setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
+      setIsModalOpen(false); // Close the modal
+      setIsDeleting(false); // Stop the delete loading state
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}/room/${roomData.uuid}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -130,24 +227,24 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
           },
         }
       );
-  
-      // Log the received response data
-      console.log('Received response data:', response.data);
-  
+
+      // Log the response
+      console.log('Delete response data:', response.data);
+
       if (response.status === 200) {
-        toast.success('اتاق با موفقیت ثبت شد');
+        toast.success('اتاق با موفقیت حذف شد');
+        setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
+        onSubmit(); // Update houseData after deletion
       } else {
-        toast.error('خطا در ثبت اطلاعات');
+        toast.error('خطا در حذف اتاق');
       }
     } catch (error) {
-      // Log any errors encountered during the request
-      console.error('Error during room submission:', error);
       toast.error('متاسفانه مشکلی پیش آمده است');
     } finally {
-      setLoadingSubmit(false);
+      setIsModalOpen(false); // Close the modal
+      setIsDeleting(false); // Stop the delete loading state
     }
   };
-  
 
   return (
     <div className="relative flex flex-col h-full">
@@ -158,19 +255,35 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
         </div>
       ) : (
         <>
-          <button
-            onClick={addRoom}
-            className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mb-4 max-w-36"
-          >
-            اضافه کردن اتاق
-          </button>
+          <div>
+            <button
+              onClick={() => addRoom(false)} // Regular room
+              className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mb-4 max-w-36"
+            >
+              اضافه کردن اتاق
+            </button>
 
+            <button
+              onClick={() => addRoom(true)} // Living room
+              className={`bg-blue-600 truncate cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mb-4 max-w-52 mr-2 ${
+                hasLivingRoom ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={hasLivingRoom}
+            >
+              اضافه کردن اتاق پذیرایی
+            </button>
+          </div>
           {rooms.map((room, index) => (
             <Disclosure key={index}>
               {({ open }) => (
                 <>
                   <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-gray-200 rounded-lg px-4 mb-2">
-                    <span>{room.roomName || `اتاق ${index + 1}`}</span>
+                    <span>
+                      {room.roomName || `اتاق ${index + 1}`}
+                      {room.isLivingRoom && (
+                        <span className="mr-2 text-blue-500">(پذیرایی)</span> // Living room tag
+                      )}
+                    </span>
                     <svg
                       className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
                       fill="none"
@@ -207,11 +320,11 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
                           >
                             <span
                               className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${
-                                room.isMasterRoom ? 'translate-x-6' : 'translate-x-1'
+                                room.isMasterRoom ? '-translate-x-6' : '-translate-x-1'
                               }`}
                             />
                           </Switch>
-                          <span className="ml-3 text-sm font-medium text-gray-700">اتاق پذیرایی</span>
+                          <span className="ml-3 text-sm font-medium text-gray-700">اتاق دارای مستر می باشد</span>
                         </label>
                       </Switch.Group>
                     </div>
@@ -332,21 +445,56 @@ const RoomDetails = ({ token, houseUuid ,houseData}) => {
                       </div>
                     </div>
 
-                    {/* Submit Button */}
-                    <div className="mt-4">
+                    {/* Submit / Update & Delete Buttons */}
+                    <div className="mt-4 flex gap-1">
                       <button
                         onClick={() => handleSubmit(index)}
                         className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
                         disabled={loadingSubmit}
                       >
-                        {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اتاق'}
+                        {loadingSubmit ? 'در حال بارگذاری...' : room.uuid ? 'ثبت تغییرات اقامتگاه' : 'ثبت اتاق'}
                       </button>
+
+                      {room.uuid && (
+                        <button
+                          onClick={() => confirmDelete(index)}
+                          className="bg-red-600 cursor-pointer text-white px-4 py-2 mr-1.5 rounded-xl shadow-xl"
+                          disabled={loadingSubmit}
+                        >
+                          حذف اتاق
+                        </button>
+                      )}
                     </div>
                   </Disclosure.Panel>
                 </>
               )}
             </Disclosure>
           ))}
+
+          {/* Confirmation Modal */}
+          <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
+            <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <Dialog.Title className="text-lg font-medium">آیا مطمعن هستید که می‌خواهید اتاق را حذف کنید؟</Dialog.Title>
+                <div className="mt-4">
+                  <button
+                    onClick={handleDelete}
+                    className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mr-4"
+                    disabled={isDeleting} // Disable button during delete
+                  >
+                    {isDeleting ? 'در حال حذف ...' : 'بله حذفش کن'}
+                  </button>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl mr-2 shadow-xl"
+                  >
+                    لغو
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </div>
+          </Dialog>
         </>
       )}
     </div>
