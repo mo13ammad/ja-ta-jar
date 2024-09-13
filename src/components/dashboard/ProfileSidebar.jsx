@@ -1,6 +1,5 @@
-// ProfileSidebar.jsx
-import React from "react";
-import { Tab } from "@headlessui/react";
+import React, { useState } from "react";
+import { Tab, Dialog, DialogPanel, DialogTitle } from "@headlessui/react"; // Ensure Tab is imported
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import profile from "./assets/profile.webp";
@@ -8,6 +7,7 @@ import toast from "react-hot-toast";
 
 const ProfileSidebar = ({ user, token }) => {
   const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -41,7 +41,7 @@ const ProfileSidebar = ({ user, token }) => {
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          handleLogout();
+          setIsLogoutModalOpen(true); // Open the confirmation modal
         }}
         className="text-sm opacity-80 border rounded-xl px-8 py-2 flex justify-center flex-row-reverse items-center hover:text-red-600 hover:bg-red-100 transition-all"
       >
@@ -109,6 +109,34 @@ const ProfileSidebar = ({ user, token }) => {
           </Tab>
         )}
       </Tab.List>
+
+      {/* Logout Confirmation Modal */}
+      <Dialog open={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="max-w-md p-8 space-y-4 bg-white border rounded-xl">
+            <DialogTitle className="text-lg font-bold">آیا مطمعن هستید؟</DialogTitle>
+            <p>آیا مطمعن هستید که میخواهید خارج شوید؟</p>
+            <div className="flex justify-end gap-4 mt-4">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+              >
+                لغو
+              </button>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsLogoutModalOpen(false);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+              >
+                بله، خارج شو
+              </button>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
     </div>
   );
 };

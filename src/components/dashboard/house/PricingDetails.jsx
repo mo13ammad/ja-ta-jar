@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 
-const PricingDetails = ({ token, houseUuid, houseData }) => {
+const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
   const [formData, setFormData] = useState({
     nowruz: "",
     normal_spring: "",
@@ -27,9 +27,11 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
     extra_people_winter: "",
   });
 
-  const [errors, setErrors] = useState({}); // Track validation errors
-  const [errorList, setErrorList] = useState([]); // To show errors as a list near the submit button
-  const [loading, setLoading] = useState(false); // Track loading state
+  const [errors, setErrors] = useState({});
+  const [errorList, setErrorList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const priceHandleBy = houseData?.price_handle_by?.key; // Check whether it is "PerNight" or "PerPerson"
 
   useEffect(() => {
     if (houseData?.prices) {
@@ -60,7 +62,7 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
   }, [houseData]);
 
   const formatNumber = (value) => {
-    return value.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '/');
+    return value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "/");
   };
 
   const handleInputChange = (key, value) => {
@@ -71,22 +73,27 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [key]: null, // Clear error when user changes the input
+      [key]: null,
     }));
   };
 
   const handleSubmit = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const formattedData = Object.fromEntries(
         Object.entries(formData)
           .filter(([key, value]) => value !== "")
-          .map(([key, value]) => [key, String(value).replace(/\//g, '')])
+          .map(([key, value]) => [key, String(value).replace(/\//g, "")])
       );
-  
-      // Log the formatted data before making the API request
-      console.log("Data being sent to the API:", formattedData);
-  
+
+      // Check if the price is handled "PerNight"
+      if (priceHandleBy === "PerNight") {
+        formattedData.extra_people_spring = "100000";
+        formattedData.extra_people_summer = "100000";
+        formattedData.extra_people_autumn = "100000";
+        formattedData.extra_people_winter = "100000";
+      }
+
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}/prices`,
         formattedData,
@@ -97,17 +104,19 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         toast.success("قیمت‌ها با موفقیت به روز شد");
-        setErrorList([]); // Clear errors on success
+        setErrorList([]);
+        if (onSubmit) {
+          const updatedPrices = { ...houseData.prices, ...response.data.data };
+          onSubmit({ prices: updatedPrices });
+        }
       }
     } catch (error) {
-      // Log the full error response to get details about the 422 error
       if (error.response) {
         console.log("Error response data:", error.response.data);
         if (error.response.status === 422) {
-          // Extract error messages
           const errorsArray = Object.values(error.response.data.errors.fields || {}).flat();
           setErrorList(errorsArray);
           toast.error("خطا در ورود اطلاعات، لطفاً بررسی کنید");
@@ -119,7 +128,7 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
         toast.error("مشکلی پیش آمده است");
       }
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
@@ -129,17 +138,13 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys.map(({ key, label }) => (
           <div key={key} className="mt-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {label}
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
             <input
               type="text"
               value={formData[key]}
               onChange={(e) => handleInputChange(key, e.target.value)}
-              className={`block p-2 border rounded-xl w-full outline-none ${
-                errors[key] ? "border-red-500" : ""
-              }`}
-              placeholder="قیمت را به تومان وارد کنید"
+              className={`block p-2 border rounded-xl w-full outline-none ${errors[key] ? "border-red-500" : ""}`}
+              placeholder={`قیمت را به تومان (${priceHandleBy === "PerNight" ? "بر اساس هر شب" : "بر اساس هر نفر"}) وارد کنید`}
             />
           </div>
         ))}
@@ -152,48 +157,48 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">قیمت‌گذاری</h1>
 
-      {/* Section for تعطیلات نوروز */}
-      {renderInputSection("قیمت در تعطیلات نوروز", [
-        { key: "nowruz", label: "تعطیلات نوروز" },
-      ])}
+      {renderInputSection("قیمت در تعطیلات نوروز", [{ key: "nowruz", label: "تعطیلات نوروز" }])}
 
-      {/* Section for Spring */}
       {renderInputSection("قیمت در بهار", [
         { key: "normal_spring", label: "روز های اول هفته" },
         { key: "weekend_spring", label: "روز های آخر هفته" },
         { key: "holiday_spring", label: "روز های تعطیل" },
         { key: "peak_spring", label: "روز های اوج شلوغی" },
-        { key: "extra_people_spring", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
+        ...(priceHandleBy !== "PerNight"
+          ? [{ key: "extra_people_spring", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
+          : []),
       ])}
 
-      {/* Section for Summer */}
       {renderInputSection("قیمت در تابستان", [
         { key: "normal_summer", label: "روز های اول هفته" },
         { key: "weekend_summer", label: "روز های آخر هفته" },
         { key: "holiday_summer", label: "روز های تعطیل" },
         { key: "peak_summer", label: "روز های اوج شلوغی" },
-        { key: "extra_people_summer", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
+        ...(priceHandleBy !== "PerNight"
+          ? [{ key: "extra_people_summer", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
+          : []),
       ])}
 
-      {/* Section for Autumn */}
       {renderInputSection("قیمت در پاییز", [
         { key: "normal_autumn", label: "روز های اول هفته" },
         { key: "weekend_autumn", label: "روز های آخر هفته" },
         { key: "holiday_autumn", label: "روز های تعطیل" },
         { key: "peak_autumn", label: "روز های اوج شلوغی" },
-        { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
+        ...(priceHandleBy !== "PerNight"
+          ? [{ key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
+          : []),
       ])}
 
-      {/* Section for Winter */}
       {renderInputSection("قیمت در زمستان", [
         { key: "normal_winter", label: "روز های اول هفته" },
         { key: "weekend_winter", label: "روز های آخر هفته" },
         { key: "holiday_winter", label: "روز های تعطیل" },
         { key: "peak_winter", label: "روز های اوج شلوغی" },
-        { key: "extra_people_winter", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" },
+        ...(priceHandleBy !== "PerNight"
+          ? [{ key: "extra_people_winter", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
+          : []),
       ])}
 
-      {/* Error List Display */}
       {errorList.length > 0 && (
         <div className="mt-4 text-red-600">
           <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
@@ -205,12 +210,11 @@ const PricingDetails = ({ token, houseUuid, houseData }) => {
         </div>
       )}
 
-      {/* Submit Button */}
       <div className="mt-4">
         <button
           onClick={handleSubmit}
           className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           {loading ? "در حال ثبت ..." : "ثبت قیمت‌ها"}
         </button>

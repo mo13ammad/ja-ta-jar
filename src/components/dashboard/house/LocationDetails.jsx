@@ -4,8 +4,8 @@ import { Listbox, Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import Spinner from "../../Spinner";
-import '@neshan-maps-platform/mapbox-gl/dist/NeshanMapboxGl.css';
-import nmp_mapboxgl from '@neshan-maps-platform/mapbox-gl';
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [provinces, setProvinces] = useState([]);
@@ -13,30 +13,20 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
   const [selectedCity, setSelectedCity] = useState(data?.address?.city?.id || null);
 
+  // Initialize coordinates from geography or fallback to default
   const [latitude, setLatitude] = useState(() => {
-    if (data?.address?.geography?.latitude) {
-      return data.address.geography.latitude;
-    } else if (data?.address?.city?.province?.latitude) {
-      return data.address.city.province.latitude;
-    } else {
-      return 35.6892; // Default to Tehran's latitude
-    }
+    return data?.address?.geography?.latitude || 35.6892; // Default to Tehran
   });
 
   const [longitude, setLongitude] = useState(() => {
-    if (data?.address?.geography?.longitude) {
-      return data.address.geography.longitude;
-    } else if (data?.address?.city?.province?.longitude) {
-      return data.address.city.province.longitude;
-    } else {
-      return 51.389; // Default to Tehran's longitude
-    }
+    return data?.address?.geography?.longitude || 51.389; // Default to Tehran
   });
 
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitButtonText, setSubmitButtonText] = useState("ثبت تغییرات");
 
   const mapContainerRef = useRef(null);
   const mapContainerLgRef = useRef(null);
@@ -47,9 +37,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
 
   const [tempLatitude, setTempLatitude] = useState(latitude);
   const [tempLongitude, setTempLongitude] = useState(longitude);
-  const [zoomLevel, setZoomLevel] = useState(11); // Add zoom level
-
-  const formatCoord = (coord) => (coord !== null ? parseFloat(coord).toFixed(5) : "");
+  const [zoomLevel] = useState(11); // Fixed zoom level
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -86,28 +74,15 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     fetchCities();
   }, [selectedProvince]);
 
-  // Effect to update the latitude and longitude when the province changes
+  // Only set initial coordinates from data.address.geography on mount
   useEffect(() => {
-    if (selectedProvince) {
-      const selectedProvinceData = provinces.find(prov => prov.id === selectedProvince);
-      if (selectedProvinceData) {
-        setLatitude(selectedProvinceData.latitude);
-        setLongitude(selectedProvinceData.longitude);
-
-        // Update map position if map is already initialized
-        if (lgMapRef.current) {
-          lgMapRef.current.setCenter([selectedProvinceData.longitude, selectedProvinceData.latitude]);
-          lgMarkerRef.current.setLngLat([selectedProvinceData.longitude, selectedProvinceData.latitude]);
-        }
-        if (modalMapRef.current) {
-          modalMapRef.current.setCenter([selectedProvinceData.longitude, selectedProvinceData.latitude]);
-          modalMarkerRef.current.setLngLat([selectedProvinceData.longitude, selectedProvinceData.latitude]);
-        }
-      }
+    if (data?.address?.geography) {
+      setLatitude(data.address.geography.latitude);
+      setLongitude(data.address.geography.longitude);
     }
-  }, [selectedProvince]);
+  }, [data]);
 
-  // Effect to update the map when city changes
+  // Update coordinates based on city selection when manually selected
   useEffect(() => {
     if (selectedCity) {
       const selectedCityData = cities.find(city => city.id === selectedCity);
@@ -115,64 +90,71 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         setLatitude(selectedCityData.latitude);
         setLongitude(selectedCityData.longitude);
 
-        // Update map position if map is already initialized
+        // Update the map views when city changes (only on user selection)
         if (lgMapRef.current) {
-          lgMapRef.current.setCenter([selectedCityData.longitude, selectedCityData.latitude]);
-          lgMarkerRef.current.setLngLat([selectedCityData.longitude, selectedCityData.latitude]);
+          lgMapRef.current.setView([selectedCityData.latitude, selectedCityData.longitude], zoomLevel);
+          lgMarkerRef.current.setLatLng([selectedCityData.latitude, selectedCityData.longitude]);
         }
         if (modalMapRef.current) {
-          modalMapRef.current.setCenter([selectedCityData.longitude, selectedCityData.latitude]);
-          modalMarkerRef.current.setLngLat([selectedCityData.longitude, selectedCityData.latitude]);
+          modalMapRef.current.setView([selectedCityData.latitude, selectedCityData.longitude], zoomLevel);
+          modalMarkerRef.current.setLatLng([selectedCityData.latitude, selectedCityData.longitude]);
         }
       }
     }
   }, [selectedCity]);
 
-  const handleMapModalClose = () => {
-    setIsMapModalOpen(false);
-  };
+  // Update coordinates based on province selection when manually selected
+  useEffect(() => {
+    if (selectedProvince) {
+      const selectedProvinceData = provinces.find(province => province.id === selectedProvince);
+      if (selectedProvinceData) {
+        setLatitude(selectedProvinceData.latitude);
+        setLongitude(selectedProvinceData.longitude);
+
+        // Update the map views when province changes
+        if (lgMapRef.current) {
+          lgMapRef.current.setView([selectedProvinceData.latitude, selectedProvinceData.longitude], zoomLevel);
+          lgMarkerRef.current.setLatLng([selectedProvinceData.latitude, selectedProvinceData.longitude]);
+        }
+        if (modalMapRef.current) {
+          modalMapRef.current.setView([selectedProvinceData.latitude, selectedProvinceData.longitude], zoomLevel);
+          modalMarkerRef.current.setLatLng([selectedProvinceData.latitude, selectedProvinceData.longitude]);
+        }
+      }
+    }
+  }, [selectedProvince]);
 
   const initializeMap = (containerRef, mapRef, markerRef) => {
     if (containerRef.current) {
-      const mapInstance = new nmp_mapboxgl.Map({
-        mapType: nmp_mapboxgl.Map.mapTypes.neshanVector,
-        container: containerRef.current,
-        zoom: zoomLevel, // use zoom level from state
-        pitch: 0,
-        center: [longitude, latitude],
-        minZoom: 2,
-        maxZoom: 21,
-        trackResize: true,
-        mapKey: "web.a3f7a30528d54b41b3432213e9b8f51f",
-        poi: true,
-        traffic: true,
-        mapTypeControllerOptions: {
-          show: true,
-          position: 'bottom-left'
-        }
-      });
+      const mapInstance = L.map(containerRef.current).setView([latitude, longitude], zoomLevel);
 
-      const markerInstance = new nmp_mapboxgl.Marker()
-        .setLngLat([longitude, latitude])
-        .addTo(mapInstance);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(mapInstance);
 
-      mapInstance.on('click', (e) => {
-        const coords = e.lngLat;
+      const markerInstance = L.marker([latitude, longitude], {
+        draggable: true
+      }).addTo(mapInstance);
+
+      // Handle marker dragging
+      markerInstance.on("dragend", function (e) {
+        const coords = e.target.getLatLng();
         setTempLatitude(coords.lat);
         setTempLongitude(coords.lng);
+        toast.success("موقعیت جدید انتخاب شد");
+      });
 
-        markerInstance.setLngLat([coords.lng, coords.lat]);
-
-        toast.success(`موقعیت انتخاب شد`);
-
-        setLatitude(coords.lat);
-        setLongitude(coords.lng);
+      // Add map click event to change marker position
+      mapInstance.on("click", function (e) {
+        const { lat, lng } = e.latlng;
+        setTempLatitude(lat);
+        setTempLongitude(lng);
+        markerInstance.setLatLng([lat, lng]);
+        toast.success("موقعیت جدید انتخاب شد");
       });
 
       mapRef.current = mapInstance;
       markerRef.current = markerInstance;
-    } else {
-      console.error("Map container not found");
     }
   };
 
@@ -196,41 +178,28 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
     setIsMapModalOpen(true);
   };
 
-  const handleSaveLocation = () => {
-    setLatitude(tempLatitude);
-    setLongitude(tempLongitude);
-    toast.success("موقعیت با موفقیت ثبت شد");
+  const handleMapModalClose = () => {
     setIsMapModalOpen(false);
   };
 
-  const handleZoomIn = () => {
-    setZoomLevel((prevZoom) => Math.min(prevZoom + 1, 21)); // Zoom in with max limit of 21
-    if (lgMapRef.current) {
-      lgMapRef.current.zoomIn();
-    }
-    if (modalMapRef.current) {
-      modalMapRef.current.zoomIn();
-    }
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel((prevZoom) => Math.max(prevZoom - 1, 2)); // Zoom out with min limit of 2
-    if (lgMapRef.current) {
-      lgMapRef.current.zoomOut();
-    }
-    if (modalMapRef.current) {
-      modalMapRef.current.zoomOut();
-    }
+  const handleSaveLocation = () => {
+    setLatitude(tempLatitude);
+    setLongitude(tempLongitude);
+    setIsMapModalOpen(false);
   };
 
   const handleSaveChanges = async () => {
     setIsSaving(true);
+    setSubmitButtonText("در حال ثبت...");
+
     const requestData = {
       city_id: selectedCity,
-      latitude,
-      longitude,
+      latitude: tempLatitude, // Send updated coordinates from the map
+      longitude: tempLongitude, // Send updated coordinates from the map
       _method: "PUT",
     };
+
+    console.log("Sending data:", requestData);
 
     try {
       const response = await axios.post(
@@ -251,8 +220,10 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       }
     } catch (error) {
       toast.error("خطا در ثبت تغییرات");
+      console.error("Error saving changes:", error);
     } finally {
       setIsSaving(false);
+      setSubmitButtonText("ثبت تغییرات");
     }
   };
 
@@ -292,7 +263,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                       >
                         {provinces.find((province) => province.id === selectedProvince)?.name || "انتخاب استان"}
                         <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </Listbox.Button>
                       <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-40 overflow-y-auto`}>
@@ -321,7 +292,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
                       >
                         {cities.find((city) => city.id === selectedCity)?.name || "انتخاب شهر"}
                         <svg className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </Listbox.Button>
                       <Listbox.Options className={`absolute mt-2 w-full border rounded-xl bg-white shadow-lg ${open ? 'block z-10' : 'hidden'} max-h-40 overflow-y-auto`}>
@@ -368,8 +339,6 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
               باز کردن نقشه
             </button>
           </div>
-          
-          
         </div>
       )}
 
@@ -409,28 +378,18 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
         </div>
       </div>
 
-      {/* Zoom Buttons */}
-      <div className="hidden  mt-4 lg:flex gap-2">
-            <button onClick={handleZoomOut} className="px-4 py-2 bg-gray-600 text-white rounded-xl">-</button>
-            <button onClick={handleZoomIn} className="px-4 py-2 bg-gray-600 text-white rounded-xl">+</button>
-          </div>
-
       {!isLoading && (
         <div className="absolute flex justify-end w-full">
           <button
             className="bg-green-600 text-white px-4 py-2 mb-2 rounded-xl shadow-xl w-36"
             onClick={handleSaveChanges}
           >
-            ثبت تغییرات
+            {submitButtonText}
           </button>
         </div>
       )}
 
-      {isSaving && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <Spinner />
-        </div>
-      )}
+      
     </div>
   );
 };

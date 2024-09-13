@@ -113,8 +113,6 @@ function MainFacilityDetails({ token, houseUuid, facilities }) {
         }
       );
 
-      console.log("Response:", response);
-
       if (response.status === 200) {
         toast.success('اطلاعات با موفقیت ثبت شد');
       } else {
@@ -168,89 +166,91 @@ function MainFacilityDetails({ token, houseUuid, facilities }) {
               </label>
             </Switch.Group>
 
-            <div className="ml-6 mt-2">
-              {facility.fields?.map((field, index) => {
-                if (field.title.trim() === facility.label.trim()) {
-                  return null;
-                }
+            {/* Show fields only if the facility is checked */}
+            {selectedFacilities[facility.key]?.checked && (
+              <div className="ml-6 mt-2">
+                {facility.fields?.map((field, index) => {
+                  // Only show the field if its title is different from the facility label
+                  if (field.title.trim() === facility.label.trim()) {
+                    return null;
+                  }
 
-                return (
-                  <div key={index} className="mb-4">
-                    {field.type === 'toggle' ? (
-                      <div className="flex items-center">
-                        <Switch.Group as="div" className="flex items-center space-x-2">
-                          <label className="flex items-center space-x-2 cursor-pointer">
-                            <span className="ml-3 text-sm font-medium text-gray-700">
-                              {field.title}
-                            </span>
-                            {selectedFacilities[facility.key]?.fields?.[field.title.trim()] && (
-                                <svg
-                                  className="w-4 h-4 text-white absolute inset-0 m-auto"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            <Switch
-                              checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
-                              onChange={() =>
-                                handleInputChange(
-                                  facility.key,
-                                  field.title,
-                                  !selectedFacilities[facility.key].fields[field.title.trim()]
-                                )
-                              }
-                              className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
-                                ${
-                                  selectedFacilities[facility.key]?.fields?.[field.title.trim()]
+                  return (
+                    <div key={index} className="mb-4">
+                      {field.type === 'toggle' ? (
+                        <div className="flex items-center">
+                          <Switch.Group as="div" className="flex items-center space-x-2">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <span className="ml-3 text-sm font-medium text-gray-700">
+                                {field.title}
+                              </span>
+                              <Switch
+                                checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
+                                onChange={() =>
+                                  handleInputChange(
+                                    facility.key,
+                                    field.title,
+                                    !selectedFacilities[facility.key].fields[field.title.trim()]
+                                  )
+                                }
+                                className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
+                                  ${selectedFacilities[facility.key]?.fields?.[field.title.trim()]
                                     ? 'bg-green-500'
                                     : 'bg-gray-200'
-                                }
-                              `}
-                            >
-                              
-                            </Switch>
+                                  }
+                                `}
+                              >
+                                {selectedFacilities[facility.key]?.fields?.[field.title.trim()] && (
+                                  <svg
+                                    className="w-4 h-4 text-white absolute inset-0 m-auto"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </Switch>
+                            </label>
+                          </Switch.Group>
+                        </div>
+                      ) : field.type === 'textarea' ? (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {field.title}
                           </label>
-                        </Switch.Group>
-                      </div>
-                    ) : field.type === 'textarea' ? (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {field.title}
-                        </label>
-                        <textarea
-                          placeholder={field.placeholder}
-                          value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
-                          onChange={(e) =>
-                            handleInputChange(facility.key, field.title, e.target.value.trim())
-                          }
-                          className="block w-full p-2 border rounded-lg focus:outline-none"
-                          rows={3}
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {field.title}
-                        </label>
-                        <input
-                          type={field.type === 'number' || field.type === 'float1' ? 'number' : 'text'}
-                          placeholder={field.placeholder}
-                          value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
-                          onChange={(e) =>
-                            handleInputChange(facility.key, field.title, e.target.value.trim())
-                          }
-                          className="block w-full p-2 border rounded-lg focus:outline-none"
-                        />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                          <textarea
+                            placeholder={field.placeholder}
+                            value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
+                            onChange={(e) =>
+                              handleInputChange(facility.key, field.title, e.target.value.trim())
+                            }
+                            className="block w-full p-2 border rounded-lg focus:outline-none"
+                            rows={3}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {field.title}
+                          </label>
+                          <input
+                            type={field.type === 'number' || field.type === 'float1' ? 'number' : 'text'}
+                            placeholder={field.placeholder}
+                            value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
+                            onChange={(e) =>
+                              handleInputChange(facility.key, field.title, e.target.value.trim())
+                            }
+                            className="block w-full p-2 border rounded-lg focus:outline-none"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         ))}
       </div>

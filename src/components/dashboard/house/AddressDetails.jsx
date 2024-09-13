@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 
-const AddressDetails = ({ data, token, houseUuid }) => {
+const AddressDetails = ({ data, onSubmit }) => {
   const [address, setAddress] = useState(data?.address?.address || '');
   const [neighborhood, setNeighborhood] = useState(data?.address?.village || '');
   const [floor, setFloor] = useState(data?.address?.floor || '');
@@ -16,33 +15,21 @@ const AddressDetails = ({ data, token, houseUuid }) => {
     setLoadingSubmit(true);
     setErrors({});
 
-    const requestData = {
+    const updatedData = {
       address,
       village_name: neighborhood,
       floor,
       house_number: plaqueNumber,
       postal_code: postalCode,
-      _method: 'PUT',
     };
 
-    try {
-      const response = await axios.post(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
-        requestData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    console.log("Submitting updated address data:", updatedData);
 
-      if (response.status === 200) {
-        toast.success("آدرس با موفقیت به‌روزرسانی شد");
-      } else {
-        toast.error("خطایی رخ داده است");
-      }
+    try {
+      await onSubmit(updatedData); // Use the onSubmit function from the parent component
+      toast.success("آدرس با موفقیت به‌روزرسانی شد");
     } catch (error) {
+      console.error("Error submitting data:", error);
       if (error.response) {
         const { data } = error.response;
         if (data.errors) {

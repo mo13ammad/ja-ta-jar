@@ -32,10 +32,10 @@ const sections = [
   },
   {
     label: 'مشخصات اقامتگاه',
-    keys: ['mainFacilities', 'rooms', 'sanitaries'],
+    keys: ['mainFacilities', 'rooms', 'sanitaries'], // Added 'rooms' here
     children: [
       { key: 'mainFacilities', label: 'امکانات اقامتگاه' },
-      { key: 'rooms', label: 'اتاق‌ها و پذیرایی' },
+      { key: 'rooms', label: 'اتاق‌ها' }, // Added RoomDetails tab in sidebar
       { key: 'sanitaries', label: 'امکانات بهداشتی' },
     ],
   },
@@ -43,7 +43,7 @@ const sections = [
     label: 'قوانین اقامتگاه',
     keys: ['reservationRules', 'stayRules'],
     children: [
-      { key: 'reservationRules', label: 'قوانین رزرو' }, // Added new tab here
+      { key: 'reservationRules', label: 'قوانین رزرو' },
       { key: 'stayRules', label: 'قوانین اقامت' },
     ],
   },
@@ -58,11 +58,14 @@ const sections = [
     children: [{ key: 'images', label: 'تصاویر اقامتگاه' }],
   },
   {
-    label: 'اطلاعات مالکیت',
-    keys: ['ownershipInfo'],
-    children: [{ key: 'ownershipInfo', label: 'اطلاعات مالکیت' }],
+    label: 'ثبت نهایی اقامتگاه',
+    keys: ['finalSubmit'],
+    children: [{ key: 'finalSubmit', label: 'ثبت نهایی اقامتگاه' }],
   },
 ];
+
+
+
 
 const EditHouseSidebar = ({ activeTab, setActiveTab }) => {
   const [openSections, setOpenSections] = React.useState({});

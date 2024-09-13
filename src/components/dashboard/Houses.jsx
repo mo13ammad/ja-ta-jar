@@ -19,6 +19,8 @@ const Houses = ({ token }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [structureOptions, setStructureOptions] = useState([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [houseToDelete, setHouseToDelete] = useState(null); // Store the house to delete
 
   useEffect(() => {
     fetchHouses(currentPage);
@@ -78,14 +80,20 @@ const Houses = ({ token }) => {
     navigate(`/house/${uuid}`, { state: { token } });
   };
 
-  const handleDeleteClick = async (uuid) => {
-    setDeleteLoading((prevState) => ({ ...prevState, [uuid]: true }));
+  const handleDeleteClick = (uuid) => {
+    setHouseToDelete(uuid); // Set the house UUID to delete
+    setDeleteModalOpen(true); // Open the confirmation modal
+  };
+
+  const confirmDelete = async () => {
+    setDeleteLoading((prevState) => ({ ...prevState, [houseToDelete]: true }));
     setError('');
     setSuccess('');
+    setDeleteModalOpen(false); // Close the modal after confirmation
 
     try {
       const response = await axios.delete(
-        `https://portal1.jatajar.com/api/client/house/${uuid}`,
+        `https://portal1.jatajar.com/api/client/house/${houseToDelete}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -103,7 +111,8 @@ const Houses = ({ token }) => {
     } catch (error) {
       setError('Failed to delete: ' + error.message);
     } finally {
-      setDeleteLoading((prevState) => ({ ...prevState, [uuid]: false }));
+      setDeleteLoading((prevState) => ({ ...prevState, [houseToDelete]: false }));
+      setHouseToDelete(null); // Reset the house to delete
     }
   };
 
@@ -278,6 +287,32 @@ const Houses = ({ token }) => {
             </div>
 
             {error && <p className="text-red-500">{error}</p>}
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="max-w-md p-8 space-y-4 bg-white border rounded-xl">
+            <DialogTitle className="text-lg font-bold">آیا مطمئن هستید؟</DialogTitle>
+            <p>آیا مطمئن هستید که می‌خواهید این اقامتگاه را حذف کنید؟</p>
+            <div className="flex justify-end gap-4 mt-4">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+              >
+                لغو
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                disabled={deleteLoading[houseToDelete]}
+              >
+                بله، حذفش کن
+              </button>
+            </div>
           </DialogPanel>
         </div>
       </Dialog>
