@@ -15,6 +15,8 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
   const [makeMainLoading, setMakeMainLoading] = useState({});
   const [buttonText, setButtonText] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState(null); // Image to delete
 
   useEffect(() => {
     if (houseData?.medias) {
@@ -75,11 +77,17 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
     }
   };
 
-  const handleDeleteClick = async (imageId) => {
-    setDeleteLoading(prev => ({ ...prev, [imageId]: true }));
+  const handleDeleteClick = (imageId) => {
+    setImageToDelete(imageId);
+    setDeleteModalOpen(true); // Open the confirmation modal
+  };
+
+  const confirmDelete = async () => {
+    setDeleteLoading((prev) => ({ ...prev, [imageToDelete]: true }));
+    setDeleteModalOpen(false); // Close the modal after confirmation
     try {
       const response = await axios.delete(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageId}`,
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageToDelete}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +97,7 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       );
 
       if (response.status === 200) {
-        setMedias(prev => prev.filter(image => image.id !== imageId));
+        setMedias((prev) => prev.filter((image) => image.id !== imageToDelete));
         toast.success('تصویر با موفقیت حذف شد');
       } else {
         throw new Error('Failed to delete image.');
@@ -100,28 +108,29 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       toast.error(errMsg);
       console.error('Error deleting image:', errMsg);
     } finally {
-      setDeleteLoading(prev => ({ ...prev, [imageId]: false }));
+      setDeleteLoading((prev) => ({ ...prev, [imageToDelete]: false }));
+      setImageToDelete(null); // Reset image to delete
     }
   };
 
   const handleMakeMain = async (imageId) => {
     if (!imageId) return;
 
-    const imageToMakeMain = medias.find(img => img.id === imageId);
+    const imageToMakeMain = medias.find((img) => img.id === imageId);
     if (!imageToMakeMain) {
       toast.error('تصویر یافت نشد');
       return;
     }
 
-    setMakeMainLoading(prev => ({ ...prev, [imageId]: true }));
-    setButtonText(prev => ({ ...prev, [imageId]: 'در حال تبدیل ...' }));
+    setMakeMainLoading((prev) => ({ ...prev, [imageId]: true }));
+    setButtonText((prev) => ({ ...prev, [imageId]: 'در حال تبدیل ...' }));
 
     try {
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageId}`,
         {
-          title: imageToMakeMain.title, // Send the latest title
-          main: 1 // Set main to 1
+          title: imageToMakeMain.title,
+          main: 1,
         },
         {
           headers: {
@@ -132,14 +141,16 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       );
 
       if (response.status === 200) {
-        setMedias(prevMedias => prevMedias.map(img => {
-          if (img.id === imageId) {
-            return { ...img, main: true }; // Mark this image as main
-          } else if (img.main) {
-            return { ...img, main: false }; // Unmark previous main image
-          }
-          return img;
-        }));
+        setMedias((prevMedias) =>
+          prevMedias.map((img) => {
+            if (img.id === imageId) {
+              return { ...img, main: true };
+            } else if (img.main) {
+              return { ...img, main: false };
+            }
+            return img;
+          })
+        );
         toast.success('تصویر به عنوان تصویر اصلی تنظیم شد');
       } else {
         throw new Error('Failed to make image main.');
@@ -150,8 +161,8 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       toast.error(errMsg);
       console.error('Error making image main:', errMsg);
     } finally {
-      setMakeMainLoading(prev => ({ ...prev, [imageId]: false }));
-      setButtonText(prev => ({ ...prev, [imageId]: 'تبدیل به تصویر اصلی' }));
+      setMakeMainLoading((prev) => ({ ...prev, [imageId]: false }));
+      setButtonText((prev) => ({ ...prev, [imageId]: 'تبدیل به تصویر اصلی' }));
     }
   };
 
@@ -207,6 +218,8 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
       ) : (
         <p className="p-1">تصویری وجود ندارد.</p>
       )}
+
+      {/* Add Image Modal */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -262,6 +275,32 @@ const ImageDetails = ({ token, houseUuid, houseData }) => {
                 disabled={loading}
               >
                 {loading ? 'در حال بارگذاری ...' : 'اضافه کردن'}
+              </button>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="max-w-md p-8 space-y-4 bg-white border rounded-xl">
+            <DialogTitle className="text-lg font-bold">آیا مطمئن هستید؟</DialogTitle>
+            <p>آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟</p>
+            <div className="flex justify-end gap-4 mt-4">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+              >
+                لغو
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                disabled={deleteLoading[imageToDelete]}
+              >
+                بله، حذفش کن
               </button>
             </div>
           </DialogPanel>

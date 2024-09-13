@@ -31,6 +31,8 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
   const [errorList, setErrorList] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const priceHandleBy = houseData?.price_handle_by?.key; // Check whether it is "PerNight" or "PerPerson"
+
   useEffect(() => {
     if (houseData?.prices) {
       setFormData({
@@ -85,7 +87,7 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
       );
 
       // Check if the price is handled "PerNight"
-      if (houseData?.price_handle_by?.key === "PerNight") {
+      if (priceHandleBy === "PerNight") {
         formattedData.extra_people_spring = "100000";
         formattedData.extra_people_summer = "100000";
         formattedData.extra_people_autumn = "100000";
@@ -107,7 +109,6 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
         toast.success("قیمت‌ها با موفقیت به روز شد");
         setErrorList([]);
         if (onSubmit) {
-          // Pass the updated house data back to the parent component
           const updatedPrices = { ...houseData.prices, ...response.data.data };
           onSubmit({ prices: updatedPrices });
         }
@@ -142,10 +143,8 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
               type="text"
               value={formData[key]}
               onChange={(e) => handleInputChange(key, e.target.value)}
-              className={`block p-2 border rounded-xl w-full outline-none ${
-                errors[key] ? "border-red-500" : ""
-              }`}
-              placeholder="قیمت را به تومان وارد کنید"
+              className={`block p-2 border rounded-xl w-full outline-none ${errors[key] ? "border-red-500" : ""}`}
+              placeholder={`قیمت را به تومان (${priceHandleBy === "PerNight" ? "بر اساس هر شب" : "بر اساس هر نفر"}) وارد کنید`}
             />
           </div>
         ))}
@@ -158,54 +157,48 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">قیمت‌گذاری</h1>
 
-      {/* Section for تعطیلات نوروز */}
       {renderInputSection("قیمت در تعطیلات نوروز", [{ key: "nowruz", label: "تعطیلات نوروز" }])}
 
-      {/* Section for Spring */}
       {renderInputSection("قیمت در بهار", [
         { key: "normal_spring", label: "روز های اول هفته" },
         { key: "weekend_spring", label: "روز های آخر هفته" },
         { key: "holiday_spring", label: "روز های تعطیل" },
         { key: "peak_spring", label: "روز های اوج شلوغی" },
-        ...(houseData?.price_handle_by?.key !== "PerNight"
+        ...(priceHandleBy !== "PerNight"
           ? [{ key: "extra_people_spring", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
           : []),
       ])}
 
-      {/* Section for Summer */}
       {renderInputSection("قیمت در تابستان", [
         { key: "normal_summer", label: "روز های اول هفته" },
         { key: "weekend_summer", label: "روز های آخر هفته" },
         { key: "holiday_summer", label: "روز های تعطیل" },
         { key: "peak_summer", label: "روز های اوج شلوغی" },
-        ...(houseData?.price_handle_by?.key !== "PerNight"
+        ...(priceHandleBy !== "PerNight"
           ? [{ key: "extra_people_summer", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
           : []),
       ])}
 
-      {/* Section for Autumn */}
       {renderInputSection("قیمت در پاییز", [
         { key: "normal_autumn", label: "روز های اول هفته" },
         { key: "weekend_autumn", label: "روز های آخر هفته" },
         { key: "holiday_autumn", label: "روز های تعطیل" },
         { key: "peak_autumn", label: "روز های اوج شلوغی" },
-        ...(houseData?.price_handle_by?.key !== "PerNight"
+        ...(priceHandleBy !== "PerNight"
           ? [{ key: "extra_people_autumn", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
           : []),
       ])}
 
-      {/* Section for Winter */}
       {renderInputSection("قیمت در زمستان", [
         { key: "normal_winter", label: "روز های اول هفته" },
         { key: "weekend_winter", label: "روز های آخر هفته" },
         { key: "holiday_winter", label: "روز های تعطیل" },
         { key: "peak_winter", label: "روز های اوج شلوغی" },
-        ...(houseData?.price_handle_by?.key !== "PerNight"
+        ...(priceHandleBy !== "PerNight"
           ? [{ key: "extra_people_winter", label: "به ازای هر نفر اضافه (قیمت هر نفر بر بین ظرفیت استاندارد تا حداکثر ظرفیت)" }]
           : []),
       ])}
 
-      {/* Error List Display */}
       {errorList.length > 0 && (
         <div className="mt-4 text-red-600">
           <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
@@ -217,7 +210,6 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
         </div>
       )}
 
-      {/* Submit Button */}
       <div className="mt-4">
         <button
           onClick={handleSubmit}
