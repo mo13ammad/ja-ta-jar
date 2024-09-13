@@ -11,12 +11,12 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
   const dischargeTimeRef = useRef(null);
 
   const [formData, setFormData] = useState({
-    short_term_booking_length: "",
-    short_term_booking_discount: "",
-    long_term_booking_length: "",
-    long_term_booking_discount: "",
-    minimum_length_stay: {
-      all: "", // Key for minimum stay for all days
+    short_term_booking_length: houseData?.reservation?.discount?.short_term?.minimum_length_stay || "",
+    short_term_booking_discount: houseData?.reservation?.discount?.short_term?.discount || "",
+    long_term_booking_length: houseData?.reservation?.discount?.long_term?.minimum_length_stay || "",
+    long_term_booking_discount: houseData?.reservation?.discount?.long_term?.discount || "",
+    minimum_length_stay: houseData?.reservation?.minimum_length_stay || {
+      all: "",
       Saturday: "",
       Sunday: "",
       Monday: "",
@@ -25,39 +25,29 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
       Thursday: "",
       Friday: ""
     },
-    enter_from: "",
-    enter_until: "",
-    discharge_time: "",
-    capacity: "",
-    maximum_capacity: "",
-    weekendType: "" // Added weekendType for the dropdown selection
+    enter_from: houseData?.reservation?.timing?.enter?.from || "",
+    enter_until: houseData?.reservation?.timing?.enter?.to || "",
+    discharge_time: houseData?.reservation?.timing?.leave || "",
+    capacity: houseData?.reservation?.capacity?.normal || "",
+    maximum_capacity: houseData?.reservation?.capacity?.maximum || "",
+    weekendType: houseData?.weekendType?.key || ""
   });
 
-  // Populate form data from houseData
   useEffect(() => {
-    if (houseData) {
-      setFormData({
-        short_term_booking_length: houseData.reservation?.discount?.short_term?.minimum_length_stay || "",
-        short_term_booking_discount: houseData.reservation?.discount?.short_term?.discount || "",
-        long_term_booking_length: houseData.reservation?.discount?.long_term?.minimum_length_stay || "",
-        long_term_booking_discount: houseData.reservation?.discount?.long_term?.discount || "",
-        minimum_length_stay: houseData.reservation?.minimum_length_stay || {
-          all: "", // Initialize the key
-          Saturday: "",
-          Sunday: "",
-          Monday: "",
-          Tuesday: "",
-          Wednesday: "",
-          Thursday: "",
-          Friday: ""
-        },
-        enter_from: houseData.reservation?.timing?.enter?.from || "",
-        enter_until: houseData.reservation?.timing?.enter?.to || "",
-        discharge_time: houseData.reservation?.timing?.leave || "",
-        capacity: houseData.reservation?.capacity?.normal || "",
-        maximum_capacity: houseData.reservation?.capacity?.maximum || "",
-        weekendType: houseData.weekendType?.key || "" // Set weekend type based on houseData
-      });
+    if (houseData?.reservation?.minimum_length_stay) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        minimum_length_stay: {
+          all: houseData.reservation.minimum_length_stay.all || "",
+          Saturday: houseData.reservation.minimum_length_stay.Saturday || "",
+          Sunday: houseData.reservation.minimum_length_stay.Sunday || "",
+          Monday: houseData.reservation.minimum_length_stay.Monday || "",
+          Tuesday: houseData.reservation.minimum_length_stay.Tuesday || "",
+          Wednesday: houseData.reservation.minimum_length_stay.Wednesday || "",
+          Thursday: houseData.reservation.minimum_length_stay.Thursday || "",
+          Friday: houseData.reservation.minimum_length_stay.Friday || ""
+        }
+      }));
     }
   }, [houseData]);
 
@@ -77,7 +67,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
   const handleInputChange = (key, value) => {
     setFormData((prevData) => ({
       ...prevData,
-      [key]: value
+      [key]: value !== undefined ? value : "" // Always set a default value to prevent uncontrolled input
     }));
   };
 
@@ -86,7 +76,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
       ...prevData,
       minimum_length_stay: {
         ...prevData.minimum_length_stay,
-        [day]: value
+        [day]: value !== undefined ? value : ""
       }
     }));
   };
@@ -127,7 +117,6 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
     }
   };
 
-  // Focus time input on label click
   const handleFocusClick = (inputRef) => {
     inputRef.current.focus();
   };
@@ -137,7 +126,6 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">قوانین رزرو</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
         {/* Short Term Booking Length */}
         <div className="mt-4">
           <label className={`block text-sm font-medium mb-2 ${errors.short_term_booking_length ? 'text-red-600' : 'text-gray-700'}`}>
@@ -145,7 +133,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </label>
           <input
             type="number"
-            value={formData.short_term_booking_length}
+            value={formData.short_term_booking_length || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("short_term_booking_length", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.short_term_booking_length ? 'border-red-600' : 'border-gray-300'}`}
             placeholder="تعداد شب رزرو کوتاه مدت"
@@ -160,7 +148,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </label>
           <input
             type="number"
-            value={formData.short_term_booking_discount}
+            value={formData.short_term_booking_discount || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("short_term_booking_discount", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.short_term_booking_discount ? 'border-red-600' : 'border-gray-300'}`}
             placeholder="درصد تخفیف"
@@ -175,7 +163,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </label>
           <input
             type="number"
-            value={formData.long_term_booking_length}
+            value={formData.long_term_booking_length || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("long_term_booking_length", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.long_term_booking_length ? 'border-red-600' : 'border-gray-300'}`}
             placeholder="تعداد شب رزرو بلند مدت"
@@ -190,7 +178,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </label>
           <input
             type="number"
-            value={formData.long_term_booking_discount}
+            value={formData.long_term_booking_discount || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("long_term_booking_discount", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.long_term_booking_discount ? 'border-red-600' : 'border-gray-300'}`}
             placeholder="درصد تخفیف"
@@ -203,7 +191,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           <label className="block text-sm font-medium mb-2">حداقل شب اقامت</label>
           <input
             type="number"
-            value={formData.minimum_length_stay.all}
+            value={formData.minimum_length_stay.all || ""} // Ensure a valid default value
             onChange={(e) => handleMinimumStayChange("all", e.target.value)}
             className="block p-2 border border-gray-300 rounded-xl w-full outline-none"
             placeholder="حداقل شبی که اقامتگاه قابل رزرو است"
@@ -219,14 +207,14 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
             <input
               ref={enterFromRef}
               type="time"
-              value={formData.enter_from}
+              value={formData.enter_from || ""} // Ensure a valid default value
               onChange={(e) => handleInputChange("enter_from", e.target.value)}
               className="p-2 border rounded-xl w-full outline-none border-gray-300"
             />
             <input
               ref={enterUntilRef}
               type="time"
-              value={formData.enter_until}
+              value={formData.enter_until || ""} // Ensure a valid default value
               onChange={(e) => handleInputChange("enter_until", e.target.value)}
               className="p-2 border rounded-xl w-full outline-none border-gray-300"
             />
@@ -242,7 +230,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           <input
             ref={dischargeTimeRef}
             type="time"
-            value={formData.discharge_time}
+            value={formData.discharge_time || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("discharge_time", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.discharge_time ? 'border-red-600' : 'border-gray-300'}`}
           />
@@ -252,11 +240,11 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
         {/* Capacity */}
         <div className="mt-4">
           <label className={`block text-sm font-medium mb-2 ${errors.capacity ? 'text-red-600' : 'text-gray-700'}`}>
-            ظرفیت
+         ظرفیت استاندارد
           </label>
           <input
             type="number"
-            value={formData.capacity}
+            value={formData.capacity || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("capacity", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.capacity ? 'border-red-600' : 'border-gray-300'}`}
           />
@@ -270,7 +258,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </label>
           <input
             type="number"
-            value={formData.maximum_capacity}
+            value={formData.maximum_capacity || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
             className={`block p-2 border rounded-xl w-full outline-none ${errors.maximum_capacity ? 'border-red-600' : 'border-gray-300'}`}
           />
@@ -283,21 +271,29 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           <table className="table-auto w-full lg:w-1/2 border border-collapse">
             <thead>
               <tr>
-                <th className="border p-1">شروع رزرو</th>
+                <th className="border p-1">روز</th>
                 <th className="border p-1">تعداد شب رزرو</th>
               </tr>
             </thead>
             <tbody>
-              {["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map((day, index) => (
-                <tr key={day}>
-                  <td className="border p-1 text-right">{day}</td>
+              {[
+                { key: "Saturday", label: "شنبه" },
+                { key: "Sunday", label: "یکشنبه" },
+                { key: "Monday", label: "دوشنبه" },
+                { key: "Tuesday", label: "سه‌شنبه" },
+                { key: "Wednesday", label: "چهارشنبه" },
+                { key: "Thursday", label: "پنج‌شنبه" },
+                { key: "Friday", label: "جمعه" }
+              ].map((day) => (
+                <tr key={day.key}>
+                  <td className="border p-1 text-right">{day.label}</td>
                   <td className="border p-1">
                     <input
                       type="number"
-                      value={formData.minimum_length_stay[day] || ""}
-                      onChange={(e) => handleMinimumStayChange(day, e.target.value)}
+                      value={formData.minimum_length_stay[day.key] || ""} // Ensure a valid default value
+                      onChange={(e) => handleMinimumStayChange(day.key, e.target.value)}
                       className="p-1 border rounded-xl w-full outline-none"
-                      placeholder={`تعداد شب برای ${day}`}
+                      placeholder={`تعداد شب برای ${day.label}`}
                     />
                   </td>
                 </tr>
@@ -306,11 +302,11 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           </table>
         </div>
 
-        {/* Weekend Type Dropdown (Simple Style) */}
+        {/* Weekend Type Dropdown */}
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">نوع تعطیلات</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">تعیین روز های آخر هفته</label>
           <select
-            value={formData.weekendType}
+            value={formData.weekendType || ""} // Ensure a valid default value
             onChange={(e) => handleInputChange("weekendType", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
           >

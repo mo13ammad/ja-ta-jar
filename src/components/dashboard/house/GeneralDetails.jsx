@@ -4,7 +4,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { Listbox } from "@headlessui/react";
 import Spinner from "./Spinner"; // Assuming you have a Spinner component
 
-const GeneralDetails = ({ data, token, houseUuid }) => {
+const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
   const [houseFloorOptions, setHouseFloorOptions] = useState([]);
   const [privacyOptions, setPrivacyOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -94,32 +94,14 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
   const handleSubmit = async () => {
     setLoadingSubmit(true);
 
-    // Log the data we are sending
-    console.log("Data being sent:", formData);
+    const updatedData = {
+      ...formData,
+      _method: "PUT",
+    };
 
     try {
-      const response = await axios.post(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
-        {
-          ...formData,
-          _method: "PUT",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Log the response after update
-      console.log("Response received:", response.data);
-
-      if (response.status === 200) {
-        toast.success("اطلاعات با موفقیت ثبت شد");
-      } else {
-        toast.error("خطایی در ثبت اطلاعات پیش آمد");
-      }
+      await onSubmit(updatedData); // Use the onSubmit function from the parent component
+      toast.success("اطلاعات با موفقیت ثبت شد");
     } catch (error) {
       toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
     } finally {
@@ -157,7 +139,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                 value={formData.land_size}
                 onChange={(e) => handleInputChange("land_size", e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="متراژ کل"
+                placeholder="متراژ کل به متر مکعب"
               />
             </div>
 
@@ -169,7 +151,7 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                 value={formData.structure_size}
                 onChange={(e) => handleInputChange("structure_size", e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="متراژ زیر بنا"
+                placeholder="متراژ زیر بنا به متر مکعب"
               />
             </div>
 
@@ -202,12 +184,13 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
               <Listbox value={formData.tip} onChange={(value) => handleInputChange("tip", value)}>
                 {({ open }) => (
                   <div className="relative">
-                    <Listbox.Button
-                      className="block p-2 border rounded-xl w-full text-left flex justify-between items-center"
-                    >
-                      {houseFloorOptions.find((option) => option.key === formData.tip)?.label || "انتخاب نوع"}
+                    <Listbox.Button className="block p-2 border rounded-xl w-full text-left flex justify-between items-center">
+                      {houseFloorOptions.find((option) => option.key === formData.tip)?.label ||
+                        "انتخاب نوع"}
                       <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`}
+                        className={`w-5 h-5 transition-transform duration-200 ${
+                          open ? "rotate-180" : "rotate-0"
+                        }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -216,15 +199,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </Listbox.Button>
-                    <Listbox.Options
-                      className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto"
-                    >
+                    <Listbox.Options className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto">
                       {houseFloorOptions.map((option) => (
-                        <Listbox.Option
-                          key={option.key}
-                          value={option.key}
-                          className="cursor-pointer px-4 py-2 hover:bg-gray-200"
-                        >
+                        <Listbox.Option key={option.key} value={option.key} className="cursor-pointer px-4 py-2 hover:bg-gray-200">
                           <span>{option.label}</span>
                         </Listbox.Option>
                       ))}
@@ -240,12 +217,12 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
               <Listbox value={formData.privacy} onChange={(value) => handleInputChange("privacy", value)}>
                 {({ open }) => (
                   <div className="relative">
-                    <Listbox.Button
-                      className="block p-2 border rounded-xl w-full text-left flex justify-between items-center"
-                    >
+                    <Listbox.Button className="block p-2 border rounded-xl w-full text-left flex justify-between items-center">
                       {privacyOptions.find((option) => option.key === formData.privacy)?.label || "انتخاب حریم"}
                       <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`}
+                        className={`w-5 h-5 transition-transform duration-200 ${
+                          open ? "rotate-180" : "rotate-0"
+                        }`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -254,15 +231,9 @@ const GeneralDetails = ({ data, token, houseUuid }) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </Listbox.Button>
-                    <Listbox.Options
-                      className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto"
-                    >
+                    <Listbox.Options className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto">
                       {privacyOptions.map((option) => (
-                        <Listbox.Option
-                          key={option.key}
-                          value={option.key}
-                          className="cursor-pointer px-4 py-2 hover:bg-gray-200"
-                        >
+                        <Listbox.Option key={option.key} value={option.key} className="cursor-pointer px-4 py-2 hover:bg-gray-200">
                           <span>{option.label}</span>
                         </Listbox.Option>
                       ))}

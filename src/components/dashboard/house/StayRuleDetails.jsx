@@ -114,7 +114,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
           {fetchedRules.map((rule) => (
             <div key={rule.key} className="flex flex-col">
               <div className="flex items-center mb-2">
-                <span className="text-sm font-medium">{rule.label}</span>
+                <span className="xl:text-lg mb-1 font-medium">{rule.label}</span>
               </div>
 
               <div className="flex space-x-4">

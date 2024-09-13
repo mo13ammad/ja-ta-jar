@@ -4,7 +4,7 @@ import { toast, Toaster } from 'react-hot-toast';
 import { Switch, Listbox } from '@headlessui/react';
 import Spinner from "./Spinner";  // Assuming you have a Spinner component
 
-const EnvironmentDetails = ({ data, token, houseUuid }) => {
+const EnvironmentDetails = ({ data, token, houseUuid, onSubmit }) => {
   const [environmentTexturesOptions, setEnvironmentTexturesOptions] = useState([]);
   const [viewOptions, setViewOptions] = useState([]);
   const [neighbourOptions, setNeighbourOptions] = useState([]);
@@ -15,7 +15,7 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
   const [view, setView] = useState(data?.views?.description || '');
   const [selectedNeighbour, setSelectedNeighbour] = useState(data?.neighbour?.key || '');
   const [selectedRoutes, setSelectedRoutes] = useState([]);
-  const [loading, setLoading] = useState(true);  // State to manage loading
+  const [loading, setLoading] = useState(true);  
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,6 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
         if (neighbourRes.status === 200) setNeighbourOptions(neighbourRes.data.data);
         if (routesRes.status === 200) setAccessRouteOptions(routesRes.data.data);
 
-        // Set initial values based on fetched options and existing data
         if (Array.isArray(data?.areas)) {
           setSelectedTextures(data.areas.map(area => area.key));
         }
@@ -101,25 +100,8 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
     };
 
     try {
-      const response = await axios.post(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
-        {
-          ...requestData,
-          _method: 'PUT',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success('اطلاعات با موفقیت ثبت شد');
-      } else {
-        toast.error('خطایی در ثبت اطلاعات پیش آمد');
-      }
+      await onSubmit(requestData); // Send data to parent component for submission
+      toast.success('اطلاعات با موفقیت ثبت شد');
     } catch (error) {
       toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
     } finally {
@@ -149,8 +131,7 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                           checked={selectedTextures.includes(option.key)}
                           onChange={() => toggleTexture(option.key)}
                           className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
-                            ${selectedTextures.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                          `}
+                            ${selectedTextures.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}`}
                         >
                           {selectedTextures.includes(option.key) && (
                             <svg
@@ -182,8 +163,7 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                           checked={selectedViews.includes(option.key)}
                           onChange={() => toggleView(option.key)}
                           className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
-                            ${selectedViews.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                          `}
+                            ${selectedViews.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}`}
                         >
                           {selectedViews.includes(option.key) && (
                             <svg
@@ -253,8 +233,7 @@ const EnvironmentDetails = ({ data, token, houseUuid }) => {
                           checked={selectedRoutes.includes(option.key)}
                           onChange={() => toggleRoute(option.key)}
                           className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1
-                            ${selectedRoutes.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}
-                          `}
+                            ${selectedRoutes.includes(option.key) ? 'bg-green-500' : 'bg-gray-200'}`}
                         >
                           {selectedRoutes.includes(option.key) && (
                             <svg

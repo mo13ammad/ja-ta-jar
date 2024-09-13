@@ -58,9 +58,9 @@ const sections = [
     children: [{ key: 'images', label: 'تصاویر اقامتگاه' }],
   },
   {
-    label: 'اطلاعات مالکیت',
-    keys: ['ownershipInfo'],
-    children: [{ key: 'ownershipInfo', label: 'اطلاعات مالکیت' }],
+    label: 'ثبت نهایی اقامتگاه',
+    keys: ['finalSubmit'],
+    children: [{ key: 'finalSubmit', label: 'ثبت نهایی اقامتگاه' }],
   },
 ];
 
