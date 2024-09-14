@@ -139,7 +139,7 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
                 value={formData.land_size}
                 onChange={(e) => handleInputChange("land_size", e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="متراژ کل به متر مکعب"
+                placeholder="متراژ کل به متر مربع"
               />
             </div>
 
@@ -151,7 +151,7 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
                 value={formData.structure_size}
                 onChange={(e) => handleInputChange("structure_size", e.target.value)}
                 className="block p-2 border rounded-xl w-full outline-none"
-                placeholder="متراژ زیر بنا به متر مکعب"
+                placeholder="متراژ زیر بنا به متر مربع"
               />
             </div>
 

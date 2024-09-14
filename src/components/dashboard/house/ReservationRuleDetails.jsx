@@ -5,6 +5,7 @@ import { toast, Toaster } from "react-hot-toast";
 const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [errors, setErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState(""); // For non-field specific errors
   const [weekendOptions, setWeekendOptions] = useState([]);
   const enterFromRef = useRef(null);
   const enterUntilRef = useRef(null);
@@ -84,6 +85,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     setErrors({});
+    setErrorMessage(""); // Reset error message
 
     try {
       const response = await axios.put(
@@ -106,9 +108,19 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
         toast.error("خطایی در ثبت اطلاعات پیش آمد");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        setErrors(error.response.data.errors.fields);
-        toast.error("خطا در اعتبارسنجی اطلاعات");
+      if (error.response && error.response.data) {
+        const responseErrors = error.response.data.errors?.fields;
+
+        // Check if there are field-specific errors
+        if (responseErrors) {
+          setErrors(responseErrors);
+        }
+
+        // If there's a general error message, display it
+        if (error.response.data.message) {
+          setErrorMessage(error.response.data.message);
+          toast.error(error.response.data.message);
+        } 
       } else {
         toast.error("خطایی رخ داده است");
       }
@@ -125,6 +137,14 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
     <div className="container mx-auto p-4">
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">قوانین رزرو</h1>
+
+      {/* Display general error message */}
+      {errorMessage && (
+        <div className="bg-red-100 text-red-600 p-4 rounded-md mb-4">
+          <p>{errorMessage}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Short Term Booking Length */}
         <div className="mt-4">
