@@ -27,12 +27,15 @@ const tabs = [
   { key: "pricing", label: "قیمت گذاری" },
   { key: "reservationRules", label: "قوانین رزرو" },
   { key: "images", label: "تصاویر اقامتگاه" },
+  { key: "finalSubmit", label: "ثبت نهایی اقامتگاه" }, // Added finalSubmit tab
 ];
 
 const EditHouseContent = ({ token, houseUuid }) => {
   const [houseData, setHouseData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(tabs[0].key);
+  const [publishing, setPublishing] = useState(false); // Track the publishing state
+  const [errorMessages, setErrorMessages] = useState([]); // Track error messages
 
   const fetchHouseData = async () => {
     try {
@@ -46,7 +49,6 @@ const EditHouseContent = ({ token, houseUuid }) => {
         }
       );
       setHouseData(response.data.data);
-      
     } catch (error) {
       console.error("Error fetching house data:", error);
       toast.error("Error fetching house data");
@@ -82,6 +84,49 @@ const EditHouseContent = ({ token, houseUuid }) => {
     }
   };
 
+  const handleFinalSubmit = async () => {
+    setPublishing(true); // Set publishing state to true
+    setErrorMessages([]); // Reset error messages before final submission
+
+    try {
+      const response = await axios.put(
+        `https://portal1.jatajar.com/api/client/house/${houseUuid}/publish`, 
+        { uuid: houseUuid }, // Send the UUID
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Final submission response:", response.data); // Log the success response
+
+      if (response.status === 200) {
+        toast.success("اقامتگاه با موفقیت ثبت نهایی شد");
+      } else {
+        toast.error("خطا در ثبت نهایی اقامتگاه");
+      }
+    } catch (error) {
+      console.error("Error during final submission:", error);
+
+      // Log the error response data if available
+      if (error.response) {
+        console.log("Error response data:", error.response.data); // Log error response data
+        toast.error(`خطا: ${error.response.data.message || "خطا در ثبت نهایی اقامتگاه"}`);
+
+        // Extract error messages from error.response.data
+        const errorFields = error.response.data.errors?.fields || {};
+        const errorList = Object.values(errorFields).flat();
+        setErrorMessages(errorList); // Set the error messages to be displayed
+      } else {
+        toast.error("خطا در ثبت نهایی اقامتگاه");
+      }
+    } finally {
+      setPublishing(false); // Reset publishing state
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -108,7 +153,12 @@ const EditHouseContent = ({ token, houseUuid }) => {
             <AddressDetails data={houseData} onSubmit={handleSubmit} />
           )}
           {activeTab === "location" && (
-            <LocationDetails data={houseData} token={token} houseUuid={houseUuid} onSubmit={handleSubmit} />
+            <LocationDetails
+              data={houseData}
+              token={token}
+              houseUuid={houseUuid}
+              onSubmit={handleSubmit}
+            />
           )}
           {activeTab === "environmentInfo" && (
             <EnvironmentDetails
@@ -119,16 +169,29 @@ const EditHouseContent = ({ token, houseUuid }) => {
             />
           )}
           {activeTab === "mainFacilities" && (
-            <MainFacilityDetails facilities={houseData.facilities} token={token} houseUuid={houseUuid} />
+            <MainFacilityDetails
+              facilities={houseData.facilities}
+              token={token}
+              houseUuid={houseUuid}
+            />
           )}
           {activeTab === "rooms" && (
-            <RoomDetails houseData={houseData} token={token} houseUuid={houseUuid} onSubmit={handleSubmit}/>
+            <RoomDetails
+              houseData={houseData}
+              token={token}
+              houseUuid={houseUuid}
+              onSubmit={handleSubmit}
+            />
           )}
           {activeTab === "sanitaries" && (
-            <Sanitaries data={houseData}  token={token} houseUuid={houseUuid}  />
+            <Sanitaries data={houseData} token={token} houseUuid={houseUuid} />
           )}
           {activeTab === "stayRules" && (
-            <StayRuleDetails token={token} houseUuid={houseUuid} rules={houseData.rules.types} />
+            <StayRuleDetails
+              token={token}
+              houseUuid={houseUuid}
+              rules={houseData.rules.types}
+            />
           )}
           {activeTab === "pricing" && (
             <PricingDetails
@@ -139,7 +202,11 @@ const EditHouseContent = ({ token, houseUuid }) => {
             />
           )}
           {activeTab === "reservationRules" && (
-            <ReservationRuleDetails houseData={houseData} token={token} houseUuid={houseUuid}  />
+            <ReservationRuleDetails
+              houseData={houseData}
+              token={token}
+              houseUuid={houseUuid}
+            />
           )}
           {activeTab === "images" && (
             <ImageDetails
@@ -148,6 +215,29 @@ const EditHouseContent = ({ token, houseUuid }) => {
               houseUuid={houseUuid}
               onSubmit={handleSubmit} // Pass handleSubmit to update houseData after image actions
             />
+          )}
+          {activeTab === "finalSubmit" && (
+            <div className="flex flex-col justify-end">
+              {/* Display the error messages if any */}
+              {errorMessages.length > 0 && (
+                <div className="bg-red-100 text-red-600 p-4 rounded-md mb-4">
+                  <h3 className="font-semibold">خطاها:</h3>
+                  <ul className="list-disc list-inside">
+                    {errorMessages.map((error, index) => (
+                      <li key={index}>{error}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <button
+                className="bg-orange-600 text-white px-4 py-2 rounded-xl max-w-52 shadow-xl mt-4"
+                onClick={handleFinalSubmit}
+                disabled={publishing} // Disable button during publishing
+              >
+                {publishing ? "در حال ثبت ..." : "ثبت نهایی اقامتگاه"}
+              </button>
+            </div>
           )}
         </div>
       </div>
