@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import logo from "../assets/jatajarlogo.webp";
+import { Link } from "react-router-dom";
 
 function Navbar({userName}) {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -12,18 +13,18 @@ function Navbar({userName}) {
     <div className="w-full">
       <nav className="relative w-full px-5 py-2 flex bg-gray-100 shadow-md flex-wrap justify-between items-center">
         {/* Logo */}
-        <a href="/" className="ml-auto">
+        <Link to="/" className="ml-auto">
           <img className="max-w-28 md:max-w-32 max-h-10" src={logo} alt="Logo" />
-        </a>
+        </Link>
 
         {/* Links in lg size */}
         <div className="hidden lg:flex lg:items-center lg:mr-auto lg:space-x-4 lg:space-x-reverse">
   {userName ? (
     <p className="text-gray-700">{userName}</p>
   ) : (
-    <a href="/login" className="text-gray-700 hover:text-green-600">
+    <Link to="/login" className="text-gray-700 hover:text-green-600">
       ورود | ثبت نام
-    </a>
+    </Link>
   )}
 </div>
 
@@ -48,12 +49,12 @@ function Navbar({userName}) {
       {showMobileMenu && (
         <div className="lg:hidden w-full">
           <div className="flex flex-col items-end text-gray-700 bg-white w-full overflow-hidden">
-            <a href="/login" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
+            <Link to="/login" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
               ورود
-            </a>
-            <a href="/" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
+            </Link>
+            <Link to="/" className="block py-2 px-2 hover:bg-gray-200 w-full text-right">
               صفحه اصلی
-            </a>
+            </Link>
           </div>
         </div>
       )}

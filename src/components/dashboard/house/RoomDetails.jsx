@@ -324,7 +324,7 @@ const RoomDetails = ({ token, houseUuid, houseData, onSubmit }) => {
                               }`}
                             />
                           </Switch>
-                          <span className="ml-3 text-sm font-medium text-gray-700">اتاق دارای مستر می باشد</span>
+                          <span className="ml-3 text-sm font-medium text-gray-700">اتاق مستر می باشد</span>
                         </label>
                       </Switch.Group>
                     </div>

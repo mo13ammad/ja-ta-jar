@@ -24,9 +24,9 @@ const Login = () => {
       
       const hasAccount = response.data.data.has_account;
       if (hasAccount) {
-        navigate("/register", { state: { phone, hasAccount } });
+        navigate("/register", { state: { phone, hasAccount },replace:false  });
       } else {
-        navigate("/register", { state: { phone, hasAccount } });
+        navigate("/register", { state: { phone, hasAccount },replace:false  });
       }
     } catch (error) {
       let errorMessage = "An unexpected error occurred";

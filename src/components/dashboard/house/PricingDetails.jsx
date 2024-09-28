@@ -212,22 +212,22 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
                     { key: "normal_spring", label: "روز های اول هفته (بهار)" },
                     { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
                     { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
-                    { key: "peak_spring", label: "روز های اوج شلوغی (بهار)" },
+                    { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
                     { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
                     { key: "normal_summer", label: "روز های اول هفته (تابستان)" },
                     { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
                     { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
-                    { key: "peak_summer", label: "روز های اوج شلوغی (تابستان)" },
+                    { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
                     { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
                     { key: "normal_autumn", label: "روز های اول هفته (پاییز)" },
                     { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
                     { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
-                    { key: "peak_autumn", label: "روز های اوج شلوغی (پاییز)" },
+                    { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
                     { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
                     { key: "normal_winter", label: "روز های اول هفته (زمستان)" },
                     { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
                     { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
-                    { key: "peak_winter", label: "روز های اوج شلوغی (زمستان)" },
+                    { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
                     { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
                   ])}
 
@@ -263,28 +263,28 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
             { key: "normal_spring", label: "روز های اول هفته (بهار)" },
             { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
             { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
-            { key: "peak_spring", label: "روز های اوج شلوغی (بهار)" },
+            { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
             { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
           ])}
           {renderInputSection(null, "قیمت در تابستان", [
             { key: "normal_summer", label: "روز های اول هفته (تابستان)" },
             { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
             { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
-            { key: "peak_summer", label: "روز های اوج شلوغی (تابستان)" },
+            { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
             { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
           ])}
           {renderInputSection(null, "قیمت در پاییز", [
             { key: "normal_autumn", label: "روز های اول هفته (پاییز)" },
             { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
             { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
-            { key: "peak_autumn", label: "روز های اوج شلوغی (پاییز)" },
+            { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
             { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
           ])}
           {renderInputSection(null, "قیمت در زمستان", [
             { key: "normal_winter", label: "روز های اول هفته (زمستان)" },
             { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
             { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
-            { key: "peak_winter", label: "روز های اوج شلوغی (زمستان)" },
+            { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
             { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
           ])}
         </>

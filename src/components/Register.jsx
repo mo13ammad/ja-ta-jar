@@ -56,12 +56,12 @@ const Register = () => {
           localStorage.setItem('userData', JSON.stringify(user));
 
           // Navigate to dashboard with token and user data
-          navigate('/dashboard', { state: { token: userToken, user } });
+          navigate('/dashboard', { state: { token: userToken, user },replace:false });
         })
         .catch(error => {
           console.error('Login with token failed:', error);
           toast.error('Login with token failed. Please check the token or contact support.');
-          navigate('/login');
+          navigate('/login', {replace:false});
         })
         .finally(() => setLoading(false)); // Hide spinner when done
     }

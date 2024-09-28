@@ -22,7 +22,7 @@ function Header({ token, userName }) {
 
   const handleProfileClick = () => {
     if (userName) {
-      navigate("/dashboard", { state: { token, userName } });
+      navigate("/dashboard", { state: { token, userName }});
     } else {
       navigate("/login");
     }
