@@ -156,6 +156,14 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
   const isVendor = user.type === "Vendor";
   const isDisabled = (field) => isVendor && !["bio", "avatar", "secondPhone", "email"].includes(field);
 
+  // Regex pattern to allow only Persian characters and numbers
+  const handleBioChange = (e) => {
+    const persianPattern = /^[؀-ۿ0-9\s]*$/;
+    if (persianPattern.test(e.target.value)) {
+      setBio(e.target.value);
+    }
+  };
+
   return (
     <div className="relative">
       {loadingFetch && (
@@ -291,13 +299,13 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           <div className="flex gap-2">
             <input
               type="text"
-              value={birthYear}
-              onChange={(e) => setBirthYear(e.target.value)}
-              onFocus={() => setFocusedField('birthYear')}
+              value={birthDay}
+              onChange={(e) => setBirthDay(e.target.value)}
+              onFocus={() => setFocusedField('birthDay')}
               onBlur={() => setFocusedField('')}
-              className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthYear' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-              placeholder="سال 1367"
-              disabled={isDisabled("birthYear")}
+              className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDay' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+              placeholder="روز"
+              disabled={isDisabled("birthDay")}
             />
             <input
               type="text"
@@ -311,13 +319,13 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
             />
             <input
               type="text"
-              value={birthDay}
-              onChange={(e) => setBirthDay(e.target.value)}
-              onFocus={() => setFocusedField('birthDay')}
+              value={birthYear}
+              onChange={(e) => setBirthYear(e.target.value)}
+              onFocus={() => setFocusedField('birthYear')}
               onBlur={() => setFocusedField('')}
-              className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthDay' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
-              placeholder="روز"
-              disabled={isDisabled("birthDay")}
+              className={`mt-1 p-2 border rounded-xl w-full ${errors.birth_date ? 'border-red-500' : ''} ${focusedField === 'birthYear' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
+              placeholder="سال 1367"
+              disabled={isDisabled("birthYear")}
             />
           </div>
           {renderErrorMessages(errors.birth_date)}
@@ -384,7 +392,7 @@ const EditUser = ({ user, token, onUpdate, onEditStart, onEditEnd }) => {
           <label className="block text-sm font-medium text-gray-700">درباره شما</label>
           <textarea
             value={bio}
-            onChange={(e) => setBio(e.target.value)}
+            onChange={handleBioChange}
             onFocus={() => setFocusedField('bio')}
             className={`mt-1 p-2 border rounded-xl w-full ${errors.bio ? 'border-red-500' : ''} ${focusedField === 'bio' ? 'border-green-400 focus:outline-green-400 border-2' : ''}`}
             rows="4"

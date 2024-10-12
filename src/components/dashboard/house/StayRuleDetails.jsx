@@ -13,6 +13,7 @@ const statusOptions = [
 const StayRuleDetails = ({ token, houseUuid, rules }) => {
   const [fetchedRules, setFetchedRules] = useState([]); // Fetched rules from the server
   const [selectedRules, setSelectedRules] = useState({}); // Selected rule statuses
+  const [descriptions, setDescriptions] = useState({}); // Descriptions for each rule
   const [loading, setLoading] = useState(true); // Loading state for fetching rules
   const [loadingSubmit, setLoadingSubmit] = useState(false); // Loading state for submission
 
@@ -29,6 +30,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
 
         if (response.status === 200) {
           const fetchedRulesData = response.data.data; // Assuming response.data.data contains the rules
+          console.log('Fetched Rules:', fetchedRulesData);
           setFetchedRules(fetchedRulesData); // Store fetched rules in the state
 
           // Initialize selected rules based on fetched rules and the `rules` prop
@@ -37,6 +39,14 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
             acc[rule.key] = matchedRule ? matchedRule.status.key : null; // Set status if exists, otherwise null
             return acc;
           }, {});
+
+          const initialDescriptions = fetchedRulesData.reduce((acc, rule) => {
+            const matchedRule = rules.find((r) => r.key === rule.key);
+            acc[rule.key] = matchedRule ? matchedRule.description : ""; // Set description if exists, otherwise empty string
+            return acc;
+          }, {});
+
+          setDescriptions(initialDescriptions);
 
           setSelectedRules(initialSelectedRules);
         } else {
@@ -61,6 +71,14 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
     }));
   };
 
+  // Function to handle Descriptions changes
+  const handleDescriptionChange = (key, value) => {
+    setDescriptions((prevDescriptions) => ({
+      ...prevDescriptions,
+      [key]: value,
+    }));
+  };
+
   // Function to handle form submission
   const handleSubmit = async () => {
     setLoadingSubmit(true);
@@ -69,8 +87,11 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
         rules: Object.keys(selectedRules).map((key) => ({
           key: key,
           status: selectedRules[key] || 'NotAllowed', // Default to 'NotAllowed' only if it's explicitly selected or null
+          description: descriptions[key] || "", // Add the Description for each rule
         })),
       };
+
+      console.log('Submitting Data:', requestData);
 
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
@@ -107,7 +128,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
 
   // Display the rules form after loading is complete
   return (
-    <div className="relative flex flex-col h-full">
+    <div className="relative flex flex-col">
       <div className="flex-1 overflow-y-auto scrollbar-thin max-h-full pl-4">
         <h2 className="text-xl font-semibold mb-4">قوانین اقامتگاه</h2>
         <div className="space-y-4">
@@ -117,7 +138,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
                 <span className="xl:text-lg mb-1 font-medium">{rule.label}</span>
               </div>
 
-              <div className="flex space-x-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {statusOptions.map((option) => (
                   <label key={option.key} className="flex items-center cursor-pointer space-x-2">
                     <input
@@ -148,6 +169,17 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
                     <span className="ml-2 text-sm font-medium text-gray-700">{option.label}</span>
                   </label>
                 ))}
+              </div>
+
+              <div className="mt-2 xl:w-1/2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">یادداشت:</label>
+                <textarea
+                  value={descriptions[rule.key] || ""}
+                  onChange={(e) => handleDescriptionChange(rule.key, e.target.value)}
+                  className="block p-2 border rounded-xl w-full outline-none"
+                  placeholder="یادداشت خود را وارد کنید"
+                  rows="1"
+                />
               </div>
             </div>
           ))}

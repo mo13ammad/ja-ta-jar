@@ -101,12 +101,12 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
         .map(([key, value]) => [key, String(value).replace(/\//g, "")])
     );
 
-    // Set extra_people values to 100000 if price_handle_by is PerNight
-    if (priceHandleBy === "PerNight") {
-      formattedData.extra_people_spring = "100000";
-      formattedData.extra_people_summer = "100000";
-      formattedData.extra_people_autumn = "100000";
-      formattedData.extra_people_winter = "100000";
+    // Remove extra_people values if price_handle_by is PerPerson
+    if (priceHandleBy === "PerPerson") {
+      delete formattedData.extra_people_spring;
+      delete formattedData.extra_people_summer;
+      delete formattedData.extra_people_autumn;
+      delete formattedData.extra_people_winter;
     }
 
     try {
@@ -165,7 +165,7 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
       <h2 className="text-lg font-semibold mt-7">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys
-          .filter(({ key }) => !(priceHandleBy === "PerNight" && key.includes("extra_people")))
+          .filter(({ key }) => (priceHandleBy === "PerPerson" ? !key.includes("extra_people") : true))
           .map(({ key, label }) => (
             <div key={key} className="mt-3">
               <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
@@ -288,17 +288,6 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
             { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
           ])}
         </>
-      )}
-
-      {errorList.length > 0 && (
-        <div className="mt-4 text-red-600">
-          <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
-          <ul className="list-disc ml-5">
-            {errorList.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </div>
       )}
 
       {!houseData.is_rent_room && (
