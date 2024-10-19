@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {         
+--color-primary-800: 79, 18, 14;
+--color-primary-700: 103, 23, 17;
+--color-primary-600: 128, 29, 20;
+--color-primary-500: 150, 35, 25;
+--color-primary-400: 175, 52, 44;
+--color-primary-300: 200, 83, 77;
+--color-primary-200: 217, 117, 111;
+--color-primary-100: 233, 157, 149;
+--color-primary-50: 244, 204, 199;
+
+--color-secondary-900: 179, 199, 255;
+--color-secondary-800: 184, 204, 255;
+--color-secondary-700: 189, 209, 255;
+--color-secondary-600: 194, 214, 255;
+--color-secondary-500: 199, 220, 255;
+--color-secondary-400: 204, 225, 255;
+--color-secondary-300: 209, 230, 255;
+--color-secondary-200: 217, 234, 255;
+--color-secondary-100: 225, 241, 255;
+--color-secondary-50: 233, 247, 255;
+
+--color-secondary-0: 255, 255, 255;
+--color-success: 0, 192, 115;
+--color-warning: 255, 153, 0;
+--color-error: 255, 71, 87;
+
+        }
+    @font-face {
+      font-family: "iransans";
+      font-style: Light;
+      font-weight: 300;
+      font-display: swap;
+      src: url(/public/fonts/IRANSansX-Light.woff2) format("woff2");
+    }
+    @font-face {
+      font-family: "iransans";
+      font-style: Normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url(/public/fonts/IRANSansX-Regular.woff2) format("woff2");
+    }
+    @font-face {
+      font-family: "iransans";
+      font-style: Bold;
+      font-weight: 700;
+      font-display: swap;
+      src: url(/public/fonts/IRANSansX-Bold.woff2) format("woff2");
+    }
+  }
+  @layer components{
+    .textField__input{
+      @apply w-full drop-shadow outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4
+    }
+    .btn{
+      @apply transition-all duration-300 text-white opacity-80 rounded-2xl w-full py-2 shadow-sm  font-bold
+    }
+  }
+  label {
+    display: block;
+  }
+
+.otp-input::-webkit-outer-spin-button,
+.otp-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.otp-input[type=number] {
+  -moz-appearance: textfield;
+}
