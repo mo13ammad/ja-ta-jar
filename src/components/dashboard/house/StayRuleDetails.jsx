@@ -10,7 +10,7 @@ const statusOptions = [
   { key: 'NotNeeded', label: 'نیاز نیست' },
 ];
 
-const StayRuleDetails = ({ token, houseUuid, rules }) => {
+const StayRuleDetails = ({ token, houseUuid, rules, onSubmit }) => {
   const [fetchedRules, setFetchedRules] = useState([]); // Fetched rules from the server
   const [selectedRules, setSelectedRules] = useState({}); // Selected rule statuses
   const [descriptions, setDescriptions] = useState({}); // Descriptions for each rule
@@ -18,8 +18,15 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
   const [loadingSubmit, setLoadingSubmit] = useState(false); // Loading state for submission
 
   useEffect(() => {
+    // Clear previous data before fetching new data
+    setFetchedRules([]);
+    setSelectedRules({});
+    setDescriptions({});
+    setLoading(true); // Keep loading until data is fetched
+
     // Fetch rules from backend
     const fetchRules = async () => {
+      console.log('Fetching rules from server...');
       try {
         const response = await axios.get(
           'https://portal1.jatajar.com/api/assets/types/rules/detail',
@@ -29,25 +36,28 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
         );
 
         if (response.status === 200) {
-          const fetchedRulesData = response.data.data; // Assuming response.data.data contains the rules
+          const fetchedRulesData = response.data.data;
           console.log('Fetched Rules:', fetchedRulesData);
-          setFetchedRules(fetchedRulesData); // Store fetched rules in the state
+          setFetchedRules(fetchedRulesData);
 
-          // Initialize selected rules based on fetched rules and the `rules` prop
+          // Initialize selected rules based on fetched rules and the rules prop
           const initialSelectedRules = fetchedRulesData.reduce((acc, rule) => {
             const matchedRule = rules.find((r) => r.key === rule.key);
             acc[rule.key] = matchedRule ? matchedRule.status.key : null; // Set status if exists, otherwise null
             return acc;
           }, {});
 
+          // Initialize descriptions based on fetched rules and the rules prop
           const initialDescriptions = fetchedRulesData.reduce((acc, rule) => {
             const matchedRule = rules.find((r) => r.key === rule.key);
-            acc[rule.key] = matchedRule ? matchedRule.description : ""; // Set description if exists, otherwise empty string
+            acc[rule.key] = matchedRule && matchedRule.description ? matchedRule.description : ''; // Set description if exists
             return acc;
           }, {});
 
-          setDescriptions(initialDescriptions);
+          console.log('Selected Rules (on fetch):', initialSelectedRules);
+          console.log('Descriptions (on fetch):', initialDescriptions);
 
+          setDescriptions(initialDescriptions);
           setSelectedRules(initialSelectedRules);
         } else {
           toast.error('Failed to fetch rules from server');
@@ -56,7 +66,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
         toast.error('Error fetching rules from server');
         console.error('Error:', error);
       } finally {
-        setLoading(false); // Stop loading once the data is processed
+        setLoading(false); // Stop loading after the data is set
       }
     };
 
@@ -65,14 +75,16 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
 
   // Function to handle radio button status changes
   const handleStatusChange = (key, status) => {
+    console.log(`Status changed for ${key}: ${status}`);
     setSelectedRules((prevSelected) => ({
       ...prevSelected,
       [key]: status,
     }));
   };
 
-  // Function to handle Descriptions changes
+  // Function to handle descriptions changes
   const handleDescriptionChange = (key, value) => {
+    console.log(`Description changed for ${key}: ${value}`);
     setDescriptions((prevDescriptions) => ({
       ...prevDescriptions,
       [key]: value,
@@ -83,16 +95,18 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     try {
+      // Build request data
       const requestData = {
         rules: Object.keys(selectedRules).map((key) => ({
           key: key,
-          status: selectedRules[key] || 'NotAllowed', // Default to 'NotAllowed' only if it's explicitly selected or null
-          description: descriptions[key] || "", // Add the Description for each rule
+          status: selectedRules[key] || 'NotAllowed', // Use the selected rule status
+          description: descriptions[key] || '', // Include the description for each rule
         })),
       };
 
-      console.log('Submitting Data:', requestData);
+      console.log('Submitting Data:', requestData); // Ensure this is a serializable object
 
+      // Make API request to update data with PUT method
       const response = await axios.put(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
         requestData,
@@ -106,6 +120,10 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
 
       if (response.status === 200) {
         toast.success('اطلاعات با موفقیت ثبت شد');
+        console.log('Response data:', response.data);
+
+        // Refetch house data if necessary
+        onSubmit && onSubmit(response.data);
       } else {
         toast.error('خطایی در ثبت اطلاعات پیش آمد');
       }
@@ -151,8 +169,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
                     />
                     <div
                       className={`h-6 w-6 flex items-center justify-center rounded-full transition-colors ease-in-out duration-200 
-                        ${selectedRules[rule.key] === option.key ? 'bg-green-500' : 'bg-gray-200'}
-                      `}
+                        ${selectedRules[rule.key] === option.key ? 'bg-green-500' : 'bg-gray-200'}`}
                     >
                       {selectedRules[rule.key] === option.key && (
                         <svg
@@ -174,7 +191,7 @@ const StayRuleDetails = ({ token, houseUuid, rules }) => {
               <div className="mt-2 xl:w-1/2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">یادداشت:</label>
                 <textarea
-                  value={descriptions[rule.key] || ""}
+                  value={descriptions[rule.key] || ''}
                   onChange={(e) => handleDescriptionChange(rule.key, e.target.value)}
                   className="block p-2 border rounded-xl w-full outline-none"
                   placeholder="یادداشت خود را وارد کنید"

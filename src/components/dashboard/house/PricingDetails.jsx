@@ -2,76 +2,82 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import { Disclosure } from "@headlessui/react";
+import Spinner from "./Spinner"; // Assuming this component exists
 
 const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [errorList, setErrorList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Set loading to true initially
   const [priceHandleBy, setPriceHandleBy] = useState(houseData?.price_handle_by?.key);
 
   useEffect(() => {
+    setLoading(true); // Start loading when fetching data
+
+    const formatNumber = (value) =>
+      value?.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "/");
+
     setPriceHandleBy(houseData?.price_handle_by?.key);
 
     if (houseData?.is_rent_room) {
       const initialFormData = houseData.room.reduce((acc, room) => {
         acc[room.uuid] = {
-          nowruz: room.prices?.nowruz || "",
-          normal_spring: room.prices?.spring?.normal || "",
-          weekend_spring: room.prices?.spring?.weekend || "",
-          holiday_spring: room.prices?.spring?.holiday || "",
-          peak_spring: room.prices?.spring?.peak || "",
-          extra_people_spring: room.prices?.spring?.extra_people || "",
-          normal_summer: room.prices?.summer?.normal || "",
-          weekend_summer: room.prices?.summer?.weekend || "",
-          holiday_summer: room.prices?.summer?.holiday || "",
-          peak_summer: room.prices?.summer?.peak || "",
-          extra_people_summer: room.prices?.summer?.extra_people || "",
-          normal_autumn: room.prices?.autumn?.normal || "",
-          weekend_autumn: room.prices?.autumn?.weekend || "",
-          holiday_autumn: room.prices?.autumn?.holiday || "",
-          peak_autumn: room.prices?.autumn?.peak || "",
-          extra_people_autumn: room.prices?.autumn?.extra_people || "",
-          normal_winter: room.prices?.winter?.normal || "",
-          weekend_winter: room.prices?.winter?.weekend || "",
-          holiday_winter: room.prices?.winter?.holiday || "",
-          peak_winter: room.prices?.winter?.peak || "",
-          extra_people_winter: room.prices?.winter?.extra_people || "",
+          nowruz: formatNumber(room.prices?.nowruz || ""),
+          normal_spring: formatNumber(room.prices?.spring?.normal || ""),
+          weekend_spring: formatNumber(room.prices?.spring?.weekend || ""),
+          holiday_spring: formatNumber(room.prices?.spring?.holiday || ""),
+          peak_spring: formatNumber(room.prices?.spring?.peak || ""),
+          extra_people_spring: formatNumber(room.prices?.spring?.extra_people || ""),
+          normal_summer: formatNumber(room.prices?.summer?.normal || ""),
+          weekend_summer: formatNumber(room.prices?.summer?.weekend || ""),
+          holiday_summer: formatNumber(room.prices?.summer?.holiday || ""),
+          peak_summer: formatNumber(room.prices?.summer?.peak || ""),
+          extra_people_summer: formatNumber(room.prices?.summer?.extra_people || ""),
+          normal_autumn: formatNumber(room.prices?.autumn?.normal || ""),
+          weekend_autumn: formatNumber(room.prices?.autumn?.weekend || ""),
+          holiday_autumn: formatNumber(room.prices?.autumn?.holiday || ""),
+          peak_autumn: formatNumber(room.prices?.autumn?.peak || ""),
+          extra_people_autumn: formatNumber(room.prices?.autumn?.extra_people || ""),
+          normal_winter: formatNumber(room.prices?.winter?.normal || ""),
+          weekend_winter: formatNumber(room.prices?.winter?.weekend || ""),
+          holiday_winter: formatNumber(room.prices?.winter?.holiday || ""),
+          peak_winter: formatNumber(room.prices?.winter?.peak || ""),
+          extra_people_winter: formatNumber(room.prices?.winter?.extra_people || ""),
         };
         return acc;
       }, {});
       setFormData(initialFormData);
     } else if (houseData?.prices) {
       setFormData({
-        nowruz: houseData.prices.nowruz || "",
-        normal_spring: houseData.prices.spring?.normal || "",
-        weekend_spring: houseData.prices.spring?.weekend || "",
-        holiday_spring: houseData.prices.spring?.holiday || "",
-        peak_spring: houseData.prices.spring?.peak || "",
-        extra_people_spring: houseData.prices.spring?.extra_people || "",
-        normal_summer: houseData.prices.summer?.normal || "",
-        weekend_summer: houseData.prices.summer?.weekend || "",
-        holiday_summer: houseData.prices.summer?.holiday || "",
-        peak_summer: houseData.prices.summer?.peak || "",
-        extra_people_summer: houseData.prices.summer?.extra_people || "",
-        normal_autumn: houseData.prices.autumn?.normal || "",
-        weekend_autumn: houseData.prices.autumn?.weekend || "",
-        holiday_autumn: houseData.prices.autumn?.holiday || "",
-        peak_autumn: houseData.prices.autumn?.peak || "",
-        extra_people_autumn: houseData.prices.autumn?.extra_people || "",
-        normal_winter: houseData.prices.winter?.normal || "",
-        weekend_winter: houseData.prices.winter?.weekend || "",
-        holiday_winter: houseData.prices.winter?.holiday || "",
-        peak_winter: houseData.prices.winter?.peak || "",
-        extra_people_winter: houseData.prices.winter?.extra_people || "",
+        nowruz: formatNumber(houseData.prices.nowruz || ""),
+        normal_spring: formatNumber(houseData.prices.spring?.normal || ""),
+        weekend_spring: formatNumber(houseData.prices.spring?.weekend || ""),
+        holiday_spring: formatNumber(houseData.prices.spring?.holiday || ""),
+        peak_spring: formatNumber(houseData.prices.spring?.peak || ""),
+        extra_people_spring: formatNumber(houseData.prices.spring?.extra_people || ""),
+        normal_summer: formatNumber(houseData.prices.summer?.normal || ""),
+        weekend_summer: formatNumber(houseData.prices.summer?.weekend || ""),
+        holiday_summer: formatNumber(houseData.prices.summer?.holiday || ""),
+        peak_summer: formatNumber(houseData.prices.summer?.peak || ""),
+        extra_people_summer: formatNumber(houseData.prices.summer?.extra_people || ""),
+        normal_autumn: formatNumber(houseData.prices.autumn?.normal || ""),
+        weekend_autumn: formatNumber(houseData.prices.autumn?.weekend || ""),
+        holiday_autumn: formatNumber(houseData.prices.autumn?.holiday || ""),
+        peak_autumn: formatNumber(houseData.prices.autumn?.peak || ""),
+        extra_people_autumn: formatNumber(houseData.prices.autumn?.extra_people || ""),
+        normal_winter: formatNumber(houseData.prices.winter?.normal || ""),
+        weekend_winter: formatNumber(houseData.prices.winter?.weekend || ""),
+        holiday_winter: formatNumber(houseData.prices.winter?.holiday || ""),
+        peak_winter: formatNumber(houseData.prices.winter?.peak || ""),
+        extra_people_winter: formatNumber(houseData.prices.winter?.extra_people || ""),
       });
     }
+
+    setLoading(false); // Set loading to false once data is set
   }, [houseData, priceHandleBy]);
 
-  const formatNumber = (value) => value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "/");
-
   const handleInputChange = (key, value, roomUuid = null) => {
-    const formattedValue = formatNumber(value);
+    const formattedValue = value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, "/");
     if (houseData.is_rent_room && roomUuid) {
       setFormData((prevData) => ({
         ...prevData,
@@ -182,6 +188,15 @@ const PricingDetails = ({ token, houseUuid, houseData, onSubmit }) => {
       </div>
     </div>
   );
+
+  // Show spinner until data is set and ready
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">

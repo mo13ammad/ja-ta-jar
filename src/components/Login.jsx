@@ -27,7 +27,7 @@ const Login = () => {
         navigate("/register", { state: { phone, hasAccount },replace:false  });
       } else {
         navigate("/register", { state: { phone, hasAccount },replace:false  });
-      }
+      } 
     } catch (error) {
       let errorMessage = "An unexpected error occurred";
       if (error.response) {

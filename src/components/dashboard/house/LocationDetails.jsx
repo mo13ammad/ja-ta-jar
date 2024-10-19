@@ -7,7 +7,7 @@ import Spinner from "../../Spinner";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const LocationDetails = ({ data, onSave, token, houseUuid }) => {
+const LocationDetails = ({ data, onSubmit, token, houseUuid }) => {
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState(data?.address?.city?.province?.id || null);
@@ -191,16 +191,16 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
   const handleSaveChanges = async () => {
     setIsSaving(true);
     setSubmitButtonText("در حال ثبت...");
-
+  
     const requestData = {
       city_id: selectedCity,
       latitude: tempLatitude, // Send updated coordinates from the map
       longitude: tempLongitude, // Send updated coordinates from the map
       _method: "PUT",
     };
-
+  
     console.log("Sending data:", requestData);
-
+  
     try {
       const response = await axios.post(
         `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
@@ -212,9 +212,19 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
           },
         }
       );
-
+      
       if (response.status === 200) {
         toast.success("تغییرات با موفقیت ثبت شد");
+        
+        // Trigger the onSubmit function with the updated data
+        onSubmit({
+          city: cities.find((city) => city.id === selectedCity),
+          geography: {
+            latitude: tempLatitude,
+            longitude: tempLongitude,
+          },
+        });
+        
       } else {
         toast.error("خطایی رخ داده است");
       }
@@ -226,6 +236,7 @@ const LocationDetails = ({ data, onSave, token, houseUuid }) => {
       setSubmitButtonText("ثبت تغییرات");
     }
   };
+  
 
   const renderErrorMessages = (fieldErrors) => {
     if (!fieldErrors) return null;

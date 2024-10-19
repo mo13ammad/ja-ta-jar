@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 
-const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
+const ReservationRuleDetails = ({ token, houseUuid, houseData, onSubmit, errors }) => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState(""); // For non-field specific errors
   const [weekendOptions, setWeekendOptions] = useState([]);
   const enterFromRef = useRef(null);
@@ -84,53 +83,34 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
 
   const handleSubmit = async () => {
     setLoadingSubmit(true);
-    setErrors({});
     setErrorMessage(""); // Reset error message
 
     try {
-      const response = await axios.put(
-        `https://portal1.jatajar.com/api/client/house/${houseUuid}`,
-        {
-          ...formData,
-          _method: "PUT"
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
+      await onSubmit(formData); // Submit data via parent component
 
-      if (response.status === 200) {
-        toast.success("اطلاعات با موفقیت ثبت شد");
-      } else {
-        toast.error("خطایی در ثبت اطلاعات پیش آمد");
-      }
     } catch (error) {
-      if (error.response && error.response.data) {
-        const responseErrors = error.response.data.errors?.fields;
-
-        // Check if there are field-specific errors
-        if (responseErrors) {
-          setErrors(responseErrors);
-        }
-
-        // If there's a general error message, display it
-        if (error.response.data.message) {
-          setErrorMessage(error.response.data.message);
-          toast.error(error.response.data.message);
-        } 
+      if (error.response) {
+        setErrorMessage(error.response.data.message || "An unexpected error occurred.");
+        toast.error(error.response.data.message || "An unexpected error occurred.");
       } else {
-        toast.error("خطایی رخ داده است");
+        toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
       }
     } finally {
       setLoadingSubmit(false);
     }
   };
 
-  const handleFocusClick = (inputRef) => {
-    inputRef.current.focus();
+  const renderErrorMessages = (fieldErrors) => {
+    if (!fieldErrors) return null;
+    return (
+      <div className="mt-0.5 text-red-500 text-sm">
+        {Array.isArray(fieldErrors) ? (
+          fieldErrors.map((error, index) => <p key={index}>{error}</p>)
+        ) : (
+          <p>{fieldErrors}</p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -138,72 +118,57 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
       <Toaster />
       <h1 className="text-2xl font-bold mb-4">قوانین رزرو</h1>
 
-      {/* Display general error message */}
-      {errorMessage && (
-        <div className="bg-red-100 text-red-600 p-4 rounded-md mb-4">
-          <p>{errorMessage}</p>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Short Term Booking Length */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.short_term_booking_length ? 'text-red-600' : 'text-gray-700'}`}>
-            تعداد شب اقامت کوتاه مدت
-          </label>
+          <label className="block text-sm font-medium mb-2">تعداد شب اقامت کوتاه مدت</label>
           <input
             type="number"
-            value={formData.short_term_booking_length || ""} // Ensure a valid default value
+            value={formData.short_term_booking_length || ""}
             onChange={(e) => handleInputChange("short_term_booking_length", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.short_term_booking_length ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
             placeholder="تعداد شب رزرو کوتاه مدت"
           />
-          {errors.short_term_booking_length && <p className="text-red-600 text-sm">{errors.short_term_booking_length[0]}</p>}
+          {renderErrorMessages(errors?.short_term_booking_length)}
         </div>
 
         {/* Short Term Booking Discount */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.short_term_booking_discount ? 'text-red-600' : 'text-gray-700'}`}>
-            درصد تخفیف
-          </label>
+          <label className="block text-sm font-medium mb-2">درصد تخفیف</label>
           <input
             type="number"
-            value={formData.short_term_booking_discount || ""} // Ensure a valid default value
+            value={formData.short_term_booking_discount || ""}
             onChange={(e) => handleInputChange("short_term_booking_discount", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.short_term_booking_discount ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
             placeholder="درصد تخفیف"
           />
-          {errors.short_term_booking_discount && <p className="text-red-600 text-sm">{errors.short_term_booking_discount[0]}</p>}
+          {renderErrorMessages(errors?.short_term_booking_discount)}
         </div>
 
         {/* Long Term Booking Length */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.long_term_booking_length ? 'text-red-600' : 'text-gray-700'}`}>
-            تعداد شب اقامت بلند مدت
-          </label>
+          <label className="block text-sm font-medium mb-2">تعداد شب اقامت بلند مدت</label>
           <input
             type="number"
-            value={formData.long_term_booking_length || ""} // Ensure a valid default value
+            value={formData.long_term_booking_length || ""}
             onChange={(e) => handleInputChange("long_term_booking_length", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.long_term_booking_length ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
             placeholder="تعداد شب رزرو بلند مدت"
           />
-          {errors.long_term_booking_length && <p className="text-red-600 text-sm">{errors.long_term_booking_length[0]}</p>}
+          {renderErrorMessages(errors?.long_term_booking_length)}
         </div>
 
         {/* Long Term Booking Discount */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.long_term_booking_discount ? 'text-red-600' : 'text-gray-700'}`}>
-            درصد تخفیف
-          </label>
+          <label className="block text-sm font-medium mb-2">درصد تخفیف</label>
           <input
             type="number"
-            value={formData.long_term_booking_discount || ""} // Ensure a valid default value
+            value={formData.long_term_booking_discount || ""}
             onChange={(e) => handleInputChange("long_term_booking_discount", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.long_term_booking_discount ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
             placeholder="درصد تخفیف"
           />
-          {errors.long_term_booking_discount && <p className="text-red-600 text-sm">{errors.long_term_booking_discount[0]}</p>}
+          {renderErrorMessages(errors?.long_term_booking_discount)}
         </div>
 
         {/* Minimum Stay for All Days */}
@@ -211,83 +176,79 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           <label className="block text-sm font-medium mb-2">حداقل شب اقامت</label>
           <input
             type="number"
-            value={formData.minimum_length_stay.all || ""} // Ensure a valid default value
+            value={formData.minimum_length_stay.all || ""}
             onChange={(e) => handleMinimumStayChange("all", e.target.value)}
-            className="block p-2 border border-gray-300 rounded-xl w-full outline-none"
+            className="block p-2 border rounded-xl w-full outline-none"
             placeholder="حداقل شبی که اقامتگاه قابل رزرو است"
           />
         </div>
 
         {/* Enter Time Inputs */}
         <div className="mt-4">
-          <label onClick={() => handleFocusClick(enterFromRef)} className={`block text-sm font-medium mb-2 cursor-pointer ${errors.enter_from ? 'text-red-600' : 'text-gray-700'}`}>
+          <label onClick={() => enterFromRef.current.focus()} className="block text-sm font-medium mb-2">
             زمان ورود از
           </label>
           <div className="grid grid-cols-2 gap-2">
             <input
               ref={enterFromRef}
               type="time"
-              value={formData.enter_from || ""} // Ensure a valid default value
+              value={formData.enter_from || ""}
               onChange={(e) => handleInputChange("enter_from", e.target.value)}
-              className="p-2 border rounded-xl w-full outline-none border-gray-300"
+              className="p-2 border rounded-xl w-full outline-none"
             />
             <input
               ref={enterUntilRef}
               type="time"
-              value={formData.enter_until || ""} // Ensure a valid default value
+              value={formData.enter_until || ""}
               onChange={(e) => handleInputChange("enter_until", e.target.value)}
-              className="p-2 border rounded-xl w-full outline-none border-gray-300"
+              className="p-2 border rounded-xl w-full outline-none"
             />
           </div>
-          {errors.enter_from && <p className="text-red-600 text-sm">{errors.enter_from[0]}</p>}
+          {renderErrorMessages(errors?.enter_from)}
         </div>
 
         {/* Discharge Time */}
         <div className="mt-4">
-          <label onClick={() => handleFocusClick(dischargeTimeRef)} className={`block text-sm font-medium mb-2 cursor-pointer ${errors.discharge_time ? 'text-red-600' : 'text-gray-700'}`}>
+          <label onClick={() => dischargeTimeRef.current.focus()} className="block text-sm font-medium mb-2">
             زمان تخلیه
           </label>
           <input
             ref={dischargeTimeRef}
             type="time"
-            value={formData.discharge_time || ""} // Ensure a valid default value
+            value={formData.discharge_time || ""}
             onChange={(e) => handleInputChange("discharge_time", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.discharge_time ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
           />
-          {errors.discharge_time && <p className="text-red-600 text-sm">{errors.discharge_time[0]}</p>}
+          {renderErrorMessages(errors?.discharge_time)}
         </div>
 
         {/* Capacity */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.capacity ? 'text-red-600' : 'text-gray-700'}`}>
-         ظرفیت استاندارد
-          </label>
+          <label className="block text-sm font-medium mb-2">ظرفیت استاندارد</label>
           <input
             type="number"
-            value={formData.capacity || ""} // Ensure a valid default value
+            value={formData.capacity || ""}
             onChange={(e) => handleInputChange("capacity", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.capacity ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
           />
-          {errors.capacity && <p className="text-red-600 text-sm">{errors.capacity[0]}</p>}
+          {renderErrorMessages(errors?.capacity)}
         </div>
 
         {/* Maximum Capacity */}
         <div className="mt-4">
-          <label className={`block text-sm font-medium mb-2 ${errors.maximum_capacity ? 'text-red-600' : 'text-gray-700'}`}>
-            حداکثر ظرفیت
-          </label>
+          <label className="block text-sm font-medium mb-2">حداکثر ظرفیت</label>
           <input
             type="number"
-            value={formData.maximum_capacity || ""} // Ensure a valid default value
+            value={formData.maximum_capacity || ""}
             onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
-            className={`block p-2 border rounded-xl w-full outline-none ${errors.maximum_capacity ? 'border-red-600' : 'border-gray-300'}`}
+            className="block p-2 border rounded-xl w-full outline-none"
           />
-          {errors.maximum_capacity && <p className="text-red-600 text-sm">{errors.maximum_capacity[0]}</p>}
+          {renderErrorMessages(errors?.maximum_capacity)}
         </div>
 
         {/* Minimum Stay Table */}
         <div className="mt-4 lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">حداقل شب اقامت به ازای روزهای هفته</label>
+          <label className="block text-sm font-medium mb-2">حداقل شب اقامت به ازای روزهای هفته</label>
           <table className="table-auto w-full lg:w-1/2 border border-collapse">
             <thead>
               <tr>
@@ -310,7 +271,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
                   <td className="border p-1">
                     <input
                       type="number"
-                      value={formData.minimum_length_stay[day.key] || ""} // Ensure a valid default value
+                      value={formData.minimum_length_stay[day.key] || ""}
                       onChange={(e) => handleMinimumStayChange(day.key, e.target.value)}
                       className="p-1 border rounded-xl w-full outline-none"
                       placeholder={`تعداد شب برای ${day.label}`}
@@ -324,9 +285,9 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
 
         {/* Weekend Type Dropdown */}
         <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">تعیین روز های آخر هفته</label>
+          <label className="block text-sm font-medium mb-2">تعیین روز های آخر هفته</label>
           <select
-            value={formData.weekendType || ""} // Ensure a valid default value
+            value={formData.weekendType || ""}
             onChange={(e) => handleInputChange("weekendType", e.target.value)}
             className="block p-2 border rounded-xl w-full outline-none"
           >
@@ -340,6 +301,14 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
         </div>
       </div>
 
+      {/* Display error message above the submit button */}
+      {errorMessage && (
+        <div className="mt-4 bg-red-100 text-red-600 p-4 rounded-md mb-4">
+          <h3 className="font-semibold">خطا:</h3>
+          <p>{errorMessage}</p>
+        </div>
+      )}
+
       {/* Submit Button */}
       <div className="mt-4">
         <button
@@ -347,7 +316,7 @@ const ReservationRuleDetails = ({ token, houseUuid, houseData }) => {
           className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
           disabled={loadingSubmit}
         >
-          {loadingSubmit ? "در حال بارگذاری..." : "ثبت اطلاعات"}
+          {loadingSubmit ? "در حال ارسال..." : "ثبت اطلاعات"}
         </button>
       </div>
     </div>

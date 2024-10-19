@@ -9,6 +9,7 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
   const [privacyOptions, setPrivacyOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [hasFetchedOptions, setHasFetchedOptions] = useState(false); // To track if options have been fetched
 
   const [formData, setFormData] = useState({
     name: data?.name || "",
@@ -30,6 +31,11 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
 
   useEffect(() => {
     const fetchOptions = async () => {
+      if (hasFetchedOptions) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const [houseFloorRes, privacyRes] = await Promise.all([
           axios.get("https://portal1.jatajar.com/api/assets/types/tip/detail", {
@@ -60,6 +66,8 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
           tip: data?.tip?.key || "",
           privacy: data?.privacy?.key || "",
         }));
+
+        setHasFetchedOptions(true); // Mark options as fetched
       } catch (error) {
         toast.error("Error fetching options");
       } finally {
@@ -68,7 +76,7 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
     };
 
     fetchOptions();
-  }, [token, data]);
+  }, [token, data, hasFetchedOptions]);
 
   const handleInputChange = (key, value) => {
     setFormData((prevData) => ({
@@ -102,6 +110,7 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
     try {
       await onSubmit(updatedData); // Use the onSubmit function from the parent component
       toast.success("اطلاعات با موفقیت ثبت شد");
+      setHasFetchedOptions(false); // Reset the fetched state to allow fetching updated options if necessary
     } catch (error) {
       toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
     } finally {
@@ -370,3 +379,10 @@ const GeneralDetails = ({ data, onSubmit, token, houseUuid }) => {
 };
 
 export default GeneralDetails;
+
+
+
+
+
+
+

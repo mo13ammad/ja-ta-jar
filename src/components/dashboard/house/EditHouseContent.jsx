@@ -35,7 +35,8 @@ const EditHouseContent = ({ token, houseUuid }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(tabs[0].key);
   const [publishing, setPublishing] = useState(false); // Track the publishing state
-  const [errorMessages, setErrorMessages] = useState([]); // Track error messages
+  const [errorMessages, setErrorMessages] = useState([]); // Track error messages for final submission
+  const [formErrors, setFormErrors] = useState({}); // Track form-specific errors
 
   const fetchHouseData = async () => {
     try {
@@ -75,12 +76,16 @@ const EditHouseContent = ({ token, houseUuid }) => {
       );
       if (response.status === 200) {
         setHouseData(response.data.data); // Update the houseData with the latest response
+        setFormErrors({}); // Clear errors after successful update
       } else {
         toast.error("Failed to update data");
       }
     } catch (error) {
       console.error("Error updating data:", error);
-      toast.error("Error updating data");
+      if (error.response && error.response.data.errors) {
+        setFormErrors(error.response.data.errors.fields || {}); // Capture form-specific errors
+      }
+      toast.error(error?.response?.data?.message);
     }
   };
 
@@ -100,8 +105,6 @@ const EditHouseContent = ({ token, houseUuid }) => {
         }
       );
 
-      console.log("Final submission response:", response.data); // Log the success response
-
       if (response.status === 200) {
         toast.success("اقامتگاه با موفقیت ثبت نهایی شد");
       } else {
@@ -110,12 +113,9 @@ const EditHouseContent = ({ token, houseUuid }) => {
     } catch (error) {
       console.error("Error during final submission:", error);
 
-      // Log the error response data if available
       if (error.response) {
-        console.log("Error response data:", error.response.data); // Log error response data
         toast.error(`خطا: ${error.response.data.message || "خطا در ثبت نهایی اقامتگاه"}`);
 
-        // Extract error messages from error.response.data
         const errorFields = error.response.data.errors?.fields || {};
         const errorList = Object.values(errorFields).flat();
         setErrorMessages(errorList); // Set the error messages to be displayed
@@ -173,6 +173,7 @@ const EditHouseContent = ({ token, houseUuid }) => {
               facilities={houseData.facilities}
               token={token}
               houseUuid={houseUuid}
+              onSubmit={handleSubmit}
             />
           )}
           {activeTab === "rooms" && (
@@ -191,6 +192,7 @@ const EditHouseContent = ({ token, houseUuid }) => {
               token={token}
               houseUuid={houseUuid}
               rules={houseData.rules.types}
+              onSubmit={handleSubmit}
             />
           )}
           {activeTab === "pricing" && (
@@ -206,6 +208,8 @@ const EditHouseContent = ({ token, houseUuid }) => {
               houseData={houseData}
               token={token}
               houseUuid={houseUuid}
+              onSubmit={handleSubmit}
+              errors={formErrors} // Pass form-specific errors to ReservationRuleDetails
             />
           )}
           {activeTab === "images" && (
