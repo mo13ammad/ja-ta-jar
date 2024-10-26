@@ -17,6 +17,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        'centered': '0 0 15px rgba(0, 0, 0, 0.1)',
+      },
       colors: {
         primary: {
           
@@ -61,5 +64,6 @@ module.exports = {
     require("@tailwindcss/forms")({
       strategy: 'class', // only generate classes
     }),
+    require('tailwind-scrollbar'),
   ],
 }

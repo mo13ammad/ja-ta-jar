@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { HiArrowRight } from 'react-icons/hi';
 
-const RESEND_TIME = 10;
+const RESEND_TIME = 120;
 
 // Helper function to store the token in cookies
 const setAuthTokenInCookie = (token, expiryDays = 30) => {
@@ -30,7 +30,7 @@ function CheckOTPForm({ userStatus, phone, onBack, onResendOtp }) {
 
   const {
     mutateAsync,
-    isPending,
+    isLoading,
     isError,
     error,
   } = useMutation({
@@ -59,9 +59,9 @@ function CheckOTPForm({ userStatus, phone, onBack, onResendOtp }) {
       console.log("Request successful:", data);
 
       // Store the token in cookie
-      setAuthTokenInCookie(data.token); // Store token in cookie
+      setAuthTokenInCookie(data.token);
 
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error?.response?.data?.message || 'خطایی در ارسال کد تایید پیش آمده! لطفا دوباره امتحان کنید');
@@ -98,7 +98,7 @@ function CheckOTPForm({ userStatus, phone, onBack, onResendOtp }) {
 
   const resendOtpHandler = () => {
     console.log("Resending OTP...");
-    onResendOtp(); // Trigger resend OTP
+    onResendOtp();
     setTime(RESEND_TIME); // Reset timer
   };
 
@@ -174,15 +174,15 @@ function CheckOTPForm({ userStatus, phone, onBack, onResendOtp }) {
         </div>
 
         <div className="text-center mt-5 mb-3">
-          {isPending ? <Loading /> : (
-            <button className={`btn hover:bg-primary-700 bg-primary-600`} type="submit">
+          {isLoading ? <Loading /> : (
+            <button className="btn hover:bg-primary-700 bg-primary-600 w-full" type="submit">
               {userStatus ? "ورود" : "ثبت نام"}
             </button>
           )}
           {time > 0 ? (
             <p className='text-primary-600 mt-1.5'>{time} ثانیه تا ارسال مجدد کد</p>
           ) : (
-            <button onClick={resendOtpHandler} className="btn mt-2 hover:bg-primary-700 bg-primary-600">
+            <button onClick={resendOtpHandler} className="btn mt-2 hover:bg-primary-700 bg-primary-600 w-full">
               ارسال مجدد کد
             </button>
           )}

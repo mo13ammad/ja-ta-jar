@@ -13,6 +13,3 @@ export function register(data) {
   }
 
 
-  export function getUser(data) {
-    return http.get('/client/profile', data).then(({data})=>data.data);
-  }

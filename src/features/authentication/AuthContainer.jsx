@@ -1,44 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SendOTPForm from './SendOTPForm';
 import CheckOTPForm from './CheckOTPForm';
 import { useMutation } from '@tanstack/react-query';
 import { getOtp } from '../../services/authService';
 import toast from 'react-hot-toast';
+import useUser from '../dashboard/useUser';
 
 function AuthContainer() {
   const [step, setStep] = useState(1);
   const [userStatus, setUserStatus] = useState(null);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // New loading state
+  const navigate = useNavigate();
 
-  // Mutation to send OTP
-  const { isError, isPending, mutateAsync } = useMutation({
+  const { data: user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
+
+  const { mutateAsync } = useMutation({
     mutationFn: getOtp,
+    onMutate: () => setLoading(true), // Set loading to true on mutation start
     onSuccess: (data) => {
-      console.log("Response from server:", data);
+      setLoading(false); // Reset loading on success
       toast.success("کد تایید برای شما ارسال گردید");
-      setUserStatus(data.has_account); // Save user status (has_account)
-      setStep(2); // Move to the OTP verification step
+      setUserStatus(data.has_account);
+      setStep(2);
     },
     onError: (error) => {
+      setLoading(false); // Reset loading on error
       setError(error?.response?.data?.message || 'خطایی در ارسال کد تایید پیش آمده!');
       toast.error(error?.response?.data?.message || 'خطایی در ارسال کد تایید پیش آمده! لطفا دوباره امتحان کنید');
     },
   });
 
-  // Handler for sending OTP
   const sendOtpHandler = async (e) => {
-    if (e && e.preventDefault) {
-      e.preventDefault(); // Ensure preventDefault only runs if an event is passed
-    }
+    e.preventDefault();
     if (!phone) {
       toast.error("لطفا شماره موبایل صحیح را وارد کنید");
       return;
     }
-    console.log("Sending request with phone number:", phone);
     await mutateAsync({ phone });
   };
-  
 
   const renderStep = () => {
     switch (step) {
@@ -48,8 +56,7 @@ function AuthContainer() {
             phone={phone}
             onChange={(e) => setPhone(e.target.value)}
             onSubmit={sendOtpHandler}
-            isError={isError}
-            isPending={isPending}
+            loading={loading} // Pass the loading state
             error={error}
           />
         );
@@ -58,9 +65,8 @@ function AuthContainer() {
           <CheckOTPForm
             phone={phone}
             userStatus={userStatus}
-            isPending={isPending}
-            onBack={() => setStep(1)} // Go back to phone input step
-            onResendOtp={sendOtpHandler} // Resend OTP functionality
+            onBack={() => setStep(1)}
+            onResendOtp={sendOtpHandler}
           />
         );
       default:
