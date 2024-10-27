@@ -7,19 +7,33 @@ import HouseCard from './HouseCard';
 import useFetchHouses from './useFetchHouses';
 import useFetchHouseTypes from './useFetchHouseTypes';
 import Loading from '../../ui/Loading';
-import { createHouse } from '../../services/houseService';
+import { createHouse, deleteHouse } from '../../services/houseService';
 
 const Houses = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Fetch houses and house types
-  const { data: houses = [], isLoading: isHousesLoading, isError: isHousesError } = useFetchHouses();
-  const { data: houseTypes = [], isLoading: isHouseTypesLoading, isError: isHouseTypesError } = useFetchHouseTypes();
+  const {
+    data: houses = [],
+    isLoading: isHousesLoading,
+    isError: isHousesError,
+    refetch: refetchHouses,
+    isFetching: isRefetchingHouses
+  } = useFetchHouses();
+
+  const {
+    data: houseTypes = [],
+    isLoading: isHouseTypesLoading,
+    isFetching: isHouseTypesFetching,
+    isError: isHouseTypesError,
+  } = useFetchHouseTypes(); // Fetch house types by default
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
   const [dialogErrorMessage, setDialogErrorMessage] = useState('');
+  const [houseToDelete, setHouseToDelete] = useState(null);
 
   // Set default option when opening dialog
   useEffect(() => {
@@ -28,19 +42,30 @@ const Houses = () => {
     }
   }, [isAddDialogOpen, houseTypes]);
 
-  // Mutation for creating a house with proper destructuring
+  // Mutation for creating a house
   const createHouseMutation = useMutation(createHouse, {
     onSuccess: async (response) => {
-      console.log("House created successfully:", response);
       const uuid = response.uuid;
       toast.success('اقامتگاه با موفقیت اضافه شد!');
       navigate(`/dashboard/edit-house/${uuid}`);
       await queryClient.invalidateQueries(['houses']);
     },
     onError: (error) => {
-      console.error("Error creating house:", error);
       const errorMessage = error.response?.data?.message || 'خطا در اضافه کردن اقامتگاه. لطفاً دوباره تلاش کنید.';
       setDialogErrorMessage(errorMessage);
+      toast.error(errorMessage);
+    },
+  });
+
+  // Mutation for deleting a house
+  const deleteHouseMutation = useMutation(deleteHouse, {
+    onSuccess: async () => {
+      toast.success('اقامتگاه با موفقیت حذف شد!');
+      setIsDeleteConfirmDialogOpen(false); // Close the delete confirmation dialog
+      await refetchHouses(); // Refetch the houses to update the list
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data?.message || 'خطا در حذف اقامتگاه. لطفاً دوباره تلاش کنید.';
       toast.error(errorMessage);
     },
   });
@@ -51,11 +76,23 @@ const Houses = () => {
     setIsAddDialogOpen(false);
   };
 
-  // Show loading state when houses or house types are loading
-  if (isHousesLoading || isHouseTypesLoading) {
+  const handleDeleteHouse = async (houseId) => {
+    setHouseToDelete(houseId);
+    setIsDeleteConfirmDialogOpen(true); // Open the delete confirmation dialog
+  };
+
+  const confirmDeleteHouse = async () => {
+    if (houseToDelete) {
+      await deleteHouseMutation.mutateAsync(houseToDelete);
+      setHouseToDelete(null);
+    }
+  };
+
+  // Show loading state when houses or house types are loading or refetching
+  if (isHousesLoading || isRefetchingHouses) {
     return (
       <div className="min-h-[65vh] flex items-center justify-center">
-        <Loading />
+        <Loading message="در حال بارگذاری اقامتگاه‌ها..." />
       </div>
     );
   }
@@ -84,7 +121,12 @@ const Houses = () => {
       {/* Houses List */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {houses.map((house) => (
-          <HouseCard key={house.uuid} house={house} onDelete={() => setIsAddDialogOpen(true)} />
+          <HouseCard
+            key={house.uuid}
+            house={house}
+            onDelete={() => handleDeleteHouse(house.uuid)}
+            isDeleting={houseToDelete === house.uuid && deleteHouseMutation.isLoading}
+          />
         ))}
       </div>
 
@@ -95,28 +137,32 @@ const Houses = () => {
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-3xl w-full">
             <DialogTitle className="font-bold text-xl">افزودن اقامتگاه</DialogTitle>
             <p>لطفاً نوع اقامتگاه خود را وارد کنید :</p>
-            <div className="w-full">
-              <RadioGroup value={selectedOption} onChange={setSelectedOption} className="grid grid-cols-2 gap-2">
-                {houseTypes.map((option) => (
-                  <RadioGroup.Option key={option.key} value={option.key} className="flex items-center">
-                    {({ checked }) => (
-                      <div
-                        className={`flex items-center p-4 border rounded-lg cursor-pointer w-full ${
-                          checked ? 'bg-gray-100' : ''
-                        }`}
-                      >
-                        <div className="flex-shrink-0">
-                          <img src={option.icon} alt={option.label} className="w-6 h-6" />
+            {isHouseTypesFetching ? ( // Show loading indicator if house types are still fetching
+              <Loading message="در حال بارگذاری نوع اقامتگاه..." />
+            ) : (
+              <div className="w-full">
+                <RadioGroup value={selectedOption} onChange={setSelectedOption} className="grid grid-cols-2 gap-2">
+                  {houseTypes.map((option) => (
+                    <RadioGroup.Option key={option.key} value={option.key} className="flex items-center">
+                      {({ checked }) => (
+                        <div
+                          className={`flex items-center p-4 border rounded-lg cursor-pointer w-full ${
+                            checked ? 'bg-gray-100' : ''
+                          }`}
+                        >
+                          <div className="flex-shrink-0">
+                            <img src={option.icon} alt={option.label} className="w-6 h-6" />
+                          </div>
+                          <div className="ml-3 flex flex-col">
+                            <Label className="text-lg font-medium mr-2">{option.label}</Label>
+                          </div>
                         </div>
-                        <div className="ml-3 flex flex-col">
-                          <Label className="text-lg font-medium mr-2">{option.label}</Label>
-                        </div>
-                      </div>
-                    )}
-                  </RadioGroup.Option>
-                ))}
-              </RadioGroup>
-            </div>
+                      )}
+                    </RadioGroup.Option>
+                  ))}
+                </RadioGroup>
+              </div>
+            )}
             {dialogErrorMessage && (
               <p className="text-red-500 mt-2">{dialogErrorMessage}</p>
             )}
@@ -134,6 +180,32 @@ const Houses = () => {
                 disabled={createHouseMutation.isLoading}
               >
                 {createHouseMutation.isLoading ? 'در حال اضافه کردن ...' : 'اضافه کردن'}
+              </button>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteConfirmDialogOpen} onClose={() => setIsDeleteConfirmDialogOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="max-w-lg space-y-4 border bg-white p-6 rounded-3xl w-full">
+            <DialogTitle className="font-bold text-xl">ایا از حذف کردن این اقامت گاه مطمعن هستید ؟</DialogTitle>
+            <div className="flex gap-4 mt-4">
+              <button
+                className="btn bg-gray-300 text-gray-800"
+                onClick={() => setIsDeleteConfirmDialogOpen(false)}
+                disabled={deleteHouseMutation.isLoading}
+              >
+                لغو
+              </button>
+              <button
+                className="btn bg-red-600 text-white"
+                onClick={confirmDeleteHouse}
+                disabled={deleteHouseMutation.isLoading}
+              >
+                {deleteHouseMutation.isLoading ? 'در حال حذف...' : 'بله'}
               </button>
             </div>
           </DialogPanel>

@@ -1,37 +1,20 @@
 import http from "./httpService";
 
 export function getHouses(data) {
-  return http.get('/client/house', data)
-    .then(({ data }) => {
-      return data.data;
-    });
+  return http.get('/client/house', data).then(({ data }) => data.data);
 }
 
 export function createHouse(data) {
-  return http.post('/client/house', data)
-    .then(({ data }) => {
-      return data.data;
-    });
+  return http.post('/client/house', data).then(({ data }) => data.data);
 }
 
 export function getHouseTypes(data) {
-  return http.get('/assets/types/structure/detail', data)
-    .then(({ data }) => {
-      return data.data;
-    });
+  return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
 }
 
-
-
-
-// const response = await axios.put(
-//   `https://portal1.jatajar.com/api/client/house/${houseUuid}/facility`,
-//   requestData,
-//   {
-//     headers: {
-
-
-
+export function deleteHouse(houseId) {
+  return http.delete(`/client/house/${houseId}`).then(({ data }) => data);
+}
 
 
 

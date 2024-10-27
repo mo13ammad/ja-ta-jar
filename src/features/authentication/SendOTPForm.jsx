@@ -5,7 +5,7 @@ import Loading from '../../ui/Loading';
 
 function SendOTPForm({ phone, onChange, onSubmit, loading, error }) {
   return (
-    <div className="rounded-2xl p-8 bg-gray-100 shadow-sm">
+    <div className="rounded-2xl  p-8 bg-gray-100 shadow-sm">
       <form onSubmit={onSubmit}>
         <div className="mb-2">
           <img src={logo} alt="Logo" className="max-w-40 mx-auto rounded-3xl" />
