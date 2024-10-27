@@ -9,7 +9,7 @@ function DashboardContainer() {
   const { isLoading, data: user } = useUser();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState('profile');
-
+  console.log(user);
   // Redirect to home if user does not exist after loading
   useEffect(() => {
     if (!isLoading && !user) {

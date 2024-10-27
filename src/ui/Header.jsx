@@ -34,7 +34,7 @@ function Header() {
     if (location.pathname.includes('/dashboard')) {
       navigate('/');
     } else {
-      navigate('/dashboard');
+      navigate('/auth');
     }
   };
 
