@@ -58,33 +58,33 @@ function EditHouseSidebar({ setSelectedTab }) {
   ];
 
   return (
-    <div className="w-full overflow-auto rounded-xl flex flex-col justify-start pt-10 items-center py-4 gap-y-5">
+    <div className="w-full overflow-auto rounded-xl flex flex-col justify-start  items-center gap-y-2">
       <Tab.Group className="w-full">
-        <Tab.List className="rounded-xl flex flex-col justify-center items-center p-2 gap-y-2">
+        <Tab.List className="rounded-xl flex flex-col justify-center items-center gap-y-1">
           {sections.map((section) => (
             <Disclosure key={section.label} as="div" className="w-full">
               {({ open }) => (
                 <>
-                  <Disclosure.Button className="flex justify-between items-center w-full px-4 py-2 text-lg font-bold text-left text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <span>{section.label}</span>
+                  <Disclosure.Button className="flex justify-between items-center w-full px-2 py-1.5 lg:px-4 lg:py-3    text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <span className='text-xs lg:text-sm  font-bold truncate '>{section.label}</span>
                     <ChevronUpIcon
                       className={`${
-                        open ? 'rotate-180 transform' : ''
-                      } w-5 h-5 text-gray-500`}
+                        open ? 'rotate-180 transform ' : ''
+                      } w-4 h-4 lg:w-5 lg:h-5 text-gray-500  transition-all duration-300`}
                     />
                   </Disclosure.Button>
-                  <Disclosure.Panel className="px-4 pt-2 pb-2 text-sm text-gray-500">
+                  <Disclosure.Panel className="py-1 px-1 md:px-2 lg:px-3 text-gray-500">
                     {section.children.map((child) => (
                       <Tab
                         key={child.key}
                         as="div"
                         className={({ selected }) =>
-                          `tab ${selected ? 'tab-selected' : 'tab-hover'}`
+                          `tab  my-1 ${selected ? 'tab-selected' : 'tab-hover'}`
                         }
                         onClick={() => setSelectedTab(child.key)} // Set selected tab to corresponding key
                       >
                         {({ selected }) => (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center">
                             <HomeIcon
                               className={`${svgClasses} ${
                                 selected
@@ -92,7 +92,7 @@ function EditHouseSidebar({ setSelectedTab }) {
                                   : 'text-gray-700'
                               }`}
                             />
-                            <span>{child.label}</span>
+                            <span className='text-xs lg:text-sm truncate'>{child.label}</span>
                           </div>
                         )}
                       </Tab>

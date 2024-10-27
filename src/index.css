@@ -60,13 +60,13 @@
   }
   @layer components{
     .textField__input{
-      @apply w-full shadow-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4
+      @apply w-full text-xs lg:text-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4
     }
     .textArea__input {
-      @apply w-full shadow-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4;
+      @apply w-full text-xs lg:text-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4;
     }
     .listbox__button {
-      @apply w-full shadow-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4 text-left flex justify-between items-center;
+      @apply w-full text-xs lg:text-sm shadow-centered outline-none transition-all duration-300 hover:border focus:border border-secondary-300 rounded-2xl py-2 px-4 text-left flex justify-between items-center;
     }
     
     .listbox__options {
@@ -81,10 +81,10 @@
       @apply bg-secondary-100 text-secondary-700;
     }
     .btn{
-      @apply transition-all duration-300 bg-white text-white  opacity-80 rounded-2xl px-4 py-1.5 shadow-sm 
+      @apply transition-all duration-300 bg-white text-white  opacity-80 rounded-2xl px-2 lg:px-4 py-0.5 lg:py-1.5 shadow-sm 
     }
     .tab {
-      @apply text-sm opacity-80 w-full  flex justify-end outline-none pr-5 flex-row-reverse items-center transition py-3 rounded-xl;
+      @apply text-xs md:text-sm opacity-80 w-full  flex justify-end outline-none pr-2 lg:pr-4 flex-row-reverse items-center transition py-1.5 lg:py-3 rounded-xl;
     }
   
     .tab-hover {

@@ -47,9 +47,9 @@ const EditHouseAddressDetails = ({ data, onSubmit }) => {
   };
 
   return (
-    <div className="relative md:w-5/6 md:h-5/6">
+    <div className="relative">
       <Toaster />
-      <form className="flex flex-col md:grid grid-cols-2 gap-6 p-1.5 overflow-auto max-h-[80vh] scrollbar-thin pr-2 w-full min-h-[70vh]">
+      <form className="flex flex-col md:grid grid-cols-2 overflow-auto gap-x-2 gap-y-4 p-2 scrollbar-thinw-full">
         <TextField
           label="آدرس اقامتگاه"
           name="address"
