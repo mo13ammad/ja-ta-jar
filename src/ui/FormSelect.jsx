@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'; // Importing Chevro
 
 function FormSelect({ label, name, value, onChange, options }) {
   return (
-    <div className="w-full">
+    <div className="w-full bg-white">
       <label className="block font-medium text-gray-700 mb-2">{label}</label>
       <Listbox
         value={value}
@@ -33,14 +33,14 @@ function FormSelect({ label, name, value, onChange, options }) {
               leaveTo="opacity-0"
             >
               <Listbox.Options
-                className="listbox__options max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+                className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-gray-400 scrollbar-track-gray-100"
               >
                 {options.map((option) => (
                   <Listbox.Option
                     key={option.value}
                     value={option}
                     className={({ active }) =>
-                      `listbox__option ${
+                      `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
                         active ? 'bg-secondary-100 text-secondary-700' : 'text-gray-900'
                       }`
                     }

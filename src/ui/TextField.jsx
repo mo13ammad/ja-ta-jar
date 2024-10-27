@@ -1,9 +1,11 @@
-import React from 'react'
+import React from 'react';
 
-function TextField({label,name,value,onChange,placeholder}) {
+function TextField({ label, name, value, onChange, placeholder, readOnly }) {
   return (
-    <div className=''>
-    <label htmlFor={name} className="text-xs md:text-sm xl:text-lg mb-3 font-medium">{label} </label>
+    <div>
+      <label htmlFor={name} className="text-xs md:text-sm xl:text-lg mb-3 font-medium">
+        {label}
+      </label>
       <input
         className="textField__input"
         type="text"
@@ -12,10 +14,11 @@ function TextField({label,name,value,onChange,placeholder}) {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        autoComplete='off'
+        autoComplete="off"
+        readOnly={readOnly}  // Set the field as read-only if needed
       />
     </div>
-  )
+  );
 }
 
-export default TextField
+export default TextField;

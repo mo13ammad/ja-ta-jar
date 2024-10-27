@@ -10,37 +10,39 @@ import Pricing from './edithouse-components/EditHousePricing';
 import Images from './edithouse-components/EditHouseImages';
 import LocationDetails from './edithouse-components/EditHouseLocationDetails';
 import EnvironmentInfo  from './edithouse-components/EditHouseEnvironmentInfo ';
+import useUser from '../useUser';
 
 
 const EditHouseContent = ({ selectedTab }) => {
+  const { data: userData, isLoading: loadingUser } = useUser();
   const renderContent = () => {
     switch (selectedTab) {
       case 'address':
-        return <AddressDetails />;
+        return <AddressDetails  userData={userData} loadingUser={loadingUser}/>;
       case 'location':
-        return <LocationDetails />; 
+        return <LocationDetails  userData={userData} loadingUser={loadingUser}/>; 
       case 'generalInfo':
-        return <GeneralInfo />;
+        return <GeneralInfo  userData={userData} loadingUser={loadingUser}/>;
       case 'environmentInfo':
-        return <EnvironmentInfo />; 
+        return <EnvironmentInfo  userData={userData} loadingUser={loadingUser}/>; 
       case 'mainFacilities':
-        return <MainFacilities />;
+        return <MainFacilities  userData={userData} loadingUser={loadingUser}/>;
       case 'rooms':
-        return <Rooms />;
+        return <Rooms  userData={userData} loadingUser={loadingUser}/>;
       case 'sanitaries':
-        return <Sanitaries />;
+        return <Sanitaries  userData={userData} loadingUser={loadingUser}/>;
       case 'reservationRules':
-        return <ReservationRules />;
+        return <ReservationRules userData={userData} loadingUser={loadingUser}/>;
       case 'stayRules':
-        return <StayRules />;
+        return <StayRules  userData={userData} loadingUser={loadingUser}/>;
       case 'pricing':
-        return <Pricing />;
+        return <Pricing  userData={userData} loadingUser={loadingUser}/>;
       case 'images':
-        return <Images />;
+        return <Images  userData={userData} loadingUser={loadingUser}/>;
       case 'finalSubmit':
         return <div>FinalSubmit</div>;
       default:
-        return <AddressDetails />; // Default case
+        return <AddressDetails  userData={userData} loadingUser={loadingUser}/>; // Default case
     }
   };
 
