@@ -30,13 +30,8 @@ export function getProvinces(data) {
     return http.get('/assets/types/privacy/detail').then(({ data }) => data.data);
   }
   
-  export function getFacilities() {
-    return http.get('/assets/types/houseFacilities/detail').then(({ data }) => data.data);
-  }
   
-  export function getWeekendOptions() {
-    return http.get('/assets/types/weekendHoliday/detail').then(({ data }) => data.data);
-  }
+  
   
   export function getRoomFacilities() {
     return http.get('/assets/types/roomFacilities/detail').then(({ data }) => data.data);
@@ -50,11 +45,45 @@ export function getProvinces(data) {
     return http.get('/assets/types/sanitaryFacilities/detail').then(({ data }) => data.data);
   }
   
+  export function getFacilities() {
+    return http.get('/assets/types/houseFacilities/detail').then(({ data }) => data.data);
+  }
+  
   export function getRules() {
     return http.get('/assets/types/rules/detail').then(({ data }) => data.data);
   }
-  
+
+  export function getWeekendOptions() {
+    return http.get('/assets/types/weekendHoliday/detail').then(({ data }) => data.data);
+  }
   // Custom hooks for each fetch function
+
+  export function useFetchWeekendOptions() {
+    return useQuery({
+      queryKey: ["get-weekend-options"],
+      queryFn: getWeekendOptions,
+      retry: false,
+    });
+  }
+  
+
+
+  export function useFetchRules() {
+    return useQuery({
+      queryKey: ["get-rules"],
+      queryFn: getRules,
+      retry: false,
+    });
+  }
+  
+  export function useFetchFacilities() {
+    return useQuery({
+      queryKey: ["get-facilities"],
+      queryFn: getFacilities,
+      retry: false,
+    });
+  }
+  
   export function useFetchTextures() {
     return useQuery({
       queryKey: ["get-textures"],
@@ -103,22 +132,7 @@ export function getProvinces(data) {
     });
   }
   
-  export function useFetchFacilities() {
-    return useQuery({
-      queryKey: ["get-facilities"],
-      queryFn: getFacilities,
-      retry: false,
-    });
-  }
-  
-  export function useFetchWeekendOptions() {
-    return useQuery({
-      queryKey: ["get-weekend-options"],
-      queryFn: getWeekendOptions,
-      retry: false,
-    });
-  }
-  
+
   export function useFetchRoomFacilities() {
     return useQuery({
       queryKey: ["get-room-facilities"],
@@ -139,14 +153,6 @@ export function getProvinces(data) {
     return useQuery({
       queryKey: ["get-sanitary-options"],
       queryFn: getSanitaryOptions,
-      retry: false,
-    });
-  }
-  
-  export function useFetchRules() {
-    return useQuery({
-      queryKey: ["get-rules"],
-      queryFn: getRules,
       retry: false,
     });
   }

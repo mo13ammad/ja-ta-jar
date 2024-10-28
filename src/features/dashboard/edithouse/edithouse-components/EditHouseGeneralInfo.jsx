@@ -60,7 +60,7 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
 
   return (
     <div className="relative">
-      <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TextField
             label="نام اقامتگاه"
