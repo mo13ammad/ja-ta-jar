@@ -13,7 +13,6 @@ const Houses = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  // Fetch houses and house types
   const {
     data: houses = [],
     isLoading: isHousesLoading,
@@ -27,7 +26,7 @@ const Houses = () => {
     isLoading: isHouseTypesLoading,
     isFetching: isHouseTypesFetching,
     isError: isHouseTypesError,
-  } = useFetchHouseTypes(); // Fetch house types by default
+  } = useFetchHouseTypes();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteConfirmDialogOpen, setIsDeleteConfirmDialogOpen] = useState(false);
@@ -35,20 +34,18 @@ const Houses = () => {
   const [dialogErrorMessage, setDialogErrorMessage] = useState('');
   const [houseToDelete, setHouseToDelete] = useState(null);
 
-  // Set default option when opening dialog
   useEffect(() => {
     if (isAddDialogOpen && houseTypes.length > 0) {
       setSelectedOption(houseTypes[0].key);
     }
   }, [isAddDialogOpen, houseTypes]);
 
-  // Mutation for creating a house
   const createHouseMutation = useMutation(createHouse, {
     onSuccess: async (response) => {
       const uuid = response.uuid;
       toast.success('اقامتگاه با موفقیت اضافه شد!');
       navigate(`/dashboard/edit-house/${uuid}`);
-      await queryClient.invalidateQueries(['houses']);
+      await queryClient.invalidateQueries(['get-houses']);
     },
     onError: (error) => {
       const errorMessage = error.response?.data?.message || 'خطا در اضافه کردن اقامتگاه. لطفاً دوباره تلاش کنید.';
@@ -57,12 +54,11 @@ const Houses = () => {
     },
   });
 
-  // Mutation for deleting a house
   const deleteHouseMutation = useMutation(deleteHouse, {
     onSuccess: async () => {
       toast.success('اقامتگاه با موفقیت حذف شد!');
-      setIsDeleteConfirmDialogOpen(false); // Close the delete confirmation dialog
-      await refetchHouses(); // Refetch the houses to update the list
+      setIsDeleteConfirmDialogOpen(false);
+      await refetchHouses();
     },
     onError: (error) => {
       const errorMessage = error.response?.data?.message || 'خطا در حذف اقامتگاه. لطفاً دوباره تلاش کنید.';
@@ -78,7 +74,7 @@ const Houses = () => {
 
   const handleDeleteHouse = async (houseId) => {
     setHouseToDelete(houseId);
-    setIsDeleteConfirmDialogOpen(true); // Open the delete confirmation dialog
+    setIsDeleteConfirmDialogOpen(true);
   };
 
   const confirmDeleteHouse = async () => {
@@ -88,7 +84,6 @@ const Houses = () => {
     }
   };
 
-  // Show loading state when houses or house types are loading or refetching
   if (isHousesLoading || isRefetchingHouses) {
     return (
       <div className="min-h-[65vh] flex items-center justify-center">
@@ -97,7 +92,6 @@ const Houses = () => {
     );
   }
 
-  // Display error message if there is an error in fetching houses or house types
   if (isHousesError || isHouseTypesError) {
     return (
       <div className="text-center text-red-500">
@@ -118,7 +112,6 @@ const Houses = () => {
         </button>
       </div>
 
-      {/* Houses List */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {houses.map((house) => (
           <HouseCard
@@ -130,14 +123,13 @@ const Houses = () => {
         ))}
       </div>
 
-      {/* Add House Dialog */}
       <Dialog open={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-3xl w-full">
             <DialogTitle className="font-bold text-xl">افزودن اقامتگاه</DialogTitle>
             <p>لطفاً نوع اقامتگاه خود را وارد کنید :</p>
-            {isHouseTypesFetching ? ( // Show loading indicator if house types are still fetching
+            {isHouseTypesFetching ? (
               <Loading message="در حال بارگذاری نوع اقامتگاه..." />
             ) : (
               <div className="w-full">
@@ -186,7 +178,6 @@ const Houses = () => {
         </div>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteConfirmDialogOpen} onClose={() => setIsDeleteConfirmDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
 import GeneralInfo from './edithouse-components/EditHouseGeneralInfo';
 import MainFacilities from './edithouse-components/EditHouseMainFacilities';
@@ -10,43 +11,54 @@ import Pricing from './edithouse-components/EditHousePricing';
 import Images from './edithouse-components/EditHouseImages';
 import LocationDetails from './edithouse-components/EditHouseLocationDetails';
 import EnvironmentInfo  from './edithouse-components/EditHouseEnvironmentInfo ';
-import useUser from '../useUser';
-
+import useFetchHouse from '../useFetchHouse';
+import Loading from '../../../ui/Loading'; // Assuming Loading is a component for showing the loading state
 
 const EditHouseContent = ({ selectedTab }) => {
-  const { data: userData, isLoading: loadingUser } = useUser();
+  const { uuid } = useParams(); // Retrieve uuid from the URL parameters
+  const { data: houseData, isLoading: loadingHouse } = useFetchHouse(uuid);
+  console.log(houseData);
+
   const renderContent = () => {
     switch (selectedTab) {
       case 'address':
-        return <AddressDetails  userData={userData} loadingUser={loadingUser}/>;
+        return <AddressDetails houseData={houseData} loadingHouse={loadingHouse} />;
       case 'location':
-        return <LocationDetails  userData={userData} loadingUser={loadingUser}/>; 
+        return <LocationDetails houseData={houseData} loadingHouse={loadingHouse} />;
       case 'generalInfo':
-        return <GeneralInfo  userData={userData} loadingUser={loadingUser}/>;
+        return <GeneralInfo houseData={houseData} loadingHouse={loadingHouse} />;
       case 'environmentInfo':
-        return <EnvironmentInfo  userData={userData} loadingUser={loadingUser}/>; 
+        return <EnvironmentInfo houseData={houseData} loadingHouse={loadingHouse} />;
       case 'mainFacilities':
-        return <MainFacilities  userData={userData} loadingUser={loadingUser}/>;
+        return <MainFacilities houseData={houseData} loadingHouse={loadingHouse} />;
       case 'rooms':
-        return <Rooms  userData={userData} loadingUser={loadingUser}/>;
+        return <Rooms houseData={houseData} loadingHouse={loadingHouse} />;
       case 'sanitaries':
-        return <Sanitaries  userData={userData} loadingUser={loadingUser}/>;
+        return <Sanitaries houseData={houseData} loadingHouse={loadingHouse} />;
       case 'reservationRules':
-        return <ReservationRules userData={userData} loadingUser={loadingUser}/>;
+        return <ReservationRules houseData={houseData} loadingHouse={loadingHouse} />;
       case 'stayRules':
-        return <StayRules  userData={userData} loadingUser={loadingUser}/>;
+        return <StayRules houseData={houseData} loadingHouse={loadingHouse} />;
       case 'pricing':
-        return <Pricing  userData={userData} loadingUser={loadingUser}/>;
+        return <Pricing houseData={houseData} loadingHouse={loadingHouse} />;
       case 'images':
-        return <Images  userData={userData} loadingUser={loadingUser}/>;
+        return <Images houseData={houseData} loadingHouse={loadingHouse} />;
       case 'finalSubmit':
-        return <div>FinalSubmit</div>;
+        return <div>Final Submit</div>;
       default:
-        return <AddressDetails  userData={userData} loadingUser={loadingUser}/>; // Default case
+        return <AddressDetails houseData={houseData} loadingHouse={loadingHouse} />;
     }
   };
 
-  return <div>{renderContent()}</div>;
+  return (
+    <div>
+      {loadingHouse ? (
+        <Loading message="در حال بارگذاری اطلاعات اقامتگاه..." />
+      ) : (
+        renderContent()
+      )}
+    </div>
+  );
 };
 
 export default EditHouseContent;

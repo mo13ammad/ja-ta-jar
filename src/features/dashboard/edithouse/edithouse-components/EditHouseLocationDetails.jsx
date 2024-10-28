@@ -11,14 +11,14 @@ import L from "leaflet";
 const DEFAULT_LAT = 35.6892; // Tehran latitude
 const DEFAULT_LNG = 51.389; // Tehran longitude
 
-const EditHouseLocationDetails = ({ userData, loadingUser }) => {
+const EditHouseLocationDetails = ({ houseData, loadingHouse }) => {
   const { data: provinces = [], isLoading: loadingProvinces } = useFetchProvinces();
   
-  // State to manage selected province, city, latitude, and longitude
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
   const [longitude, setLongitude] = useState(DEFAULT_LNG);
+  const [shouldSetView, setShouldSetView] = useState(false);
 
   const { data: cityData, isLoading: loadingCities } = useFetchCities(selectedProvince);
   const cities = cityData?.cities || [];
@@ -27,23 +27,26 @@ const EditHouseLocationDetails = ({ userData, loadingUser }) => {
   const markerRef = useRef(null);
   const mapInitialized = useRef(false);
 
-  // Set initial location data after userData is loaded
+  // Initialize location data based on houseData when it loads
   useEffect(() => {
-    if (userData && userData.city) {
-      setSelectedProvince(userData.city.province.id);
-      setSelectedCity(userData.city.id);
-      setLatitude(userData.city.latitude);
-      setLongitude(userData.city.longitude);
-    } else if (userData && userData.city?.province) {
-      setSelectedProvince(userData.city.province.id);
-      setLatitude(userData.city.province.latitude);
-      setLongitude(userData.city.province.longitude);
-    }
-  }, [userData]);
+    if (houseData && houseData.address) {
+      const lat = houseData.address.geography?.latitude || DEFAULT_LAT;
+      const lng = houseData.address.geography?.longitude || DEFAULT_LNG;
+      setLatitude(lat);
+      setLongitude(lng);
 
-  // Initialize the map only when userData is loaded
+      if (houseData.address.city) {
+        setSelectedCity(houseData.address.city.id);
+        setSelectedProvince(houseData.address.city.province.id);
+      } else if (houseData.address.city?.province) {
+        setSelectedProvince(houseData.address.city.province.id);
+      }
+    }
+  }, [houseData]);
+
+  // Initialize the map once when data is loaded
   useEffect(() => {
-    if (!loadingUser && !loadingProvinces && !mapInitialized.current && document.getElementById("map-container")) {
+    if (!loadingHouse && !loadingProvinces && !mapInitialized.current && document.getElementById("map-container")) {
       mapInitialized.current = true;
 
       mapRef.current = L.map("map-container").setView([latitude, longitude], 11);
@@ -53,10 +56,12 @@ const EditHouseLocationDetails = ({ userData, loadingUser }) => {
 
       markerRef.current = L.marker([latitude, longitude], { draggable: true }).addTo(mapRef.current);
 
+      // Handle marker drag to set new lat/lng without changing map view
       markerRef.current.on("dragend", (e) => {
         const coords = e.target.getLatLng();
         setLatitude(coords.lat);
         setLongitude(coords.lng);
+        setShouldSetView(false); // No view update for user-dragged marker
         toast.success("موقعیت جدید انتخاب شد");
       });
 
@@ -65,47 +70,57 @@ const EditHouseLocationDetails = ({ userData, loadingUser }) => {
         setLatitude(lat);
         setLongitude(lng);
         markerRef.current.setLatLng([lat, lng]);
+        setShouldSetView(false); // No view update for user-clicked map
         toast.success("موقعیت جدید انتخاب شد");
       });
     }
-  }, [loadingUser, loadingProvinces, latitude, longitude]);
+  }, [loadingHouse, loadingProvinces, latitude, longitude]);
 
-  // Update marker position on map when latitude or longitude changes
+  // Conditionally update map view based on shouldSetView
   useEffect(() => {
+    if (mapInitialized.current && shouldSetView) {
+      mapRef.current.setView([latitude, longitude], 11);
+      setShouldSetView(false); // Reset after setting the view
+    }
     if (mapInitialized.current && markerRef.current) {
       markerRef.current.setLatLng([latitude, longitude]);
-      mapRef.current.setView([latitude, longitude], 11);
     }
-  }, [latitude, longitude]);
+  }, [latitude, longitude, shouldSetView]);
 
-  // Update location when a new city is selected
+  // Update latitude and longitude when the selected province changes
+  useEffect(() => {
+    if (selectedProvince) {
+      const selectedProvinceData = provinces.find((province) => province.id === selectedProvince);
+      if (selectedProvinceData) {
+        setLatitude(selectedProvinceData.latitude);
+        setLongitude(selectedProvinceData.longitude);
+        setShouldSetView(true); // Set view when province changes
+      }
+      setSelectedCity(""); // Reset city when province changes
+    }
+  }, [selectedProvince, provinces]);
+
+  // Update latitude and longitude when the selected city changes
   useEffect(() => {
     if (selectedCity && cities.length > 0) {
       const city = cities.find((city) => city.id === selectedCity);
       if (city) {
         setLatitude(city.latitude);
         setLongitude(city.longitude);
+        setShouldSetView(true); // Set view when city changes
       }
     }
   }, [selectedCity, cities]);
 
   const handleProvinceChange = (e) => {
-    const provinceId = e.target.value;
-    setSelectedProvince(provinceId);
-    setSelectedCity("");
-    
-    const selectedProvinceData = provinces.find((province) => province.id === provinceId);
-    if (selectedProvinceData) {
-      setLatitude(selectedProvinceData.latitude);
-      setLongitude(selectedProvinceData.longitude);
-    }
+    setSelectedProvince(e.target.value);
   };
 
   const handleSaveChanges = () => {
     toast.success("تغییرات ذخیره شدند (بدون ارسال)");
   };
 
-  if (loadingUser || loadingProvinces) return <Loading />;
+  if (loadingHouse || loadingProvinces) return <Loading />;
 
   return (
     <div className="relative p-4">

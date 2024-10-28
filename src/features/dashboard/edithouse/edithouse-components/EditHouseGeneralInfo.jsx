@@ -1,206 +1,186 @@
-import React from "react";
-import { Listbox } from "@headlessui/react";
+import React, { useState, useEffect } from "react";
 import Spinner from "../../../../ui/Loading";
 import TextField from "../../../../ui/TextField";
+import TextArea from "../../../../ui/TextArea";
+import FormSelect from "../../../../ui/FormSelect";
 import RadioInput from "../../../../ui/RadioInput";
+import { useFetchHouseFloors, useFetchPrivacyOptions } from "../../../../services/fetchDataService";
 
-const EditHouseGeneralInfo = ({
-    formData = {}, // Provide default value for formData
-  handleInputChange,
-  houseFloorOptions = [], // Provide default value for houseFloorOptions
-  privacyOptions = [], // Provide default value for privacyOptions
-  priceHandleOptions = [], // Provide default value for priceHandleOptions
-  toggleRentType,
-  togglePriceHandleBy,
-  loading,
-  loadingSubmit,
-  handleSubmit,
-}) => {
+const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    land_size: "",
+    structure_size: "",
+    number_stairs: "",
+    description: "",
+    tip: "",
+    privacy: "",
+  });
+
+  const { data: houseFloorOptions = [], isLoading: loadingHouseFloors } = useFetchHouseFloors();
+  const { data: privacyOptions = [], isLoading: loadingPrivacyOptions } = useFetchPrivacyOptions();
+
+  const priceHandleOptions = [
+    { key: "PerNight", label: "براساس هر شب" },
+    { key: "PerPerson", label: "براساس هر نفر-شب" },
+  ];
+
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        name: userData.name || "",
+        land_size: userData.land_size || "",
+        structure_size: userData.structure_size || "",
+        number_stairs: userData.number_stairs || "",
+        description: userData.description || "",
+        tip: userData.tip || "",
+        privacy: userData.privacy || "",
+      });
+    }
+  }, [userData]);
+
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const toggleRentType = (value) => {
+    handleInputChange("rentType", value);
+  };
+
+  const togglePriceHandleBy = (value) => {
+    handleInputChange("price_handle_by", value);
+  };
+
+  if (loadingUser || loadingHouseFloors || loadingPrivacyOptions) {
+    return (
+      <div className="flex justify-center items-center min-h-[50vh]">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <Spinner />
-        </div>
-      ) : (
-        <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
-          {/* Static Header */}
-          <div className="text-center font-bold text-xl my-4">
-            اطلاعات کلی اقامتگاه
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
+        <div className="text-center font-bold text-xl my-4">اطلاعات کلی اقامتگاه</div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TextField
+            label="نام اقامتگاه"
+            name="name"
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            placeholder="نام اقامتگاه"
+          />
+
+          <TextField
+            label="متراژ کل"
+            name="land_size"
+            value={formData.land_size}
+            onChange={(e) => handleInputChange("land_size", e.target.value)}
+            placeholder="متراژ کل به متر مربع"
+          />
+
+          <TextField
+            label="متراژ زیر بنا"
+            name="structure_size"
+            value={formData.structure_size}
+            onChange={(e) => handleInputChange("structure_size", e.target.value)}
+            placeholder="متراژ زیر بنا به متر مربع"
+          />
+
+          <TextField
+            label="تعداد پله"
+            name="number_stairs"
+            value={formData.number_stairs}
+            onChange={(e) => handleInputChange("number_stairs", e.target.value)}
+            placeholder="تعداد پله"
+          />
+
+          <div className="mt-4 lg:col-span-2">
+            <TextArea
+              label="درباره اقامتگاه"
+              name="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
+            />
           </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Name Input */}
-            <TextField
-              label="نام اقامتگاه"
-              name="name"
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              placeholder="نام اقامتگاه"
-            />
 
-            {/* Land Size Input */}
-            <TextField
-              label="متراژ کل"
-              name="land_size"
-              value={formData.land_size}
-              onChange={(e) => handleInputChange("land_size", e.target.value)}
-              placeholder="متراژ کل به متر مربع"
-            />
+          <div className="lg:col-span-2 mt-4">
+            <hr className="border-gray-300 my-4" />
+          </div>
 
-            {/* Structure Size Input */}
-            <TextField
-              label="متراژ زیر بنا"
-              name="structure_size"
-              value={formData.structure_size}
-              onChange={(e) => handleInputChange("structure_size", e.target.value)}
-              placeholder="متراژ زیر بنا به متر مربع"
-            />
+          <FormSelect
+            label="تیپ سازه"
+            name="tip"
+            value={formData.tip}
+            onChange={(e) => handleInputChange("tip", e.target.value)}
+            options={
+              loadingHouseFloors
+                ? [{ value: "", label: "در حال بارگذاری..." }]
+                : [{ value: "", label: "انتخاب نوع" }, ...houseFloorOptions.map((option) => ({
+                    value: option.key,
+                    label: option.label,
+                  }))]
+            }
+          />
 
-            {/* Number of Stairs Input */}
-            <TextField
-              label="تعداد پله"
-              name="number_stairs"
-              value={formData.number_stairs}
-              onChange={(e) => handleInputChange("number_stairs", e.target.value)}
-              placeholder="تعداد پله"
-            />
+          <FormSelect
+            label="وضعیت حریم"
+            name="privacy"
+            value={formData.privacy}
+            onChange={(e) => handleInputChange("privacy", e.target.value)}
+            options={
+              loadingPrivacyOptions
+                ? [{ value: "", label: "در حال بارگذاری..." }]
+                : [{ value: "", label: "انتخاب حریم" }, ...privacyOptions.map((option) => ({
+                    value: option.key,
+                    label: option.label,
+                  }))]
+            }
+          />
 
-            {/* Description Input */}
-            <div className="mt-4 lg:col-span-2">
-              <TextField
-                label="درباره اقامتگاه"
-                name="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
-                placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
+            <div className="grid grid-cols-2 gap-4">
+              <RadioInput
+                label="اقامتگاه"
+                value="House"
+                name="rentType"
+                id="rent-house"
+                onChange={() => toggleRentType("House")}
+              />
+              <RadioInput
+                label="اتاق"
+                value="Rooms"
+                name="rentType"
+                id="rent-rooms"
+                onChange={() => toggleRentType("Rooms")}
               />
             </div>
+          </div>
 
-            {/* Static Divider */}
-            <div className="lg:col-span-2 mt-4">
-              <hr className="border-gray-300 my-4" />
-            </div>
-
-            {/* Static Section Header */}
-            <div className="lg:col-span-2 text-lg font-bold mb-2">
-              تنظیمات نوع اقامتگاه و قیمت گذاری
-            </div>
-
-            {/* Tip (House Floor Type) Dropdown */}
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">تیپ سازه</label>
-              <Listbox value={formData.tip} onChange={(value) => handleInputChange("tip", value)}>
-                {({ open }) => (
-                  <div className="relative">
-                    <Listbox.Button className="block p-2 border rounded-xl w-full text-left flex justify-between items-center">
-                      {houseFloorOptions.find((option) => option.key === formData.tip)?.label || "انتخاب نوع"}
-                      <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Listbox.Button>
-                    <Listbox.Options className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto">
-                      {houseFloorOptions.map((option) => (
-                        <Listbox.Option key={option.key} value={option.key} className="cursor-pointer px-4 py-2 hover:bg-gray-200">
-                          <span>{option.label}</span>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </div>
-                )}
-              </Listbox>
-            </div>
-
-            {/* Privacy Dropdown */}
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">وضعیت حریم</label>
-              <Listbox value={formData.privacy} onChange={(value) => handleInputChange("privacy", value)}>
-                {({ open }) => (
-                  <div className="relative">
-                    <Listbox.Button className="block p-2 border rounded-xl w-full text-left flex justify-between items-center">
-                      {privacyOptions.find((option) => option.key === formData.privacy)?.label || "انتخاب حریم"}
-                      <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Listbox.Button>
-                    <Listbox.Options className="absolute mt-2 w-full border rounded-xl bg-white shadow-lg z-50 max-h-60 overflow-y-auto">
-                      {privacyOptions.map((option) => (
-                        <Listbox.Option key={option.key} value={option.key} className="cursor-pointer px-4 py-2 hover:bg-gray-200">
-                          <span>{option.label}</span>
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </div>
-                )}
-              </Listbox>
-            </div>
-
-            {/* Rent Type Radio Buttons */}
-            <div className="mt-4 lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
-              <div className="grid grid-cols-2 gap-4">
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
+            <div className="grid grid-cols-2 gap-4">
+              {priceHandleOptions.map((option) => (
                 <RadioInput
-                  label="اقامتگاه"
-                  value="House"
-                  name="rentType"
-                  id="rent-house"
-                  onChange={() => toggleRentType("House")}
+                  key={option.key}
+                  label={option.label}
+                  value={option.key}
+                  name="price_handle_by"
+                  id={option.key}
+                  onChange={() => togglePriceHandleBy(option.key)}
                 />
-                <RadioInput
-                  label="اتاق"
-                  value="Rooms"
-                  name="rentType"
-                  id="rent-rooms"
-                  onChange={() => toggleRentType("Rooms")}
-                />
-              </div>
-            </div>
-
-            {/* Price Handle By Radio Buttons */}
-            <div className="mt-4 lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
-              <div className="grid grid-cols-2 gap-4">
-                {priceHandleOptions.map((option) => (
-                  <RadioInput
-                    key={option.key}
-                    label={option.label}
-                    value={option.key}
-                    name="price_handle_by"
-                    id={option.key}
-                    onChange={() => togglePriceHandleBy(option.key)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Submit Button with Static Info */}
-            <div className="mt-4">
-              <div className="mb-2 text-sm text-gray-600">
-                <span className="font-bold">توجه:</span> قبل از ثبت، مطمئن شوید که تمام اطلاعات به درستی وارد شده است.
-              </div>
-              <button
-                onClick={handleSubmit}
-                className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
-                disabled={loadingSubmit}
-              >
-                {loadingSubmit ? "در حال بارگذاری..." : "ثبت اطلاعات"}
-              </button>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

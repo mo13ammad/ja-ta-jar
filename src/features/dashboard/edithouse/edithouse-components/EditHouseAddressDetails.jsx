@@ -1,19 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import TextField from '../../../../ui/TextField';
-import TextArea from '../../../../ui/TextArea';
+import Loading from '../../../../ui/Loading'; // Assuming you have a Loading component
 
-const EditHouseAddressDetails = ({ data, onSubmit }) => {
+const EditHouseAddressDetails = ({ houseData, loadingHouse }) => {
   const [formData, setFormData] = useState({
-    address: data?.address?.address || '',
-    neighborhood: data?.address?.village || '',
-    floor: data?.address?.floor || '',
-    plaqueNumber: data?.address?.house_number || '',
-    postalCode: data?.address?.postal_code || '',
+    address: '',
+    neighborhood: '',
+    floor: '',
+    plaqueNumber: '',
+    postalCode: '',
   });
 
   const [errors, setErrors] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  useEffect(() => {
+    if (houseData?.address) {
+      setFormData({
+        address: houseData.address.address || '',
+        neighborhood: houseData.address.village || '',
+        floor: houseData.address.floor || '',
+        plaqueNumber: houseData.address.house_number || '',
+        postalCode: houseData.address.postal_code || '',
+      });
+    }
+  }, [houseData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,10 +58,14 @@ const EditHouseAddressDetails = ({ data, onSubmit }) => {
     }
   };
 
+  if (loadingHouse) {
+    return <Loading message="در حال بارگذاری اطلاعات آدرس..." />;
+  }
+
   return (
     <div className="relative">
       <Toaster />
-      <form className="flex flex-col md:grid grid-cols-2 overflow-auto gap-x-2 gap-y-4 p-2 scrollbar-thinw-full">
+      <form className="flex flex-col md:grid grid-cols-2 overflow-auto gap-x-2 gap-y-4 p-2 scrollbar-thin w-full">
         <TextField
           label="آدرس اقامتگاه"
           name="address"

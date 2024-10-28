@@ -4,12 +4,12 @@ export function getHouses(data) {
   return http.get('/client/house', data).then(({ data }) => data.data);
 }
 
-export function createHouse(data) {
-  return http.post('/client/house', data).then(({ data }) => data.data);
+export function getHouse(uuid) {
+  return http.get(`/client/house/${uuid}`).then(({ data }) => data.data);
 }
 
-export function getHouseTypes(data) {
-  return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
+export function createHouse(data) {
+  return http.post('/client/house', data).then(({ data }) => data.data);
 }
 
 export function deleteHouse(houseId) {
@@ -19,6 +19,9 @@ export function deleteHouse(houseId) {
 
 
 
+export function getHouseTypes(data) {
+  return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
+}
 
 
 // Rooms 
