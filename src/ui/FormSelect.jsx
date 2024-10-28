@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid'; // Importing Chevro
 
 function FormSelect({ label, name, value, onChange, options }) {
   return (
-    <div className="w-full bg-white">
+    <div className="w-full">
       <label className="block font-medium text-gray-700 mb-2">{label}</label>
       <Listbox
         value={value}

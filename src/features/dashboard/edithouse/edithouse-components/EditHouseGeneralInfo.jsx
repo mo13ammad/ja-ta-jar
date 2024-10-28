@@ -3,7 +3,7 @@ import Spinner from "../../../../ui/Loading";
 import TextField from "../../../../ui/TextField";
 import TextArea from "../../../../ui/TextArea";
 import FormSelect from "../../../../ui/FormSelect";
-import RadioInput from "../../../../ui/RadioInput";
+import { Switch } from "@headlessui/react";
 import { useFetchHouseFloors, useFetchPrivacyOptions } from "../../../../services/fetchDataService";
 
 const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
@@ -15,6 +15,8 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
     description: "",
     tip: "",
     privacy: "",
+    rentType: "House",
+    price_handle_by: "PerNight",
   });
 
   const { data: houseFloorOptions = [], isLoading: loadingHouseFloors } = useFetchHouseFloors();
@@ -35,6 +37,8 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
         description: userData.description || "",
         tip: userData.tip || "",
         privacy: userData.privacy || "",
+        rentType: userData.rentType || "House",
+        price_handle_by: userData.price_handle_by || "PerNight",
       });
     }
   }, [userData]);
@@ -44,14 +48,6 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
       ...prevData,
       [name]: value,
     }));
-  };
-
-  const toggleRentType = (value) => {
-    handleInputChange("rentType", value);
-  };
-
-  const togglePriceHandleBy = (value) => {
-    handleInputChange("price_handle_by", value);
   };
 
   if (loadingUser || loadingHouseFloors || loadingPrivacyOptions) {
@@ -65,8 +61,6 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
   return (
     <div className="relative">
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pr-2 w-full min-h-[70vh]">
-        <div className="text-center font-bold text-xl my-4">اطلاعات کلی اقامتگاه</div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TextField
             label="نام اقامتگاه"
@@ -110,10 +104,6 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
             />
           </div>
 
-          <div className="lg:col-span-2 mt-4">
-            <hr className="border-gray-300 my-4" />
-          </div>
-
           <FormSelect
             label="تیپ سازه"
             name="tip"
@@ -144,38 +134,70 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
             }
           />
 
+          {/* Rent Type Toggle Group */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
             <div className="grid grid-cols-2 gap-4">
-              <RadioInput
-                label="اقامتگاه"
-                value="House"
-                name="rentType"
-                id="rent-house"
-                onChange={() => toggleRentType("House")}
-              />
-              <RadioInput
-                label="اتاق"
-                value="Rooms"
-                name="rentType"
-                id="rent-rooms"
-                onChange={() => toggleRentType("Rooms")}
-              />
+              {["House", "Rooms"].map((type) => (
+                <Switch.Group key={type} as="div" className="flex items-center space-x-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                  
+                    <Switch
+                      checked={formData.rentType === type}
+                      onChange={() => handleInputChange("rentType", type)}
+                      className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
+                        formData.rentType === type ? 'bg-primary-600' : 'bg-gray-200'
+                      }`}
+                    >
+                      {formData.rentType === type && (
+                        <svg
+                          className="w-4 h-4 text-white absolute inset-0 m-auto"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </Switch>
+                    <span className="ml-1 text-sm font-medium text-gray-700">{type === "House" ? "اقامتگاه" : "اتاق"}</span>
+                  </label>
+                </Switch.Group>
+              ))}
             </div>
           </div>
 
+          {/* Price Handle By Toggle Group */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
             <div className="grid grid-cols-2 gap-4">
               {priceHandleOptions.map((option) => (
-                <RadioInput
-                  key={option.key}
-                  label={option.label}
-                  value={option.key}
-                  name="price_handle_by"
-                  id={option.key}
-                  onChange={() => togglePriceHandleBy(option.key)}
-                />
+                <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                   
+                    <Switch
+                      checked={formData.price_handle_by === option.key}
+                      onChange={() => handleInputChange("price_handle_by", option.key)}
+                      className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
+                        formData.price_handle_by === option.key ? 'bg-primary-600' : 'bg-gray-200'
+                      }`}
+                    >
+                      {formData.price_handle_by === option.key && (
+                        <svg
+                          className="w-4 h-4 text-white absolute inset-0 m-auto"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </Switch>
+                    <span className="ml-1 text-sm font-medium text-gray-700">{option.label}</span>
+                  </label>
+                </Switch.Group>
               ))}
             </div>
           </div>
