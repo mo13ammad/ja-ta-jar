@@ -29,7 +29,7 @@ const EditHouseSanitaries = ({ token, data }) => {
   return (
     <div className="relative flex flex-col h-full p-4">
       {isLoading ? (
-        <div className="flex justify-center items-center min-h-[50vh]">
+        <div className="flex justify-center items-center min-h-[60vh]">
           <Loading />
         </div>
       ) : (

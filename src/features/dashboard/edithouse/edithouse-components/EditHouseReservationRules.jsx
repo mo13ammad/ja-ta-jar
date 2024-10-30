@@ -76,7 +76,7 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
 
   if (loadingSubmit || loadingWeekendOptions) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
+      <div className="flex justify-center items-center min-h-[60vh]">
         <Spinner />
       </div>
     );
@@ -234,7 +234,14 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           <p>{errorMessage}</p>
         </div>
       )}
-
+   <div className="mt-4 w-full lg:col-span-2 flex justify-end">
+          <button
+            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+            onClick={()=>{}}
+          >
+            ثبت اطلاعات
+          </button>
+        </div>
     
     </div>
   );

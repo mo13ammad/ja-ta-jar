@@ -53,7 +53,8 @@ const EditHouseContent = ({ selectedTab }) => {
   return (
     <div>
       {loadingHouse ? (
-        <Loading message="در حال بارگذاری اطلاعات اقامتگاه..." />
+        
+        <div className='min-h-[60vh] flex justify-center items-center'><Loading /></div>
       ) : (
         renderContent()
       )}

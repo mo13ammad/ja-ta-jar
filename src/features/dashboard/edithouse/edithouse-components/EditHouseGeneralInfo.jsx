@@ -3,7 +3,7 @@ import Spinner from "../../../../ui/Loading";
 import TextField from "../../../../ui/TextField";
 import TextArea from "../../../../ui/TextArea";
 import FormSelect from "../../../../ui/FormSelect";
-import { Switch } from "@headlessui/react";
+import ToggleSwitch from "../../../../ui/ToggleSwitch";
 import { useFetchHouseFloors, useFetchPrivacyOptions } from "../../../../services/fetchDataService";
 
 const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
@@ -21,6 +21,11 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
 
   const { data: houseFloorOptions = [], isLoading: loadingHouseFloors } = useFetchHouseFloors();
   const { data: privacyOptions = [], isLoading: loadingPrivacyOptions } = useFetchPrivacyOptions();
+
+  const rentTypeOptions = [
+    { key: "House", label: "اقامتگاه" },
+    { key: "Rooms", label: "اتاق" },
+  ];
 
   const priceHandleOptions = [
     { key: "PerNight", label: "براساس هر شب" },
@@ -52,7 +57,7 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
 
   if (loadingUser || loadingHouseFloors || loadingPrivacyOptions) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
+      <div className="flex justify-center items-center min-h-[60vh]">
         <Spinner />
       </div>
     );
@@ -60,7 +65,7 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
 
   return (
     <div className="relative">
-      <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
+      <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full h-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TextField
             label="نام اقامتگاه"
@@ -134,72 +139,43 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
             }
           />
 
-          {/* Rent Type Toggle Group */}
+          {/* Rent Type ToggleSwitches */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
-            <div className="grid grid-cols-2 gap-4">
-              {["House", "Rooms"].map((type) => (
-                <Switch.Group key={type} as="div" className="flex items-center space-x-2">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                  
-                    <Switch
-                      checked={formData.rentType === type}
-                      onChange={() => handleInputChange("rentType", type)}
-                      className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                        formData.rentType === type ? 'bg-primary-600' : 'bg-gray-200'
-                      }`}
-                    >
-                      {formData.rentType === type && (
-                        <svg
-                          className="w-4 h-4 text-white absolute inset-0 m-auto"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </Switch>
-                    <span className="ml-1 text-sm font-medium text-gray-700">{type === "House" ? "اقامتگاه" : "اتاق"}</span>
-                  </label>
-                </Switch.Group>
+            <div className="flex space-x-4">
+              {rentTypeOptions.map((option) => (
+                <ToggleSwitch
+                  key={option.key}
+                  checked={formData.rentType === option.key}
+                  onChange={() => handleInputChange("rentType", option.key)}
+                  label={option.label}
+                />
               ))}
             </div>
           </div>
 
-          {/* Price Handle By Toggle Group */}
+          {/* Price Handle ToggleSwitches */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="flex space-x-4">
               {priceHandleOptions.map((option) => (
-                <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                   
-                    <Switch
-                      checked={formData.price_handle_by === option.key}
-                      onChange={() => handleInputChange("price_handle_by", option.key)}
-                      className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                        formData.price_handle_by === option.key ? 'bg-primary-600' : 'bg-gray-200'
-                      }`}
-                    >
-                      {formData.price_handle_by === option.key && (
-                        <svg
-                          className="w-4 h-4 text-white absolute inset-0 m-auto"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </Switch>
-                    <span className="ml-1 text-sm font-medium text-gray-700">{option.label}</span>
-                  </label>
-                </Switch.Group>
+                <ToggleSwitch
+                  key={option.key}
+                  checked={formData.price_handle_by === option.key}
+                  onChange={() => handleInputChange("price_handle_by", option.key)}
+                  label={option.label}
+                />
               ))}
             </div>
+          </div>
+
+          <div className="mt-4 w-full lg:col-span-2 flex justify-end">
+            <button
+              className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+              onClick={() => {}}
+            >
+              ثبت اطلاعات
+            </button>
           </div>
         </div>
       </div>

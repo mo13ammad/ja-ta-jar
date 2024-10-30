@@ -117,14 +117,14 @@ const EditHouseAddressDetails = ({ houseData, loadingHouse }) => {
           </div>
         )}
 
-        <button
-          type="button"
-          className="btn block bg-primary-800 text-white px-4 py-2 rounded-xl mt-4 col-span-2 max-w-36 h-10"
-          onClick={handleSubmit}
-          disabled={loadingSubmit}
-        >
-          {loadingSubmit ? "در حال ارسال..." : "ثبت آدرس"}
-        </button>
+<div className="mt-4 w-full lg:col-span-2 flex justify-end">
+          <button
+            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+            onClick={()=>{}}
+          >
+            ثبت اطلاعات
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Switch } from '@headlessui/react';
 import Spinner from '../../../../ui/Loading';
-import TextField from '../../../../ui/TextField';  // Import TextField component
-import TextArea from '../../../../ui/TextArea';    // Import TextArea component
+import TextField from '../../../../ui/TextField';
+import TextArea from '../../../../ui/TextArea';
+import ToggleSwitch from '../../../../ui/ToggleSwitch';
 import { useFetchFacilities } from '../../../../services/fetchDataService';
 
 const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
@@ -16,13 +16,19 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
   }, [facilitiesData]);
 
   const toggleFacility = (key) => {
-    setSelectedFacilities((prevSelected) => ({
-      ...prevSelected,
-      [key]: {
-        ...prevSelected[key],
-        checked: !prevSelected[key]?.checked,
-      },
-    }));
+    setSelectedFacilities((prevSelected) => {
+      const isCurrentlyChecked = prevSelected[key]?.checked;
+      const updatedState = {
+        ...prevSelected,
+        [key]: {
+          ...prevSelected[key],
+          checked: !isCurrentlyChecked,
+          fields: !isCurrentlyChecked ? prevSelected[key]?.fields : {}, // Clear fields if unchecking
+        },
+      };
+      console.log("Updated selectedFacilities:", updatedState);
+      return updatedState;
+    });
   };
 
   const handleInputChange = (facilityKey, fieldTitle, value) => {
@@ -39,7 +45,7 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
   };
 
   const handleSubmit = () => {
-    console.log("Selected Facilities Data:", selectedFacilities);
+    console.log("Final Selected Facilities Data:", selectedFacilities);
     alert("Facilities saved successfully!");
   };
 
@@ -56,33 +62,16 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
       <div className="text-center font-bold text-xl my-4">امکانات اصلی</div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 auto-rows-auto">
         {facilitiesData.map((facility) => (
-          <div key={facility.key} className="p-4 border rounded-xl flex flex-col shadow-centered">
-            <Switch.Group as="div" className="flex items-center space-x-2">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <Switch
-                  checked={selectedFacilities[facility.key]?.checked || false}
-                  onChange={() => toggleFacility(facility.key)}
-                  className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                    selectedFacilities[facility.key]?.checked ? 'bg-primary-600' : 'bg-gray-200'
-                  }`}
-                >
-                  {selectedFacilities[facility.key]?.checked && (
-                    <svg
-                      className="w-4 h-4 text-white absolute inset-0 m-auto"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </Switch>
-                <span className="ml-3 text-lg lg:text-xl font-medium text-gray-700">
-                  {facility.label}
-                </span>
-              </label>
-            </Switch.Group>
+          <div 
+            key={facility.key} 
+            className="p-4 border rounded-xl flex flex-col shadow-centered"
+          >
+            <ToggleSwitch
+              checked={selectedFacilities[facility.key]?.checked || false}
+              onChange={() => toggleFacility(facility.key)}
+              label={facility.label}
+              icon={facility.icon}
+            />
 
             {/* Show fields only if the facility is checked */}
             {selectedFacilities[facility.key]?.checked && (
@@ -90,38 +79,17 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
                 {facility.fields?.map((field, index) => (
                   <div key={index} className="mb-4">
                     {field.type === 'toggle' ? (
-                      <div className="flex items-center">
-                        <Switch.Group as="div" className="flex items-center space-x-2">
-                          <label className="flex items-center space-x-2 cursor-pointer">
-                            <Switch
-                              checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
-                              onChange={() =>
-                                handleInputChange(
-                                  facility.key,
-                                  field.title,
-                                  !selectedFacilities[facility.key]?.fields?.[field.title.trim()]
-                                )
-                              }
-                              className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                                selectedFacilities[facility.key]?.fields?.[field.title.trim()] ? 'bg-primary-600' : 'bg-gray-200'
-                              }`}
-                            >
-                              {selectedFacilities[facility.key]?.fields?.[field.title.trim()] && (
-                                <svg
-                                  className="w-4 h-4 text-white absolute inset-0 m-auto"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </Switch>
-                            <span className="ml-3 text-sm font-medium text-gray-700">{field.title}</span>
-                          </label>
-                        </Switch.Group>
-                      </div>
+                      <ToggleSwitch
+                        checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
+                        onChange={() =>
+                          handleInputChange(
+                            facility.key,
+                            field.title,
+                            !selectedFacilities[facility.key]?.fields?.[field.title.trim()]
+                          )
+                        }
+                        label={field.title}
+                      />
                     ) : field.type === 'textarea' ? (
                       <TextArea
                         label={field.title}
@@ -149,11 +117,10 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
           </div>
         ))}
       </div>
-
-      <div className="mt-6">
+      <div className="mt-4 w-full lg:col-span-2 flex justify-end">
         <button
+          className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
           onClick={handleSubmit}
-          className="bg-primary-800 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl transition-all duration-200 hover:bg-primary-900"
         >
           ثبت اطلاعات
         </button>

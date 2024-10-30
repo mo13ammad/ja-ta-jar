@@ -37,7 +37,7 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
 
   if (loadingHouse || loadingRules) {
     return (
-      <div className="flex justify-center items-center ">
+      <div className="flex justify-center items-center min-h-[60vh]:">
         <Spinner />
       </div>
     );
@@ -99,10 +99,10 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
           ))}
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button
-            onClick={() => console.log("Submitted Rules Data:", selectedRules)}
-            className="bg-primary-800 text-white px-4 py-2 rounded-xl shadow-xl transition-all duration-200 hover:bg-primary-900"
+            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+            onClick={()=>{}}
           >
             ثبت اطلاعات
           </button>

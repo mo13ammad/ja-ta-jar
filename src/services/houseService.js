@@ -4,25 +4,33 @@ export function getHouses(data) {
   return http.get('/client/house', data).then(({ data }) => data.data);
 }
 
-export function getHouse(uuid) {
-  return http.get(`/client/house/${uuid}`).then(({ data }) => data.data);
-}
-
 export function createHouse(data) {
   return http.post('/client/house', data).then(({ data }) => data.data);
 }
 
+
 export function deleteHouse(houseId) {
   return http.delete(`/client/house/${houseId}`).then(({ data }) => data);
 }
-
+export function getHouse(houseId) {
+  return http.get(`/client/house/${houseId}`).then(({ data }) => data);
+}
 
 
 
 export function getHouseTypes(data) {
   return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
 }
+export function createHousePicture(data) {
+  return http.post('/client/house/${houseUuid}/media', data).then(({ data }) => data.data);
+}
+export function deleteHousePicture(data) {
+  return http.delete('/client/house/${houseUuid}/media/${imageToDelete}', data).then(({ data }) => data.data);
+}
 
+export function changeHouseMainPicture(data) {
+  return http.delete('/client/house/${houseUuid}/media/${imageId}', data).then(({ data }) => data.data);
+}
 
 // Rooms 
 
@@ -83,12 +91,9 @@ export function getHouseTypes(data) {
 // const response = await axios.put(
 //   `https://portal1.jatajar.com/api/client/house/${houseUuid}/media/${imageId}`,
 //   {
-//     title: imageToMakeMain.title,
-//     main: 1,
 
 
 
-  //       );
 
   // const response = await axios.put(
 //   `https://portal1.jatajar.com/api/client/house/${houseUuid}/facility`,

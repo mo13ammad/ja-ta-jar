@@ -120,7 +120,7 @@ const EditHouseLocationDetails = ({ houseData, loadingHouse }) => {
     toast.success("تغییرات ذخیره شدند (بدون ارسال)");
   };
 
-  if (loadingHouse || loadingProvinces) return <Loading />;
+  if (loadingHouse || loadingProvinces) return <div className='min-h-[60vh] flex justify-center items-center'><Loading /></div>;
 
   return (
     <div className="relative p-4">
@@ -172,7 +172,7 @@ const EditHouseLocationDetails = ({ houseData, loadingHouse }) => {
             className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
             onClick={handleSaveChanges}
           >
-            ذخیره موقعیت
+            ثبت موقعیت
           </button>
         </div>
       </div>

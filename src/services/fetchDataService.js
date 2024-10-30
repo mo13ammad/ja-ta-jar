@@ -32,14 +32,7 @@ export function getProvinces(data) {
   
   
   
-  
-  export function getRoomFacilities() {
-    return http.get('/assets/types/roomFacilities/detail').then(({ data }) => data.data);
-  }
-  
-  export function getCoolingAndHeatingOptions() {
-    return http.get('/assets/types/coolingAndHeating/detail').then(({ data }) => data.data);
-  }
+
   
   export function getSanitaryOptions() {
     return http.get('/assets/types/sanitaryFacilities/detail').then(({ data }) => data.data);
@@ -56,7 +49,31 @@ export function getProvinces(data) {
   export function getWeekendOptions() {
     return http.get('/assets/types/weekendHoliday/detail').then(({ data }) => data.data);
   }
+    
+  export function getRoomFacilities() {
+    return http.get('/assets/types/roomFacilities/detail').then(({ data }) => data.data);
+  }
+  
+  export function getCoolingAndHeatingOptions() {
+    return http.get('/assets/types/coolingAndHeating/detail').then(({ data }) => data.data);
+  }
   // Custom hooks for each fetch function
+
+  export function useFetchRoomFacilities() {
+    return useQuery({
+      queryKey: ["get-room-facilities"],
+      queryFn: getRoomFacilities,
+      retry: false,
+    });
+  }
+  
+  export function useFetchCoolingAndHeatingOptions() {
+    return useQuery({
+      queryKey: ["get-cooling-and-heating-options"],
+      queryFn: getCoolingAndHeatingOptions,
+      retry: false,
+    });
+  }
 
   export function useFetchWeekendOptions() {
     return useQuery({
@@ -133,21 +150,8 @@ export function getProvinces(data) {
   }
   
 
-  export function useFetchRoomFacilities() {
-    return useQuery({
-      queryKey: ["get-room-facilities"],
-      queryFn: getRoomFacilities,
-      retry: false,
-    });
-  }
-  
-  export function useFetchCoolingAndHeatingOptions() {
-    return useQuery({
-      queryKey: ["get-cooling-and-heating-options"],
-      queryFn: getCoolingAndHeatingOptions,
-      retry: false,
-    });
-  }
+
+
   
   export function useFetchSanitaryOptions() {
     return useQuery({
