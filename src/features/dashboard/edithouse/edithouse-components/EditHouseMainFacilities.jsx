@@ -64,7 +64,7 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
         {facilitiesData.map((facility) => (
           <div 
             key={facility.key} 
-            className="p-4 border rounded-xl flex flex-col shadow-centered"
+            className="p-4  rounded-xl flex flex-col shadow-centered bg-white"
           >
             <ToggleSwitch
               checked={selectedFacilities[facility.key]?.checked || false}
@@ -75,7 +75,7 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
 
             {/* Show fields only if the facility is checked */}
             {selectedFacilities[facility.key]?.checked && (
-              <div className="mt-4 bg-gray-50 p-2 rounded-xl">
+              <div className="mt-4 bg-white p-2 rounded-xl">
                 {facility.fields?.map((field, index) => (
                   <div key={index} className="mb-4">
                     {field.type === 'toggle' ? (

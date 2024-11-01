@@ -3,6 +3,7 @@ import { Disclosure } from '@headlessui/react';
 import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
 import TextArea from '../../../../ui/TextArea';
+import ToggleSwitch from '../../../../ui/ToggleSwitch';
 import ToggleSwitchGroup from '../../../../ui/ToggleSwitchGroup';
 import { useFetchRoomFacilities, useFetchCoolingAndHeatingOptions } from '../../../../services/fetchDataService';
 
@@ -84,29 +85,30 @@ const EditHouseRooms = () => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <div className="text-center font-bold text-xl my-4">اطلاعات اتاق</div>
 
+<div className='w-full  px-4 flex justify-end'>
       <button
         onClick={() => addRoom(false)}
-        className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mb-4 max-w-36"
+        className="bg-primary-600 cursor-pointer text-white px-4 py-2  rounded-xl shadow-xl max-w-36"
       >
         اضافه کردن اتاق
       </button>
 
       <button
         onClick={() => addRoom(true)}
-        className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mb-4 max-w-52 mr-2"
+        className="bg-primary-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl max-w-52 mr-2"
       >
         اضافه کردن اتاق پذیرایی
       </button>
-
+      </div>
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
         {rooms.map((room, index) => (
           <Disclosure key={index}>
             {({ open }) => (
               <>
-                <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-gray-200 rounded-lg px-4 mb-2">
+                <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4 mb-2">
                   <span>{room.roomName || `اتاق ${index + 1}`}</span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
@@ -119,7 +121,7 @@ const EditHouseRooms = () => {
                   </svg>
                 </Disclosure.Button>
 
-                <Disclosure.Panel className="p-4 border rounded-lg mb-4">
+                <Disclosure.Panel className="p-4  rounded-xl mb-4 bg-white shadow-centered shadow-sm">
                   <TextField
                     label="نام اتاق"
                     name="roomName"
@@ -128,34 +130,13 @@ const EditHouseRooms = () => {
                     placeholder="نام اتاق"
                   />
 
-                  {/* Master Room Toggle */}
-                  <div className="mt-4 flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={room.isMasterRoom}
-                      onChange={() => toggleMasterRoom(index)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ${
-                        room.isMasterRoom ? 'bg-primary-800' : 'bg-gray-200'
-                      }`}
-                    >
-                      {room.isMasterRoom && (
-                        <svg
-                          className="w-4 h-4 text-white absolute inset-0 m-auto"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="ml-3 text-sm font-medium text-gray-700">اتاق مستر می باشد</span>
+                  <div className='mx-1 my-2 mt-3'>
+                  <ToggleSwitch
+                    checked={room.isMasterRoom}
+                    onChange={() => toggleMasterRoom(index)}
+                    label="اتاق مستر می باشد"
+                  />
                   </div>
-
                   <TextField
                     label="تعداد تخت‌های یک نفره"
                     name="numberSingleBeds"
@@ -166,19 +147,18 @@ const EditHouseRooms = () => {
 
                   {/* Facilities ToggleSwitchGroup */}
                   <ToggleSwitchGroup
-  label="امکانات"
-  options={facilitiesOptions}
-  selectedOptions={room.selectedFacilities}
-  onChange={(key) => toggleSelection(index, 'facility', key)}
-/>
+                    label="امکانات"
+                    options={facilitiesOptions}
+                    selectedOptions={room.selectedFacilities}
+                    onChange={(key) => toggleSelection(index, 'facility', key)}
+                  />
 
-<ToggleSwitchGroup
-  label="امکانات سرمایشی و گرمایشی"
-  options={airConditionOptions}
-  selectedOptions={room.selectedAirConditions}
-  onChange={(key) => toggleSelection(index, 'airCondition', key)}
-/>
-
+                  <ToggleSwitchGroup
+                    label="امکانات سرمایشی و گرمایشی"
+                    options={airConditionOptions}
+                    selectedOptions={room.selectedAirConditions}
+                    onChange={(key) => toggleSelection(index, 'airCondition', key)}
+                  />
 
                   <TextArea
                     label="توضیحات"

@@ -48,6 +48,7 @@ const Profile = () => {
   const sexLabel = user?.sex?.label || 'جنسیت نامشخص';
   const birthDate = formatPersianDate(user?.birth_date);
   const isVendor = user?.type === 'Vendor';
+  const isAdmin = user?.type === 'Admin';
 
   return (
     <div className="w-full rounded-xl p-5">
@@ -68,7 +69,7 @@ const Profile = () => {
       {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
 
       {/* Show Become Vendor Button or Loading Spinner */}
-      {!isVendor && (
+      {!isVendor && !isAdmin && (
         <button 
           onClick={handleBecomeVendorClick}
           className="btn bg-primary-600 max-w-36 mt-6 text-sm flex items-center justify-center"

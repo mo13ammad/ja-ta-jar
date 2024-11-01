@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch } from '@headlessui/react';
 
 const ToggleSwitch = ({ checked, onChange, label, icon }) => (
-  <Switch.Group as="div" className="flex items-center space-x-2 cursor-pointer ml-3">
+  <Switch.Group as="div" className="flex items-center space-x-2  cursor-pointer ml-3">
     <label className="flex items-center space-x-2 cursor-pointer">
       <Switch
         checked={checked}
