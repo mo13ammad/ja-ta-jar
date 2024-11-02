@@ -58,13 +58,13 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
   }
 
   return (
-    <div className="p-4">
-      <div className="text-center font-bold text-xl my-4">امکانات اصلی</div>
+    <div className="px-2 py-1">
+      <div className="text-right font-bold lg:text-lg mb-2">امکانات اصلی</div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 auto-rows-auto">
         {facilitiesData.map((facility) => (
           <div 
             key={facility.key} 
-            className="p-4  rounded-xl flex flex-col shadow-centered bg-white"
+            className="p-2 md:p-4   rounded-xl flex flex-col shadow-centered bg-white"
           >
             <ToggleSwitch
               checked={selectedFacilities[facility.key]?.checked || false}
@@ -75,9 +75,9 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
 
             {/* Show fields only if the facility is checked */}
             {selectedFacilities[facility.key]?.checked && (
-              <div className="mt-4 bg-white p-2 rounded-xl">
+              <div className="mt-4 bg-white p-2 rounded-xl ">
                 {facility.fields?.map((field, index) => (
-                  <div key={index} className="mb-4">
+                  <div key={index} className="mb-4 ">
                     {field.type === 'toggle' ? (
                       <ToggleSwitch
                         checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
@@ -119,7 +119,7 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
       </div>
       <div className="mt-4 w-full lg:col-span-2 flex justify-end">
         <button
-          className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+          className="btn bg-primary-600 text-white px-4 py-2 shadow-centered hover:bg-primary-600 transition-colors duration-200"
           onClick={handleSubmit}
         >
           ثبت اطلاعات

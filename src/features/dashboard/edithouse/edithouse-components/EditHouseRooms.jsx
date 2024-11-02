@@ -86,19 +86,19 @@ const EditHouseRooms = () => {
 
   return (
     <div className="relative ">
-      <div className="text-center font-bold text-xl my-4">اطلاعات اتاق</div>
+           <div className="text-right font-bold lg:text-lg mb-2 px-4">اطلاعات اتاق ها :</div>
 
 <div className='w-full  px-4 flex justify-end'>
       <button
         onClick={() => addRoom(false)}
-        className="bg-primary-600 cursor-pointer text-white px-4 py-2  rounded-xl shadow-xl max-w-36"
+        className="bg-primary-600 text-xs md:text-sm  cursor-pointer text-white px-4 py-2  rounded-2xl shadow-centered "
       >
         اضافه کردن اتاق
       </button>
 
       <button
         onClick={() => addRoom(true)}
-        className="bg-primary-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl max-w-52 mr-2"
+        className="bg-primary-600 text-xs md:text-sm  cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered  mr-2"
       >
         اضافه کردن اتاق پذیرایی
       </button>

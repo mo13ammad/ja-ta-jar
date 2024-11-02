@@ -95,7 +95,7 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
 
   const renderInputSection = (roomUuid, title, keys) => (
     <div className="">
-      <h2 className="text-lg my-2 mt-4">{title}</h2>
+      <h2 className="my-2 mt-4">{`${title} :`}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys
           .filter(({ key }) => (priceHandleBy === "PerPerson" ? !key.includes("extra_people") : true))
@@ -125,7 +125,7 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
     <div className="relative p-2">
       <Toaster />
       <div className="overflow-auto scrollbar-thin  pt-2 px-2 lg:px-4 w-full ">
-        <h1 className="text-2xl font-bold mb-4">قیمت‌گذاری</h1>
+      <div className="text-right font-bold lg:text-lg ">قوانین اقامت :</div>
 
 
         {houseData.is_rent_room ? (
@@ -135,15 +135,7 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
                 <>
                   <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-gray-200 rounded-lg px-4 mb-2">
                     <span>{room.name || `اتاق ${index + 1}`}</span>
-                    <svg
-                      className={`w-5 h-5 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                 
                   </Disclosure.Button>
 
                   <Disclosure.Panel className="p-4 border rounded-lg mb-4">

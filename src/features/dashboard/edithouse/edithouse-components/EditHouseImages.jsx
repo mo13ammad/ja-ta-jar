@@ -88,7 +88,7 @@ const EditHouseImages = ({ houseUuid, token, initialImages }) => {
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-xl">مدیریت تصاویر</h2>
         <button
-          className="btn bg-primary-600 px-4 py-2 text-white"
+          className="btn bg-primary-600 px-2 py-1 lg:py-1.5 lg:px-3 text-sm text-white"
           onClick={() => setIsOpen(true)}
         >
           اضافه کردن تصویر

@@ -3,7 +3,7 @@ import React from 'react';
 function TextField({ label, name, value, onChange, placeholder, readOnly }) {
   return (
     <div>
-      <label htmlFor={name} className="text-xs md:text-sm xl:text-lg mb-3 font-medium">
+      <label htmlFor={name} className="text-xs md:text-sm  mb-3 font-medium">
         {label}
       </label>
       <input

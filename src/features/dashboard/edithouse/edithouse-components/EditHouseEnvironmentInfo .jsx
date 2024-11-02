@@ -62,11 +62,13 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
   return (
     <div className="relative ">
       <div className="overflow-auto scrollbar-thin px-3 lg:px-4 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="text-right font-bold lg:text-lg">اطلاعات محیطی :</div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
 
           {/* Environment Texture */}
           <div className="mt-4 lg:col-span-2">
-            <label className="block text-lg font-medium text-gray-700 mb-2">بافت محیط</label>
+            
+            <label className="block  mb-2">بافت محیط :</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {textureOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
@@ -84,7 +86,7 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                    <span className="ml-3 text-sm  ">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}
@@ -93,7 +95,7 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
 
           {/* View Options */}
           <div className="mt-4 lg:col-span-2">
-            <label className="block text-lg font-medium text-gray-700 mb-2">منظره اقامتگاه</label>
+            <label className="block  mb-2">منظره اقامتگاه :</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {viewOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
@@ -111,7 +113,7 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                    <span className="ml-3 text-sm font-medium ">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}
@@ -145,7 +147,7 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
 
           {/* Access Routes */}
           <div className="mt-4 lg:col-span-2">
-            <label className="block text-lg font-medium text-gray-700 mb-2">مسیر دسترسی</label>
+            <label className="block text-lg font-medium  mb-2">مسیر دسترسی</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {routeOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
@@ -163,7 +165,7 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm font-medium text-gray-700">{option.label}</span>
+                    <span className="ml-3 text-sm font-medium ">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}

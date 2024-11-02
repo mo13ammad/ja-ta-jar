@@ -27,14 +27,15 @@ const EditHouseSanitaries = ({ token, data }) => {
   };
 
   return (
-    <div className="relative flex flex-col h-full p-4">
+    <div className="relative flex flex-col h-full p-2 " >
       {isLoading ? (
         <div className="flex justify-center items-center min-h-[60vh]">
           <Loading />
         </div>
       ) : (
         <>
-          <form className="flex-1 overflow-y-auto scrollbar-thin max-h-full">
+          <form className="flex-1 overflow-y-auto scrollbar-thin max-h-full ">
+            <h4 className='text-right font-bold lg:text-lg mb-2 px-1'>امکانات بهداشتی :</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {sanitaryOptions.map((option) => (
                 <div key={option.key} className="flex items-center space-x-2">
@@ -72,7 +73,7 @@ const EditHouseSanitaries = ({ token, data }) => {
           <div className="mt-4 flex justify-end">
             <button
               onClick={handleSubmit}
-              className="bg-primary-800 text-white px-4 py-2 rounded-xl shadow-lg transition-colors ease-in-out duration-200 hover:bg-primary-700 disabled:bg-gray-400"
+                  className="btn bg-primary-600 text-white px-4 py-2 shadow-centered hover:bg-primary-600 transition-colors duration-200"
               disabled={isLoading}
             >
               ثبت اطلاعات

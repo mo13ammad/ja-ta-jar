@@ -37,16 +37,14 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
 
   if (loadingHouse || loadingRules) {
     return (
-      <div className="flex justify-center items-center min-h-[70vh]:"><Spinner /></div>
+      <div className="flex justify-center items-center min-h-[60vh]:"><Spinner /></div>
     );
   }
 
   return (
     <div className="relative">
       <div className="overflow-auto scrollbar-thin  pt-2 px-2 lg:px-4 w-full ">
-        <div className="text-center font-bold text-xl my-4">
-          قوانین اقامتگاه
-        </div>
+      <div className="text-right font-bold lg:text-lg ">قوانین اقامت :</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {rulesData.map((rule) => (
