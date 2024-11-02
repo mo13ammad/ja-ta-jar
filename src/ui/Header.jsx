@@ -79,7 +79,7 @@ function Header() {
               <p>{data.name}</p>
 
               <div
-                className={`absolute top-full mt-3 w-40 -left-4 rounded-lg shadow-lg transition-all bg-white ring-1 ring-black ring-opacity-5 duration-500 ease-in-out ${
+                className={`absolute top-full z-50 mt-3 w-44 -left-4 rounded-lg shadow-lg transition-all bg-white ring-1 ring-black ring-opacity-5 duration-500 ease-in-out ${
                   isDropdownVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
                 }`}
               >
@@ -109,7 +109,7 @@ function Header() {
                             onClick={handleLogout}
                             className={`${
                               active ? 'bg-red-100' : ''
-                            } w-full px-4 py-2 text-xs flex items-center justify-start text-gray-700`}
+                            } w-full px-4 py-2 text-sm flex items-center justify-start text-gray-700`}
                             disabled={isLoggingOut}
                           >
                             <ArrowLeftOnRectangleIcon className="w-4 h-4 text-gray-700 ml-1" />
@@ -148,7 +148,7 @@ function Header() {
           </button>
           
           {showMobileMenu && (
-            <div className="absolute top-full left-0 w-full rounded-b-md shadow-lg transition-all bg-white ring-1 ring-black ring-opacity-5 duration-500 ease-in-out">
+            <div className="absolute top-full z-50 left-0 w-full rounded-b-md shadow-lg transition-all bg-white ring-1 ring-black ring-opacity-5 duration-500 ease-in-out">
               <button
                 onClick={handleUserPanelClick}
                 className="w-full px-4 py-2 flex items-center justify-start text-gray-700 hover:bg-gray-100"
