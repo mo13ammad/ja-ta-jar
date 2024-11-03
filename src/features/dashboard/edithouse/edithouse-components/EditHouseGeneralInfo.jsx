@@ -11,8 +11,7 @@ import { useFetchHouseFloors, useFetchPrivacyOptions } from '../../../../service
 import useEditHouse from '../useEditHouse';
 
 const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
-  console.log("House Data:", houseData);
-  console.log("EditHouseGeneralInfo received houseId:", houseId); // Debugging
+
 
   const [formData, setFormData] = useState({
     name: houseData?.name || '',
