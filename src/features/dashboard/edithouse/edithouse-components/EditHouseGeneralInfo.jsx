@@ -11,8 +11,6 @@ import { useFetchHouseFloors, useFetchPrivacyOptions } from '../../../../service
 import useEditHouse from '../useEditHouse';
 
 const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
-
-
   const [formData, setFormData] = useState({
     name: houseData?.name || '',
     land_size: houseData?.structure?.land_size || '',
@@ -54,7 +52,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
       });
     }
   }, [houseData]);
-
+ console.log(houseData);
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -64,8 +62,6 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting with data:", formData);
-    console.log("House ID:", houseId); // Debugging
     if (!houseId) {
       console.error("Error: houseId is undefined.");
       toast.error("شناسه اقامتگاه موجود نیست. امکان ارسال داده وجود ندارد.");
@@ -80,7 +76,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
   };
 
   if (loadingUser || loadingHouseFloors || loadingPrivacyOptions) {
-    return <Spinner />;
+    return <div className="flex justify-center items-center min-h-[50vh]"><Spinner /></div>;
   }
 
   return (
@@ -143,8 +139,9 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
               label: option.label,
             }))]}
           />
+          
           {/* Conditionally render the Rent Type section */}
-          {houseData.is_rent_room && (
+          {houseData?.structure?.can_rent_room && (
             <div className="mt-4 lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
               <div className="flex space-x-4">
@@ -159,6 +156,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
               </div>
             </div>
           )}
+
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
             <div className="flex space-x-4">

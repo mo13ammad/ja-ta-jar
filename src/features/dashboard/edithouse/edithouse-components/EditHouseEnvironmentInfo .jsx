@@ -3,6 +3,8 @@ import { Switch } from "@headlessui/react";
 import Spinner from "../../../../ui/Loading";
 import TextArea from "../../../../ui/TextArea";
 import FormSelect from "../../../../ui/FormSelect";
+import toast from "react-hot-toast";
+import useEditHouse from "../useEditHouse";
 import {
   useFetchTextures,
   useFetchHouseViews,
@@ -10,45 +12,67 @@ import {
   useFetchRoutes,
 } from "../../../../services/fetchDataService";
 
-const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
+const EditHouseEnvironmentDetails = ({ houseData, loadingHouse, houseId }) => {
   const { data: textureOptions = [], isLoading: loadingTextures } = useFetchTextures();
   const { data: viewOptions = [], isLoading: loadingViews } = useFetchHouseViews();
   const { data: neighbourOptions = [], isLoading: loadingNeighbours } = useFetchNeighbours();
   const { data: routeOptions = [], isLoading: loadingRoutes } = useFetchRoutes();
+  const { mutateAsync: editHouseAsync, isLoading: editLoading } = useEditHouse();
 
-  const [selectedTextures, setSelectedTextures] = useState([]);
-  const [selectedViews, setSelectedViews] = useState([]);
-  const [selectedNeighbour, setSelectedNeighbour] = useState("");
-  const [selectedRoutes, setSelectedRoutes] = useState([]);
-  const [accessMethod, setAccessMethod] = useState("");
-  const [viewDescription, setViewDescription] = useState("");
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [formData, setFormData] = useState({
+    selectedTextures: [],
+    selectedViews: [],
+    selectedNeighbour: "",
+    selectedRoutes: [],
+    accessMethod: "",
+    viewDescription: "",
+  });
 
+  // Initialize form data with houseData values
   useEffect(() => {
     if (houseData) {
-      setSelectedTextures(Array.isArray(houseData.textures) ? houseData.textures : []);
-      setSelectedViews(Array.isArray(houseData.views) ? houseData.views : []);
-      setSelectedNeighbour(houseData.neighbour || "");
-      setSelectedRoutes(Array.isArray(houseData.routes) ? houseData.routes : []);
-      setAccessMethod(houseData.accessMethod || "");
-      setViewDescription(houseData.viewDescription || "");
+      console.log("Received houseData:", houseData);
+      setFormData({
+        selectedTextures: houseData?.areas?.map((area) => area.key) || [],
+        selectedViews: houseData?.views?.types?.map((view) => view.key) || [],
+        selectedNeighbour: houseData?.neighbour?.key || "",
+        selectedRoutes: houseData?.arrivals?.types?.map((route) => route.key) || [],
+        accessMethod: houseData?.arrivals?.description || "",
+        viewDescription: houseData?.views?.description || "",
+      });
     }
   }, [houseData]);
 
-  const toggleOption = (setter, currentValue, key) => {
-    setter((prevSelected) =>
-      prevSelected.includes(key)
-        ? prevSelected.filter((item) => item !== key)
-        : [...prevSelected, key]
-    );
+  // Toggle function for checkboxes
+  const toggleOption = (key, field) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [field]: prevFormData[field].includes(key)
+        ? prevFormData[field].filter((item) => item !== key)
+        : [...prevFormData[field], key],
+    }));
   };
 
-  const handleSubmit = () => {
-    setLoadingSubmit(true);
-    setTimeout(() => {
-      setLoadingSubmit(false);
-      alert("Submitted successfully");
-    }, 1500);
+  // Handle form submission
+  const handleSubmit = async () => {
+    const requestData = {
+      areas: formData.selectedTextures,
+      views: formData.selectedViews,
+      neighbour: formData.selectedNeighbour,
+      arrivals: formData.selectedRoutes,
+      arrival_description: formData.accessMethod,
+      view_description: formData.viewDescription,
+    };
+
+    console.log("Sending request data:", requestData);
+
+    try {
+      await editHouseAsync({ houseId, houseData: requestData });
+      toast.success("اطلاعات با موفقیت ثبت شد");
+    } catch (error) {
+      console.error("Submission Error:", error);
+      toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
+    }
   };
 
   if (loadingHouse || loadingTextures || loadingViews || loadingNeighbours || loadingRoutes) {
@@ -60,33 +84,31 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
   }
 
   return (
-    <div className="relative ">
+    <div className="relative">
       <div className="overflow-auto scrollbar-thin px-3 lg:px-4 w-full">
-      <div className="text-right font-bold lg:text-lg">اطلاعات محیطی :</div>
+        <div className="text-right font-bold lg:text-lg">اطلاعات محیطی :</div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
-
           {/* Environment Texture */}
           <div className="mt-4 lg:col-span-2">
-            
-            <label className="block  mb-2">بافت محیط :</label>
+            <label className="block mb-2">بافت محیط :</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {textureOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <Switch
-                      checked={selectedTextures.includes(option.key)}
-                      onChange={() => toggleOption(setSelectedTextures, selectedTextures, option.key)}
+                      checked={formData.selectedTextures.includes(option.key)}
+                      onChange={() => toggleOption(option.key, "selectedTextures")}
                       className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                        selectedTextures.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
+                        formData.selectedTextures.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
                       }`}
                     >
-                      {selectedTextures.includes(option.key) && (
+                      {formData.selectedTextures.includes(option.key) && (
                         <svg className="w-4 h-4 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm  ">{option.label}</span>
+                    <span className="ml-3 text-sm">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}
@@ -95,25 +117,25 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
 
           {/* View Options */}
           <div className="mt-4 lg:col-span-2">
-            <label className="block  mb-2">منظره اقامتگاه :</label>
+            <label className="block mb-2">منظره اقامتگاه :</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {viewOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <Switch
-                      checked={selectedViews.includes(option.key)}
-                      onChange={() => toggleOption(setSelectedViews, selectedViews, option.key)}
+                      checked={formData.selectedViews.includes(option.key)}
+                      onChange={() => toggleOption(option.key, "selectedViews")}
                       className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                        selectedViews.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
+                        formData.selectedViews.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
                       }`}
                     >
-                      {selectedViews.includes(option.key) && (
+                      {formData.selectedViews.includes(option.key) && (
                         <svg className="w-4 h-4 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm font-medium ">{option.label}</span>
+                    <span className="ml-3 text-sm font-medium">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}
@@ -125,8 +147,8 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
             <TextArea
               label="توضیحات منظره اقامتگاه"
               name="viewDescription"
-              value={viewDescription}
-              onChange={(e) => setViewDescription(e.target.value)}
+              value={formData.viewDescription}
+              onChange={(e) => setFormData({ ...formData, viewDescription: e.target.value })}
               placeholder="توضیحات منظره اقامتگاه"
             />
           </div>
@@ -136,8 +158,8 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
             <FormSelect
               label="نوع همسایگی"
               name="neighbour"
-              value={selectedNeighbour}
-              onChange={(e) => setSelectedNeighbour(e.target.value)}
+              value={formData.selectedNeighbour}
+              onChange={(e) => setFormData({ ...formData, selectedNeighbour: e.target.value })}
               options={[
                 { value: "", label: "انتخاب نوع همسایگی" },
                 ...neighbourOptions.map((option) => ({ value: option.key, label: option.label })),
@@ -147,25 +169,25 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
 
           {/* Access Routes */}
           <div className="mt-4 lg:col-span-2">
-            <label className="block text-lg font-medium  mb-2">مسیر دسترسی</label>
+            <label className="block text-lg font-medium mb-2">مسیر دسترسی</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {routeOptions.map((option) => (
                 <Switch.Group key={option.key} as="div" className="flex items-center space-x-2">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <Switch
-                      checked={selectedRoutes.includes(option.key)}
-                      onChange={() => toggleOption(setSelectedRoutes, selectedRoutes, option.key)}
+                      checked={formData.selectedRoutes.includes(option.key)}
+                      onChange={() => toggleOption(option.key, "selectedRoutes")}
                       className={`relative inline-flex items-center h-6 w-6 rounded-full transition-colors ease-in-out duration-200 ml-1 ${
-                        selectedRoutes.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
+                        formData.selectedRoutes.includes(option.key) ? 'bg-primary-600' : 'bg-gray-200'
                       }`}
                     >
-                      {selectedRoutes.includes(option.key) && (
+                      {formData.selectedRoutes.includes(option.key) && (
                         <svg className="w-4 h-4 text-white absolute inset-0 m-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </Switch>
-                    <span className="ml-3 text-sm font-medium ">{option.label}</span>
+                    <span className="ml-3 text-sm font-medium">{option.label}</span>
                   </label>
                 </Switch.Group>
               ))}
@@ -177,8 +199,8 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
             <TextArea
               label="توضیحات شیوه دسترسی به اقامتگاه"
               name="accessMethod"
-              value={accessMethod}
-              onChange={(e) => setAccessMethod(e.target.value)}
+              value={formData.accessMethod}
+              onChange={(e) => setFormData({ ...formData, accessMethod: e.target.value })}
               placeholder="توضیحات شیوه دسترسی به اقامتگاه"
             />
           </div>
@@ -187,13 +209,14 @@ const EditHouseEnvironmentDetails = ({ houseData, loadingHouse }) => {
 
       {/* Submit Button */}
       <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-          <button
-            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={()=>{}}
-          >
-            ثبت اطلاعات
-          </button>
-        </div>
+        <button
+          onClick={handleSubmit}
+          className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+          disabled={editLoading}
+        >
+          {editLoading ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
+        </button>
+      </div>
     </div>
   );
 };

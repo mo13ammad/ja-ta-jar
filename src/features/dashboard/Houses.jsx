@@ -182,7 +182,7 @@ const Houses = () => {
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel className="max-w-lg space-y-4 border bg-white p-6 rounded-3xl w-full">
-            <DialogTitle className="font-bold text-xl">ایا از حذف کردن این اقامت گاه مطمعن هستید ؟</DialogTitle>
+            <DialogTitle className="font-bold text-xl">ایا از حذف کردن این اقامتگاه مطمعن هستید ؟</DialogTitle>
             <div className="flex gap-4 mt-4">
               <button
                 className="btn bg-gray-300 text-gray-800"
