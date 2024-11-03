@@ -1,22 +1,19 @@
+// src/ui/FormSelect.jsx
+
 import React, { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid'; // Importing Chevron icon from Heroicons
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
-function FormSelect({ label, name, value, onChange, options }) {
+
+function FormSelect({ label, name, value, onChange, options, disabled, placeholder, errorMessages }) {
   return (
     <div className="w-full">
       <label className="block font-medium text-gray-700 mb-2">{label}</label>
-      <Listbox
-        value={value}
-        onChange={(val) => onChange({ target: { name, value: val.value } })} // Use `value` as the selected item
-      >
+      <Listbox value={value} onChange={onChange} disabled={disabled}>
         {({ open }) => (
           <div className="relative bg-white rounded-xl">
-            <Listbox.Button className="listbox__button">
-              <span>
-                {options.find((option) => option.value === value)?.label || 'انتخاب کنید'}
-              </span>
-              {/* Chevron Icon with rotation based on open state */}
+            <Listbox.Button className={`listbox__button ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              <span>{value?.label || placeholder || 'انتخاب کنید'}</span>
               <ChevronDownIcon
                 className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
                   open ? 'rotate-180' : 'rotate-0'
@@ -25,7 +22,6 @@ function FormSelect({ label, name, value, onChange, options }) {
               />
             </Listbox.Button>
 
-            {/* Transition for the options */}
             <Transition
               as={Fragment}
               leave="transition ease-in duration-100"
@@ -45,7 +41,6 @@ function FormSelect({ label, name, value, onChange, options }) {
                       }`
                     }
                   >
-                    {/* Render the option label */}
                     <span className="block truncate font-normal">{option.label}</span>
                   </Listbox.Option>
                 ))}
@@ -54,6 +49,13 @@ function FormSelect({ label, name, value, onChange, options }) {
           </div>
         )}
       </Listbox>
+      {errorMessages && errorMessages.length > 0 && (
+        <div className="text-red-500 mt-1">
+          {errorMessages.map((msg, idx) => (
+            <p key={idx}>{msg}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

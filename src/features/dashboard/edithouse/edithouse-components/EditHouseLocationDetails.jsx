@@ -1,181 +1,217 @@
-import React, { useState, useEffect, useRef } from "react";
-import { toast } from "react-hot-toast";
-import Loading from "../../../../ui/Loading";
-import TextField from "../../../../ui/TextField";
-import FormSelect from "../../../../ui/FormSelect";
-import useFetchProvinces from "../../useFetchProvinces";
-import useFetchCities from "../../useFetchCities";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-hot-toast';
+import Loading from '../../../../ui/Loading';
+import TextField from '../../../../ui/TextField';
+import FormSelect from '../../../../ui/FormSelect';
+import useFetchProvinces from '../../useFetchProvinces';
+import useFetchCities from '../../useFetchCities';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-const DEFAULT_LAT = 35.6892; // Tehran latitude
-const DEFAULT_LNG = 51.389; // Tehran longitude
+import customMarkerImage from '../../../../../public/assets/location.png';
 
-const EditHouseLocationDetails = ({ houseData, loadingHouse }) => {
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: customMarkerImage,
+  iconUrl: customMarkerImage,
+  shadowUrl: null,
+});
+
+const customMarkerIcon = new L.Icon({
+  iconUrl: customMarkerImage,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
+const DEFAULT_LAT = 35.6892;
+const DEFAULT_LNG = 51.389;
+
+const EditHouseLocationDetails = ({
+  houseData,
+  loadingHouse,
+  isFetching,
+  handleEditHouse,
+  editLoading,
+  editError,
+}) => {
   const { data: provinces = [], isLoading: loadingProvinces } = useFetchProvinces();
-  
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
+
+  const [selectedProvince, setSelectedProvince] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
   const [longitude, setLongitude] = useState(DEFAULT_LNG);
-  const [shouldSetView, setShouldSetView] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [initialized, setInitialized] = useState(false);
 
-  const { data: cityData, isLoading: loadingCities } = useFetchCities(selectedProvince);
+  const { data: cityData, isLoading: loadingCities } = useFetchCities(selectedProvince || undefined);
   const cities = cityData?.cities || [];
 
+  const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const mapInitialized = useRef(false);
 
-  // Initialize location data based on houseData when it loads
   useEffect(() => {
-    if (houseData && houseData.address) {
+    if (!initialized && houseData && houseData.address) {
       const lat = houseData.address.geography?.latitude || DEFAULT_LAT;
       const lng = houseData.address.geography?.longitude || DEFAULT_LNG;
       setLatitude(lat);
       setLongitude(lng);
-
+      
       if (houseData.address.city) {
         setSelectedCity(houseData.address.city.id);
-        setSelectedProvince(houseData.address.city.province.id);
-      } else if (houseData.address.city?.province) {
-        setSelectedProvince(houseData.address.city.province.id);
+        setSelectedProvince(houseData.address.city.province_id || houseData.address.city.province?.id);
       }
+      setInitialized(true);
     }
-  }, [houseData]);
+  }, [houseData, initialized]);
 
-  // Initialize the map once when data is loaded
   useEffect(() => {
-    if (!loadingHouse && !loadingProvinces && !mapInitialized.current && document.getElementById("map-container")) {
+    if (!loadingHouse && !loadingProvinces && mapContainerRef.current && !mapInitialized.current) {
       mapInitialized.current = true;
 
-      mapRef.current = L.map("map-container").setView([latitude, longitude], 11);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
+      mapRef.current = L.map(mapContainerRef.current).setView([latitude, longitude], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
       }).addTo(mapRef.current);
 
-      markerRef.current = L.marker([latitude, longitude], { draggable: true }).addTo(mapRef.current);
+      markerRef.current = L.marker([latitude, longitude], {
+        draggable: true,
+        icon: customMarkerIcon,
+      }).addTo(mapRef.current);
 
-      // Handle marker drag to set new lat/lng without changing map view
-      markerRef.current.on("dragend", (e) => {
+      markerRef.current.on('dragend', (e) => {
         const coords = e.target.getLatLng();
         setLatitude(coords.lat);
         setLongitude(coords.lng);
-        setShouldSetView(false); // No view update for user-dragged marker
-        toast.success("موقعیت جدید انتخاب شد");
+        toast.success('موقعیت جدید انتخاب شد');
       });
 
-      mapRef.current.on("click", (e) => {
+      mapRef.current.on('click', (e) => {
         const { lat, lng } = e.latlng;
         setLatitude(lat);
         setLongitude(lng);
         markerRef.current.setLatLng([lat, lng]);
-        setShouldSetView(false); // No view update for user-clicked map
-        toast.success("موقعیت جدید انتخاب شد");
+        toast.success('موقعیت جدید انتخاب شد');
       });
     }
-  }, [loadingHouse, loadingProvinces, latitude, longitude]);
+  }, [loadingHouse, loadingProvinces]);
 
-  // Conditionally update map view based on shouldSetView
   useEffect(() => {
-    if (mapInitialized.current && shouldSetView) {
-      mapRef.current.setView([latitude, longitude], 11);
-      setShouldSetView(false); // Reset after setting the view
-    }
-    if (mapInitialized.current && markerRef.current) {
+    if (mapRef.current && markerRef.current) {
       markerRef.current.setLatLng([latitude, longitude]);
+      mapRef.current.setView([latitude, longitude], 11);
     }
-  }, [latitude, longitude, shouldSetView]);
+  }, [latitude, longitude]);
 
-  // Update latitude and longitude when the selected province changes
-  useEffect(() => {
-    if (selectedProvince) {
-      const selectedProvinceData = provinces.find((province) => province.id === selectedProvince);
-      if (selectedProvinceData) {
-        setLatitude(selectedProvinceData.latitude);
-        setLongitude(selectedProvinceData.longitude);
-        setShouldSetView(true); // Set view when province changes
-      }
-      setSelectedCity(""); // Reset city when province changes
-    }
-  }, [selectedProvince, provinces]);
+  const handleProvinceChange = (option) => {
+    setSelectedProvince(option.value);
+    setSelectedCity(null);
 
-  // Update latitude and longitude when the selected city changes
-  useEffect(() => {
-    if (selectedCity && cities.length > 0) {
-      const city = cities.find((city) => city.id === selectedCity);
-      if (city) {
-        setLatitude(city.latitude);
-        setLongitude(city.longitude);
-        setShouldSetView(true); // Set view when city changes
+    const province = provinces.find((p) => p.id === option.value);
+    if (province) {
+      setLatitude(province.latitude);
+      setLongitude(province.longitude);
+
+      if (markerRef.current && mapRef.current) {
+        markerRef.current.setLatLng([province.latitude, province.longitude]);
+        mapRef.current.setView([province.latitude, province.longitude], 11);
       }
     }
-  }, [selectedCity, cities]);
-
-  const handleProvinceChange = (e) => {
-    setSelectedProvince(e.target.value);
   };
 
-  const handleSaveChanges = () => {
-    toast.success("تغییرات ذخیره شدند (بدون ارسال)");
+  const handleCityChange = (option) => {
+    setSelectedCity(option.value);
+
+    const city = cities.find((c) => c.id === option.value);
+    if (city) {
+      setLatitude(city.latitude);
+      setLongitude(city.longitude);
+
+      if (markerRef.current && mapRef.current) {
+        markerRef.current.setLatLng([city.latitude, city.longitude]);
+        mapRef.current.setView([city.latitude, city.longitude], 11);
+      }
+    }
   };
 
-  if (loadingHouse || loadingProvinces) return <div className='min-h-[60vh] flex justify-center items-center'><Loading /></div>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors({});
+
+    if (!selectedCity) {
+      setErrors((prev) => ({ ...prev, city_id: ['لطفاً یک شهر را انتخاب کنید.'] }));
+      toast.error('لطفاً یک شهر را انتخاب کنید.');
+      return;
+    }
+
+    const dataToSend = { city_id: selectedCity, latitude, longitude };
+    try {
+      await handleEditHouse(dataToSend);
+      toast.success('موقعیت مکانی با موفقیت به‌روزرسانی شد');
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      if (error.response?.data?.errors?.fields) {
+        setErrors(error.response.data.errors.fields);
+      }
+      toast.error('خطایی رخ داده است.');
+    }
+  };
+
+  const isLoading = loadingHouse || isFetching || loadingProvinces;
+
+  if (isLoading) return <div className="min-h-[60vh] flex justify-center items-center"><Loading /></div>;
+
+  const provinceOptions = provinces.map((p) => ({ value: p.id, label: p.name }));
+  const cityOptions = cities.map((c) => ({ value: c.id, label: c.name }));
+
+  const selectedProvinceOption = provinceOptions.find((opt) => opt.value === selectedProvince);
+  const selectedCityOption = cityOptions.find((opt) => opt.value === selectedCity);
 
   return (
     <div className="relative p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Province Selection */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <FormSelect
           label="استان"
           name="province"
-          value={selectedProvince}
+          value={selectedProvinceOption || null}
           onChange={handleProvinceChange}
-          options={[
-            { value: "", label: "انتخاب استان" },
-            ...provinces.map((province) => ({ value: province.id, label: province.name })),
-          ]}
+          options={provinceOptions}
+          placeholder="انتخاب استان"
         />
-
-        {/* City Selection */}
         <FormSelect
           label="شهر"
           name="city"
-          value={selectedCity}
-          onChange={(e) => setSelectedCity(e.target.value)}
-          options={
-            !selectedProvince
-              ? [{ value: "", label: "لطفا ابتدا استان را انتخاب کنید" }]
-              : loadingCities
-              ? [{ value: "", label: "در حال بارگذاری..." }]
-              : [{ value: "", label: "انتخاب شهر" }, ...cities.map((city) => ({ value: city.id, label: city.name }))]
-          }
-          disabled={!selectedProvince}
+          value={selectedCityOption || null}
+          onChange={handleCityChange}
+          options={cityOptions}
+          disabled={!selectedProvince || loadingCities}
+          placeholder={loadingCities ? 'در حال بارگزاری...' : 'انتخاب شهر'}
+          errorMessages={errors.city_id}
         />
-
-        {/* Latitude and Longitude */}
         <div>
           <TextField label="عرض جغرافیایی" name="latitude" value={latitude} readOnly />
         </div>
         <div>
           <TextField label="طول جغرافیایی" name="longitude" value={longitude} readOnly />
         </div>
-
-        {/* Map Container */}
         <div className="mt-6 w-full shadow-centered lg:col-span-2 rounded-lg overflow-hidden border h-64">
-          <div id="map-container" style={{ height: "100%" }} />
+          <div id="map-container" ref={mapContainerRef} style={{ height: '400px' }} />
         </div>
-
-        {/* Save Button */}
+        {Object.keys(errors).length > 0 && (
+          <div className="text-red-500 col-span-2">خطایی در ثبت اطلاعات وجود دارد. لطفا موارد زیر را بررسی کنید.</div>
+        )}
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button
+            type="submit"
             className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={handleSaveChanges}
+            disabled={editLoading}
           >
-            ثبت موقعیت
+            {editLoading ? 'در حال ذخیره...' : 'ثبت موقعیت'}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

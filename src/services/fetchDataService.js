@@ -57,6 +57,7 @@ export function getProvinces(data) {
   export function getCoolingAndHeatingOptions() {
     return http.get('/assets/types/coolingAndHeating/detail').then(({ data }) => data.data);
   }
+  
   // Custom hooks for each fetch function
 
   export function useFetchRoomFacilities() {

@@ -23,8 +23,7 @@ const EditHouseContent = ({ selectedTab }) => {
   const {
     data: houseData,
     isLoading: loadingHouse,
-    // Removed isFetching as it's no longer needed
-    // isFetching,
+    isFetching, // Added isFetching
   } = useFetchHouse(uuid);
 
   // Use the useEditHouse hook
@@ -50,15 +49,16 @@ const EditHouseContent = ({ selectedTab }) => {
   // Destructure data once for easier access in child components
   const house = houseData?.data || {};
 
-  const renderContent = () => {
-    const commonProps = {
-      houseData: house,
-      loadingHouse,
-      editLoading,
-      editError,
-      handleEditHouse,
-    };
+  const commonProps = {
+    houseData: house,
+    loadingHouse,
+    isFetching, // Pass isFetching to child components
+    editLoading,
+    editError,
+    handleEditHouse,
+  };
 
+  const renderContent = () => {
     switch (selectedTab) {
       case 'address':
         return <AddressDetails {...commonProps} />;
@@ -92,7 +92,7 @@ const EditHouseContent = ({ selectedTab }) => {
   return (
     <div>
       {loadingHouse ? (
-        <div className='min-h-[60vh] flex justify-center items-center'>
+        <div className="min-h-[60vh] flex justify-center items-center">
           <Loading />
         </div>
       ) : (
