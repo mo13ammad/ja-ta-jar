@@ -12,47 +12,42 @@ import StayRules from './edithouse-components/EditHouseStayRules';
 import Pricing from './edithouse-components/EditHousePricing';
 import Images from './edithouse-components/EditHouseImages';
 import LocationDetails from './edithouse-components/EditHouseLocationDetails';
-import EnvironmentInfo from './edithouse-components/EditHouseEnvironmentInfo ';
-import useFetchHouse from '../useFetchHouse'; // Adjust the path based on your project structure
-import useEditHouse from './useEditHouse'; // Adjust the path based on your project structure
-import Loading from '../../../ui/Loading'; // Adjust the path based on your project structure
+import EnvironmentInfo from './edithouse-components//EditHouseEnvironmentInfo ';
+import useFetchHouse from '../useFetchHouse';
+import useEditHouse from './useEditHouse';
+import Loading from '../../../ui/Loading';
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams(); // Retrieve uuid from the URL parameters
+  console.log("UUID from useParams:", uuid); // Debugging
 
   const {
     data: houseData,
     isLoading: loadingHouse,
-    isFetching, // Added isFetching
+    isFetching,
   } = useFetchHouse(uuid);
 
-  // Use the useEditHouse hook
   const {
     mutateAsync: editHouseAsync,
     isLoading: editLoading,
     error: editError,
   } = useEditHouse();
 
-  // Function to handle the edit operation
   const handleEditHouse = async (updatedData) => {
     console.log('handleEditHouse - Data to be sent:', updatedData);
     try {
       const response = await editHouseAsync({ houseId: uuid, houseData: updatedData });
       console.log('handleEditHouse - Response received:', response);
-      // houseData will be automatically updated due to query invalidation in the useEditHouse hook
     } catch (error) {
       console.error('Edit House Error:', error);
-      throw error; // Re-throw the error to propagate it back to handleSubmit
     }
   };
 
-  // Destructure data once for easier access in child components
-  const house = houseData?.data || {};
-
   const commonProps = {
-    houseData: house,
+    houseData: houseData?.data || {},
+    houseId: uuid, // Pass uuid as houseId to all child components
     loadingHouse,
-    isFetching, // Pass isFetching to child components
+    isFetching,
     editLoading,
     editError,
     handleEditHouse,

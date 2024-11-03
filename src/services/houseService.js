@@ -17,18 +17,19 @@ export function getHouse(houseId) {
 }
 
 export function editHouse(houseId, houseData) {
-  console.log('editHouse - Request data:', houseData); // Log request data
+  if (!houseId || !houseData) {
+    console.error("Missing houseId or houseData:", { houseId, houseData });
+    throw new Error("House ID or data is missing.");
+  }
   return http
     .put(`/client/house/${houseId}`, houseData)
-    .then(({ data }) => {
-      console.log('editHouse - Response data:', data); // Log response data
-      return data;
-    })
+    .then(({ data }) => data)
     .catch((error) => {
-      console.error('editHouse - Error:', error); // Log any errors
+      console.error("editHouse - Error:", error);
       throw error;
     });
 }
+
 
 
 
