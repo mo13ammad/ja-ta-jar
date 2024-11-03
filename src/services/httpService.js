@@ -11,7 +11,6 @@ const setAuthTokenInCookie = (token, expiryDays = 30) => {
 
 const app = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true,
 });
 
 
