@@ -31,14 +31,13 @@ jobs:
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -p 9011 $SERVER_USER@$SERVER_IP << 'EOF'
             echo terminalok
             cd jatajar-front
-            echo gointofolder
+            echo "Entering folder"
             git stash
-            git config pull.rebase false
             echo stashok
-           # git fetch https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
-            git pull https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
-          #  git reset --hard origin/main
-            echo gitcheckok
+            git fetch https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
+            #git pull https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
+            git reset --hard origin/main
+            echo "Git reset to main branch"
             npm install build
             npm run build
             # دستورات اضافه برای سرور
