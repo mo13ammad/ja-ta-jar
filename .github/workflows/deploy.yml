@@ -35,9 +35,9 @@ jobs:
             git stash
             git config pull.rebase false
             echo stashok
-            git fetch https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
+           # git fetch https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
             git pull https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
-            git reset --hard origin/main
+          #  git reset --hard origin/main
             echo gitcheckok
             npm install build
             npm run build
@@ -45,17 +45,17 @@ jobs:
             # به عنوان مثال:
             # systemctl restart your_service
           EOF
-      - name: Send SMS Notification
-        env:
-          MOBILE: ${{ secrets.MOBILE }}
-          SMSIRAPI: ${{ secrets.SMSIRAPI }}
-          SMSIRLINENUMBER: ${{ secrets.SMSIRLINENUMBER }}
-          SMSIRUSERNAME: ${{ secrets.SMSIRUSERNAME }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}  # پیام کامیت
-        run: |
-          MESSAGE="برنچ اصلی فرانت جات آجار به عنوان کامیت '${COMMIT_MESSAGE}' آپدیت شد"
-          MESSAGE_ENCODED=$(echo "$MESSAGE" | jq -sRr @uri)  # URL encode
-          curl -X GET "https://api.sms.ir/v1/send?username=$SMSIRUSERNAME&password=$SMSIRAPI&line=$SMSIRLINENUMBER&mobile=$MOBILE&text=$MESSAGE_ENCODED"
+   #  - name: Send SMS Notification
+     #   env:
+     #     MOBILE: ${{ secrets.MOBILE }}
+      #    SMSIRAPI: ${{ secrets.SMSIRAPI }}
+        #  SMSIRLINENUMBER: ${{ secrets.SMSIRLINENUMBER }}
+       #   SMSIRUSERNAME: ${{ secrets.SMSIRUSERNAME }}
+        #  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}  # پیام کامیت
+      #  run: |
+       #   MESSAGE="برنچ اصلی فرانت جات آجار به عنوان کامیت '${COMMIT_MESSAGE}' آپدیت شد"
+     #     MESSAGE_ENCODED=$(echo "$MESSAGE" | jq -sRr @uri)  # URL encode
+      #    curl -X GET "https://api.sms.ir/v1/send?username=$SMSIRUSERNAME&password=$SMSIRAPI&line=$SMSIRLINENUMBER&mobile=$MOBILE&text=$MESSAGE_ENCODED"
           
       - name: Send Telegram Notification
         env:
