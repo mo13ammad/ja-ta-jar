@@ -171,7 +171,7 @@ const EditHouseGeneralInfo = ({ userData, loadingUser }) => {
 
           <div className="mt-4 w-full lg:col-span-2 flex justify-end">
             <button
-              className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+              className="btn bg-primary-600 text-white px-3 py-1.6 shadow-xl hover:bg-primary-800 transition-colors duration-200"
               onClick={() => {}}
             >
               ثبت اطلاعات

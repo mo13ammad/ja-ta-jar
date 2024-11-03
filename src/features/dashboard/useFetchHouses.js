@@ -1,11 +1,13 @@
-// src/hooks/useFetchHouses.js
-import { useQuery } from "@tanstack/react-query";
-import { getHouses } from "../../services/houseService";
+// src/hooks/useFetchHouse.js
 
-export default function useFetchHouses() {
-    return useQuery({
-        queryKey: ["get-houses"],
-        queryFn: getHouses,
-        retry: false,
-    });
+import { useQuery } from '@tanstack/react-query';
+import { getHouse } from '../../services/houseService';
+
+export default function useFetchHouse(uuid) {
+  return useQuery({
+    queryKey: ['get-house', uuid],
+    queryFn: () => getHouse(uuid),
+    retry: false,
+    enabled: !!uuid,
+  });
 }

@@ -1,3 +1,5 @@
+// src/components/EditHouseContent.jsx
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
@@ -10,51 +12,89 @@ import StayRules from './edithouse-components/EditHouseStayRules';
 import Pricing from './edithouse-components/EditHousePricing';
 import Images from './edithouse-components/EditHouseImages';
 import LocationDetails from './edithouse-components/EditHouseLocationDetails';
-import EnvironmentInfo  from './edithouse-components/EditHouseEnvironmentInfo ';
-import useFetchHouse from '../useFetchHouse';
-import Loading from '../../../ui/Loading'; // Assuming Loading is a component for showing the loading state
+import EnvironmentInfo from './edithouse-components/EditHouseEnvironmentInfo ';
+import useFetchHouse from '../useFetchHouse'; // Adjust the path based on your project structure
+import useEditHouse from './useEditHouse'; // Adjust the path based on your project structure
+import Loading from '../../../ui/Loading'; // Adjust the path based on your project structure
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams(); // Retrieve uuid from the URL parameters
-  const { data: houseData, isLoading: loadingHouse } = useFetchHouse(uuid);
-  console.log(houseData);
+
+  const {
+    data: houseData,
+    isLoading: loadingHouse,
+    // Removed isFetching as it's no longer needed
+    // isFetching,
+  } = useFetchHouse(uuid);
+
+  // Use the useEditHouse hook
+  const {
+    mutateAsync: editHouseAsync,
+    isLoading: editLoading,
+    error: editError,
+  } = useEditHouse();
+
+  // Function to handle the edit operation
+  const handleEditHouse = async (updatedData) => {
+    console.log('handleEditHouse - Data to be sent:', updatedData);
+    try {
+      const response = await editHouseAsync({ houseId: uuid, houseData: updatedData });
+      console.log('handleEditHouse - Response received:', response);
+      // houseData will be automatically updated due to query invalidation in the useEditHouse hook
+    } catch (error) {
+      console.error('Edit House Error:', error);
+      throw error; // Re-throw the error to propagate it back to handleSubmit
+    }
+  };
+
+  // Destructure data once for easier access in child components
+  const house = houseData?.data || {};
 
   const renderContent = () => {
+    const commonProps = {
+      houseData: house,
+      loadingHouse,
+      editLoading,
+      editError,
+      handleEditHouse,
+    };
+
     switch (selectedTab) {
       case 'address':
-        return <AddressDetails houseData={houseData} loadingHouse={loadingHouse} />;
+        return <AddressDetails {...commonProps} />;
       case 'location':
-        return <LocationDetails houseData={houseData} loadingHouse={loadingHouse} />;
+        return <LocationDetails {...commonProps} />;
       case 'generalInfo':
-        return <GeneralInfo houseData={houseData} loadingHouse={loadingHouse} />;
+        return <GeneralInfo {...commonProps} />;
       case 'environmentInfo':
-        return <EnvironmentInfo houseData={houseData} loadingHouse={loadingHouse} />;
+        return <EnvironmentInfo {...commonProps} />;
       case 'mainFacilities':
-        return <MainFacilities houseData={houseData} loadingHouse={loadingHouse} />;
+        return <MainFacilities {...commonProps} />;
       case 'rooms':
-        return <Rooms houseData={houseData} loadingHouse={loadingHouse} />;
+        return <Rooms {...commonProps} />;
       case 'sanitaries':
-        return <Sanitaries houseData={houseData} loadingHouse={loadingHouse} />;
+        return <Sanitaries {...commonProps} />;
       case 'reservationRules':
-        return <ReservationRules houseData={houseData} loadingHouse={loadingHouse} />;
+        return <ReservationRules {...commonProps} />;
       case 'stayRules':
-        return <StayRules houseData={houseData} loadingHouse={loadingHouse} />;
+        return <StayRules {...commonProps} />;
       case 'pricing':
-        return <Pricing houseData={houseData} loadingHouse={loadingHouse} />;
+        return <Pricing {...commonProps} />;
       case 'images':
-        return <Images houseData={houseData} loadingHouse={loadingHouse} />;
+        return <Images {...commonProps} />;
       case 'finalSubmit':
         return <div>Final Submit</div>;
       default:
-        return <AddressDetails houseData={houseData} loadingHouse={loadingHouse} />;
+        return <AddressDetails {...commonProps} />;
     }
   };
 
   return (
     <div>
       {loadingHouse ? (
-        
-        <div className='min-h-[60vh] flex justify-center items-center'><Loading /></div>
+        <div className='min-h-[60vh] flex justify-center items-center'>
+          <Loading />
+        </div>
       ) : (
         renderContent()
       )}

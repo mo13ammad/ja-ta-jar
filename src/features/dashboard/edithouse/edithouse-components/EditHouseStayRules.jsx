@@ -37,7 +37,7 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
 
   if (loadingHouse || loadingRules) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]:"><Spinner /></div>
+      <div className="flex justify-center items-center min-h-[60vh]"><Spinner /></div>
     );
   }
 

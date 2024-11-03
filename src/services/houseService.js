@@ -16,6 +16,20 @@ export function getHouse(houseId) {
   return http.get(`/client/house/${houseId}`).then(({ data }) => data);
 }
 
+export function editHouse(houseId, houseData) {
+  console.log('editHouse - Request data:', houseData); // Log request data
+  return http
+    .put(`/client/house/${houseId}`, houseData)
+    .then(({ data }) => {
+      console.log('editHouse - Response data:', data); // Log response data
+      return data;
+    })
+    .catch((error) => {
+      console.error('editHouse - Error:', error); // Log any errors
+      throw error;
+    });
+}
+
 
 
 export function getHouseTypes(data) {

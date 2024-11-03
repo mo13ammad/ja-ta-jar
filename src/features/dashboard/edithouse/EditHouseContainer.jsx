@@ -79,6 +79,10 @@ function EditHouseContainer() {
       </div>
 
       <div className="md:col-span-9 flex-grow w-full bg-gray-50 border-gray-200 border-t border-opacity-50 shadow-centered rounded-xl">
+       
+        <div className=''>
+        <EditHouseContent selectedTab={selectedTab} />
+        </div>
         <div className=" flex justify-between items-center p-2 py-3 lg:p-3 ">
           <button
             onClick={handlePreviousTab}
@@ -96,9 +100,6 @@ function EditHouseContainer() {
             صفحه بعد
             <ArrowLeftIcon className="w-4 h-4 mr-1" />
           </button>
-        </div>
-        <div className=''>
-        <EditHouseContent selectedTab={selectedTab} />
         </div>
       </div>
     </div>

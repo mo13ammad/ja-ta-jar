@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { toast, Toaster } from "react-hot-toast";
-import TextField from '../../../../ui/TextField';
-import Loading from '../../../../ui/Loading'; // Assuming you have a Loading component
+// src/components/edithouse-components/EditHouseAddressDetails.jsx
 
-const EditHouseAddressDetails = ({ houseData, loadingHouse }) => {
+import React, { useState, useEffect } from 'react';
+import { toast, Toaster } from 'react-hot-toast';
+import TextField from '../../../../ui/TextField'; // Adjust the path based on your project structure
+import Loading from '../../../../ui/Loading'; // Adjust the path based on your project structure
+
+const EditHouseAddressDetails = ({
+  houseData,
+  loadingHouse,
+  handleEditHouse,
+  editLoading,
+  editError,
+}) => {
   const [formData, setFormData] = useState({
     address: '',
     neighborhood: '',
@@ -13,13 +21,14 @@ const EditHouseAddressDetails = ({ houseData, loadingHouse }) => {
   });
 
   const [errors, setErrors] = useState({});
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+
 
   useEffect(() => {
     if (houseData?.address) {
       setFormData({
         address: houseData.address.address || '',
-        neighborhood: houseData.address.village || '',
+        neighborhood: houseData.address.village || '', // Use 'village' when receiving data
         floor: houseData.address.floor || '',
         plaqueNumber: houseData.address.house_number || '',
         postalCode: houseData.address.postal_code || '',
@@ -35,94 +44,120 @@ const EditHouseAddressDetails = ({ houseData, loadingHouse }) => {
     }));
   };
 
-  const handleSubmit = async () => {
-    setLoadingSubmit(true);
-    setErrors({});
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors({}); // Reset errors
+
+    // Client-side validation for postal code
+    if (formData.postalCode && !/^\d{10}$/.test(formData.postalCode)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        postal_code: ['کد پستی باید یک عدد ۱۰ رقمی باشد.'],
+      }));
+      toast.error('کد پستی معتبر نمی باشد.');
+      return;
+    }
+
+    // Prepare data to send
+    const dataToSend = {
+      address: formData.address,
+      village_name: formData.neighborhood, // Use 'village_name' when sending data
+      floor: formData.floor,
+      house_number: formData.plaqueNumber,
+      postal_code: formData.postalCode,
+    };
+
+    console.log('handleSubmit - Form data to be sent:', dataToSend); // Log data being sent
 
     try {
-      await onSubmit(formData);
-      toast.success("آدرس با موفقیت به‌روزرسانی شد");
+      await handleEditHouse(dataToSend);
+      toast.success('آدرس با موفقیت به‌روزرسانی شد');
     } catch (error) {
-      console.error("Error submitting data:", error);
-      if (error.response) {
+      console.error('Error submitting data:', error);
+      if (error.response && error.response.data) {
         const { data } = error.response;
-        if (data.errors) {
-          setErrors(data.errors.fields || {});
+        console.log('Error response data:', data); // Log the error response data for debugging
+
+        if (data.errors && data.errors.fields) {
+          setErrors(data.errors.fields);
         }
-        toast.error(data.message || "An unexpected error occurred.");
+
+        toast.error(data.message || 'خطایی رخ داده است.');
       } else {
-        toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
+        toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
       }
-    } finally {
-      setLoadingSubmit(false);
     }
   };
 
   if (loadingHouse) {
-    return <Loading message="در حال بارگذاری اطلاعات آدرس..." />;
+    return <Loading message='در حال بارگذاری اطلاعات آدرس...' />;
   }
 
   return (
-    <div className="relative">
+    <div className='relative'>
       <Toaster />
-      <form className="flex flex-col md:grid grid-cols-2 overflow-auto gap-x-2 gap-y-4 p-2 scrollbar-thin w-full">
+      <form
+        onSubmit={handleSubmit}
+        className='flex flex-col md:grid grid-cols-2 overflow-auto gap-x-2 gap-y-4 p-2 scrollbar-thin w-full'
+      >
         <TextField
-          label="آدرس اقامتگاه"
-          name="address"
+          label='آدرس اقامتگاه'
+          name='address'
           value={formData.address}
           onChange={handleInputChange}
-          placeholder="آدرس اقامتگاه"
+          placeholder='آدرس اقامتگاه'
           errorMessages={errors.address}
         />
 
         <TextField
-          label="روستا / محله"
-          name="neighborhood"
+          label='روستا / محله'
+          name='neighborhood'
           value={formData.neighborhood}
           onChange={handleInputChange}
-          placeholder="روستا / محله"
-          errorMessages={errors.village_name}
+          placeholder='روستا / محله'
+          errorMessages={errors.village_name} // Use 'village_name' to match the error key from the server
         />
 
         <TextField
-          label="اقامتگاه در طبقه"
-          name="floor"
+          label='اقامتگاه در طبقه'
+          name='floor'
           value={formData.floor}
           onChange={handleInputChange}
-          placeholder="اقامتگاه در طبقه"
+          placeholder='اقامتگاه در طبقه'
           errorMessages={errors.floor}
         />
 
         <TextField
-          label="شماره پلاک"
-          name="plaqueNumber"
+          label='شماره پلاک'
+          name='plaqueNumber'
           value={formData.plaqueNumber}
           onChange={handleInputChange}
-          placeholder="شماره پلاک"
+          placeholder='شماره پلاک'
           errorMessages={errors.house_number}
         />
 
         <TextField
-          label="کد پستی"
-          name="postalCode"
+          label='کد پستی'
+          name='postalCode'
           value={formData.postalCode}
           onChange={handleInputChange}
-          placeholder="کد پستی"
+          placeholder='کد پستی'
           errorMessages={errors.postal_code}
         />
 
         {Object.keys(errors).length > 0 && (
-          <div className="text-red-500 col-span-2">
+          <div className='text-red-500 col-span-2'>
             خطایی در ثبت اطلاعات وجود دارد. لطفا موارد زیر را بررسی کنید.
           </div>
         )}
 
-<div className="mt-4 w-full lg:col-span-2 flex justify-end">
+        <div className='mt-4 w-full lg:col-span-2 flex justify-end'>
           <button
-            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={()=>{}}
+            type='submit'
+            className='btn bg-primary-600 text-white px-3 py-1.5 shadow-xl hover:bg-primary-800 transition-colors duration-200'
+            disabled={editLoading}
           >
-            ثبت اطلاعات
+            {editLoading ? 'در حال ذخیره...' : 'ثبت اطلاعات'}
           </button>
         </div>
       </form>
