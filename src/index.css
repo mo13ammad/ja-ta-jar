@@ -122,6 +122,9 @@
   label {
     display: block;
   }
+  #map-container {
+    height: 400px;
+  }
 
 .otp-input::-webkit-outer-spin-button,
 .otp-input::-webkit-inner-spin-button {
