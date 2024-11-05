@@ -4,7 +4,7 @@ const HouseCard = ({ house, onDelete }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="house-card-container shadow-centered">
+    <div className="house-card-container shadow-centered max-h-64">
       <div className="house-info-container">
         <div className="info-item">
           <p className="font-semibold">نام :</p>

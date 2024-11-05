@@ -81,7 +81,7 @@ const EditHouseImages = ({ houseUuid, token, initialImages }) => {
       toast.error('خطایی در تنظیم تصویر اصلی رخ داد');
     }
   };
-
+   
   return (
     <div className="edit-house-images p-4">
       <Toaster />

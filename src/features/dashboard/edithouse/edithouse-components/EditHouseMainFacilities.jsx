@@ -4,49 +4,99 @@ import TextField from '../../../../ui/TextField';
 import TextArea from '../../../../ui/TextArea';
 import ToggleSwitch from '../../../../ui/ToggleSwitch';
 import { useFetchFacilities } from '../../../../services/fetchDataService';
+import { toast } from 'react-hot-toast';
+import { editHouseFacilities } from '../../../../services/houseService';
 
-const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
+const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
   const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchFacilities();
   const [selectedFacilities, setSelectedFacilities] = useState({});
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
-    if (facilitiesData) {
-      console.log("Fetched facilities data:", facilitiesData);
+    if (houseData && facilitiesData.length > 0) {
+      const initialSelectedFacilities = facilitiesData.reduce((acc, facility) => {
+        const existingFacility = houseData.facilities?.find((f) => f.key === facility.key);
+
+        acc[facility.key] = {
+          checked: !!existingFacility,
+          fields: facility.fields?.reduce((fieldAcc, field) => {
+            const existingField = existingFacility?.fields?.find(
+              (f) => f.title.trim() === field.title.trim()
+            );
+            fieldAcc[field.title.trim()] = existingField
+              ? existingField.value === "true" || existingField.value === true || existingField.value
+              : field.type === 'toggle'
+              ? false
+              : '';
+            return fieldAcc;
+          }, {}),
+        };
+        return acc;
+      }, {});
+
+      console.log("Initialized selected facilities:", initialSelectedFacilities);
+      setSelectedFacilities(initialSelectedFacilities);
     }
-  }, [facilitiesData]);
+  }, [houseData, facilitiesData]);
 
   const toggleFacility = (key) => {
-    setSelectedFacilities((prevSelected) => {
-      const isCurrentlyChecked = prevSelected[key]?.checked;
-      const updatedState = {
-        ...prevSelected,
-        [key]: {
-          ...prevSelected[key],
-          checked: !isCurrentlyChecked,
-          fields: !isCurrentlyChecked ? prevSelected[key]?.fields : {}, // Clear fields if unchecking
-        },
-      };
-      console.log("Updated selectedFacilities:", updatedState);
-      return updatedState;
-    });
+    console.log(`Toggling facility ${key}`);
+    setSelectedFacilities((prevSelected) => ({
+      ...prevSelected,
+      [key]: {
+        ...prevSelected[key],
+        checked: !prevSelected[key].checked,
+        fields: !prevSelected[key].checked ? {} : prevSelected[key].fields, // Clear fields if unchecked
+      },
+    }));
+    console.log("Updated selected facilities after toggle:", selectedFacilities);
   };
 
   const handleInputChange = (facilityKey, fieldTitle, value) => {
+    console.log(`Changing field ${fieldTitle} of facility ${facilityKey} to`, value);
     setSelectedFacilities((prevState) => ({
       ...prevState,
       [facilityKey]: {
         ...prevState[facilityKey],
         fields: {
-          ...prevState[facilityKey]?.fields,
+          ...prevState[facilityKey].fields,
           [fieldTitle.trim()]: value,
         },
       },
     }));
+    console.log("Updated selected facilities after input change:", selectedFacilities);
   };
 
-  const handleSubmit = () => {
-    console.log("Final Selected Facilities Data:", selectedFacilities);
-    alert("Facilities saved successfully!");
+  const handleSubmit = async () => {
+    setLoadingSubmit(true);
+    try {
+      // Filter out only checked facilities
+      const facilitiesData = Object.keys(selectedFacilities)
+        .filter((key) => selectedFacilities[key].checked) // Include only checked facilities
+        .map((key) => ({
+          type: key,
+          fields: Object.entries(selectedFacilities[key].fields || {}).map(
+            ([fieldKey, fieldValue]) => ({
+              key: fieldKey.trim(),
+              value:
+                typeof fieldValue === 'string' && !isNaN(fieldValue.trim())
+                  ? parseFloat(fieldValue.trim())
+                  : fieldValue === 'true' || fieldValue === true || fieldValue,
+            })
+          ),
+        }));
+
+      console.log("Sending facilities data to API:", facilitiesData);
+      const response = await editHouseFacilities(houseId, facilitiesData);
+      console.log("Received response from API:", response);
+
+      toast.success('اطلاعات با موفقیت ثبت شد');
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      toast.error('خطایی در ثبت اطلاعات پیش آمد');
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   if (loadingHouse || loadingFacilities) {
@@ -64,7 +114,7 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
         {facilitiesData.map((facility) => (
           <div 
             key={facility.key} 
-            className="p-2 md:p-4   rounded-xl flex flex-col shadow-centered bg-white"
+            className="p-2 md:p-4 rounded-xl flex flex-col shadow-centered bg-white"
           >
             <ToggleSwitch
               checked={selectedFacilities[facility.key]?.checked || false}
@@ -75,9 +125,9 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
 
             {/* Show fields only if the facility is checked */}
             {selectedFacilities[facility.key]?.checked && (
-              <div className="mt-4 bg-white p-2 rounded-xl ">
+              <div className="mt-4 bg-white p-2 rounded-xl">
                 {facility.fields?.map((field, index) => (
-                  <div key={index} className="mb-4 ">
+                  <div key={index} className="mb-4">
                     {field.type === 'toggle' ? (
                       <ToggleSwitch
                         checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
@@ -119,10 +169,11 @@ const EditHouseMainFacilities = ({ houseData, loadingHouse }) => {
       </div>
       <div className="mt-4 w-full lg:col-span-2 flex justify-end">
         <button
-          className="btn bg-primary-600 text-white px-4 py-2 shadow-centered hover:bg-primary-600 transition-colors duration-200"
+          className="btn bg-primary-600 text-white px-4 py-2 shadow-centered hover:bg-primary-700 transition-colors duration-200"
           onClick={handleSubmit}
+          disabled={loadingSubmit}
         >
-          ثبت اطلاعات
+          {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
         </button>
       </div>
     </div>

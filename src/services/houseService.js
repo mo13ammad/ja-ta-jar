@@ -4,6 +4,7 @@ export function getHouses(data) {
   return http.get('/client/house', data).then(({ data }) => data.data);
 }
 
+
 export function createHouse(data) {
   return http.post('/client/house', data).then(({ data }) => data.data);
 }
@@ -26,6 +27,20 @@ export function editHouse(houseId, houseData) {
     .then(({ data }) => data)
     .catch((error) => {
       console.error("editHouse - Error:", error);
+      throw error;
+    });
+}
+export function editHouseFacilities(houseId, facilitiesData) {
+  if (!houseId || !facilitiesData) {
+    console.error("Missing houseId or facilitiesData:", { houseId, facilitiesData });
+    throw new Error("House ID or facilities data is missing.");
+  }
+  
+  return http
+    .put(`/client/house/${houseId}/facility`, { facilities: facilitiesData })
+    .then(({ data }) => data)
+    .catch((error) => {
+      console.error("editHouseFacilities - Error:", error);
       throw error;
     });
 }
