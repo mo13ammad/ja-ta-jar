@@ -67,15 +67,12 @@ jobs:
           DATE: $(date '+%Y-%m-%d %H:%M:%S')
 
         run: |
-          MESSAGE=$(cat <<EOF
-          ✅ *برنچ اصلی فرانت جات آجار به‌روز شد\!* \n\n
-          📝 *کامیت\:* \`${COMMIT_MESSAGE}\` \n
-          👤 *نویسنده\:* ${AUTHOR_NAME} \n
-          📅 *تاریخ\:* ${DATE} \n\n
-          🔗 \[لینک به مخزن\]\(${REPO_URL}\) \n
-          🔗 \[لینک به کامیت\]\(${COMMIT_URL}\)
-          EOF
-          )
+          MESSAGE="✅ <b>برنچ اصلی فرانت جات آجار به‌روز شد!</b> \n\n"
+          MESSAGE+="📝 <b>کامیت:</b> <code>${COMMIT_MESSAGE}</code> \n"
+          MESSAGE+="👤 <b>نویسنده:</b> ${AUTHOR_NAME} \n"
+          MESSAGE+="📅 <b>تاریخ:</b> ${DATE} \n\n"
+          MESSAGE+="🔗 <a href=\"${REPO_URL}\">لینک به مخزن</a> \n"
+          MESSAGE+="🔗 <a href=\"${COMMIT_URL}\">لینک به کامیت</a>"
 
           curl -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID&text=$MESSAGE" -d "parse_mode=MarkdownV2"
+            -d "chat_id=$TELEGRAM_CHAT_ID&text=$MESSAGE" -d "parse_mode=HTML"
