@@ -241,7 +241,7 @@ const EditHouseImages = ({ houseId, houseData }) => {
               <button
                 type="button"
                 onClick={handleAddImage}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg"
                 disabled={addImageMutation.isLoading}
               >
                 {addImageMutation.isLoading ? <Spinner size={20} /> : 'اضافه کردن'}
