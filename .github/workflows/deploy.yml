@@ -59,7 +59,7 @@ jobs:
       - name: Send Telegram Notification
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID1 }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}  # پیام کامیت
           AUTHOR_NAME: ${{ github.event.head_commit.author.name }}  # نام نویسنده
           REPO_URL: "https://github.com/${{ github.repository }}"
@@ -69,11 +69,11 @@ jobs:
         run: |
           MESSAGE=$(cat <<EOF
           ✅ *برنچ اصلی فرانت جات آجار به‌روز شد\!* \n\n
-          📝 *کامیت\:* `${COMMIT_MESSAGE}` \n
+          📝 *کامیت\:* \`${COMMIT_MESSAGE}\` \n
           👤 *نویسنده\:* ${AUTHOR_NAME} \n
           📅 *تاریخ\:* ${DATE} \n\n
-          🔗 [لینک به مخزن](${REPO_URL}) \n
-          🔗 [لینک به کامیت](${COMMIT_URL})
+          🔗 \[لینک به مخزن\]\(${REPO_URL}\) \n
+          🔗 \[لینک به کامیت\]\(${COMMIT_URL}\)
           EOF
           )
 
