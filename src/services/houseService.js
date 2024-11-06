@@ -51,15 +51,17 @@ export function editHouseFacilities(houseId, facilitiesData) {
 export function getHouseTypes(data) {
   return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
 }
-export function createHousePicture(data) {
-  return http.post('/client/house/${houseUuid}/media', data).then(({ data }) => data.data);
-}
-export function deleteHousePicture(data) {
-  return http.delete('/client/house/${houseUuid}/media/${imageToDelete}', data).then(({ data }) => data.data);
+
+export function createHousePicture(houseId, data) {
+  return http.post(`/client/house/${houseId}/media`, data).then(({ data }) => data.data);
 }
 
-export function changeHouseMainPicture(data) {
-  return http.delete('/client/house/${houseUuid}/media/${imageId}', data).then(({ data }) => data.data);
+export function deleteHousePicture(houseId, imageToDelete) {
+  return http.delete(`/client/house/${houseId}/media/${imageToDelete}`).then(({ data }) => data.data);
+}
+
+export function changeHouseMainPicture(houseId, imageId) {
+  return http.put(`/client/house/${houseId}/media/${imageId}`, { main: 1 }).then(({ data }) => data.data);
 }
 
 // Rooms 

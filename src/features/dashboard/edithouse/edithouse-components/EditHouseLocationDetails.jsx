@@ -231,7 +231,7 @@ const EditHouseLocationDetails = ({
           <TextField label="طول جغرافیایی" name="longitude" value={longitude} readOnly />
         </div>
 
-        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-[400px]" ref={mapContainerRef}  />
+        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-20" ref={mapContainerRef}  />
 
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button type="submit" className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200" disabled={editLoading}>
