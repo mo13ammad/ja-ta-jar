@@ -12,19 +12,19 @@ import StayRules from './edithouse-components/EditHouseStayRules';
 import Pricing from './edithouse-components/EditHousePricing';
 import Images from './edithouse-components/EditHouseImages';
 import LocationDetails from './edithouse-components/EditHouseLocationDetails';
-import EnvironmentInfo from './edithouse-components//EditHouseEnvironmentInfo ';
+import EnvironmentInfo from './edithouse-components/EditHouseEnvironmentInfo ';
 import useFetchHouse from '../useFetchHouse';
 import useEditHouse from './useEditHouse';
 import Loading from '../../../ui/Loading';
 
 const EditHouseContent = ({ selectedTab }) => {
-  const { uuid } = useParams(); // Retrieve uuid from the URL parameters
-  console.log("UUID from useParams:", uuid); // Debugging
-
+  const { uuid } = useParams();
+  
   const {
     data: houseData,
     isLoading: loadingHouse,
     isFetching,
+    refetch: refetchHouseData, // Add refetch to manually refresh data
   } = useFetchHouse(uuid);
 
   const {
@@ -34,10 +34,10 @@ const EditHouseContent = ({ selectedTab }) => {
   } = useEditHouse();
 
   const handleEditHouse = async (updatedData) => {
-    console.log('handleEditHouse - Data to be sent:', updatedData);
     try {
       const response = await editHouseAsync({ houseId: uuid, houseData: updatedData });
-      console.log('handleEditHouse - Response received:', response);
+      console.log('Edit response:', response);
+      refetchHouseData(); // Trigger refetch on successful edit
     } catch (error) {
       console.error('Edit House Error:', error);
     }
@@ -45,12 +45,13 @@ const EditHouseContent = ({ selectedTab }) => {
 
   const commonProps = {
     houseData: houseData?.data || {},
-    houseId: uuid, // Pass uuid as houseId to all child components
+    houseId: uuid,
     loadingHouse,
     isFetching,
     editLoading,
     editError,
     handleEditHouse,
+    refetchHouseData, // Pass refetchHouseData to child components
   };
 
   const renderContent = () => {

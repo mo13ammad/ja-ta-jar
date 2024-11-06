@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Spinner from "../../../../ui/Loading";
-import TextArea from "../../../../ui/TextArea";
-import { useFetchRules } from "../../../../services/fetchDataService";
+import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
+import ToggleSwitch from '../../../../ui/ToggleSwitch';
+import { useFetchRules } from '../../../../services/fetchDataService';
+import { toast } from 'react-hot-toast';
 
 const statusOptions = [
   { key: 'NotAllowed', label: 'غیر مجاز' },
@@ -11,41 +12,81 @@ const statusOptions = [
   { key: 'NotNeeded', label: 'نیاز نیست' },
 ];
 
-const EditHouseStayRules = ({ houseData, loadingHouse }) => {
+const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse, refetchHouseData }) => {
   const { data: rulesData = [], isLoading: loadingRules } = useFetchRules();
   const [selectedRules, setSelectedRules] = useState({});
+  const [descriptions, setDescriptions] = useState({});
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
-    if (rulesData) {
-      console.log("Fetched rules data:", rulesData);
-    }
-  }, [rulesData]);
+    if (rulesData.length > 0 && Array.isArray(houseData?.rules?.types)) {
+      const initialSelectedRules = rulesData.reduce((acc, rule) => {
+        const matchedRule = houseData.rules.types.find((r) => r.key === rule.key);
+        acc[rule.key] = matchedRule ? matchedRule.status.key : null;
+        return acc;
+      }, {});
 
-  const handleOptionChange = (ruleKey, optionKey) => {
+      const initialDescriptions = rulesData.reduce((acc, rule) => {
+        const matchedRule = houseData.rules.types.find((r) => r.key === rule.key);
+        acc[rule.key] = matchedRule?.description || '';
+        return acc;
+      }, {});
+
+      setSelectedRules(initialSelectedRules);
+      setDescriptions(initialDescriptions);
+    }
+  }, [rulesData, houseData.rules]);
+
+  const handleOptionToggle = (ruleKey, optionKey) => {
     setSelectedRules((prev) => ({
       ...prev,
-      [ruleKey]: { ...prev[ruleKey], status: optionKey },
+      [ruleKey]: prev[ruleKey] === optionKey ? null : optionKey, // Toggle selection
     }));
   };
 
   const handleNoteChange = (ruleKey, value) => {
-    setSelectedRules((prev) => ({
+    setDescriptions((prev) => ({
       ...prev,
-      [ruleKey]: { ...prev[ruleKey], note: value },
+      [ruleKey]: value,
     }));
+  };
+
+  const handleSubmit = async () => {
+    setLoadingSubmit(true);
+    try {
+      const updatedData = {
+        rules: Object.keys(selectedRules)
+          .filter((key) => selectedRules[key] !== null)
+          .map((key) => ({
+            key,
+            status: selectedRules[key],
+            description: descriptions[key] || '',
+          })),
+      };
+
+      await handleEditHouse(updatedData);
+      await refetchHouseData(); // Refetch house data after submission
+      toast.success('اطلاعات با موفقیت ثبت شد');
+    } catch (error) {
+      console.error('Error submitting rules:', error);
+      toast.error('خطایی در ثبت اطلاعات پیش آمد');
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   if (loadingHouse || loadingRules) {
     return (
-      <div className="flex justify-center items-center min-h-[60vh]"><Spinner /></div>
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <Spinner />
+      </div>
     );
   }
 
   return (
     <div className="relative">
-      <div className="overflow-auto scrollbar-thin  pt-2 px-2 lg:px-4 w-full ">
-      <div className="text-right font-bold lg:text-lg ">قوانین اقامت :</div>
-
+      <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full">
+        <div className="text-right font-bold lg:text-lg mb-4">قوانین اقامت :</div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {rulesData.map((rule) => (
             <div key={rule.key} className="mt-4 p-4 border rounded-xl shadow-centered">
@@ -53,33 +94,13 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
 
               <div className="grid grid-cols-2 gap-2">
                 {statusOptions.map((option) => (
-                  <label key={option.key} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name={`rule-${rule.key}`}
-                      checked={selectedRules[rule.key]?.status === option.key}
-                      onChange={() => handleOptionChange(rule.key, option.key)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`h-6 w-6 rounded-full flex items-center justify-center transition-colors duration-200 ${
-                        selectedRules[rule.key]?.status === option.key ? 'bg-primary-600' : 'bg-gray-200'
-                      }`}
-                    >
-                      {selectedRules[rule.key]?.status === option.key && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="ml-2 text-sm font-medium text-gray-700">{option.label}</span>
-                  </label>
+                  <ToggleSwitch
+                    key={option.key}
+                    checked={selectedRules[rule.key] === option.key}
+                    onChange={() => handleOptionToggle(rule.key, option.key)}
+                    label={option.label}
+                    icon={null} // Optional: you can set an icon here if available
+                  />
                 ))}
               </div>
 
@@ -87,7 +108,7 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
                 <TextField
                   label="یادداشت"
                   placeholder="یادداشت خود را وارد کنید (اختیاری)"
-                  value={selectedRules[rule.key]?.note || ''}
+                  value={descriptions[rule.key] || ''}
                   onChange={(e) => handleNoteChange(rule.key, e.target.value)}
                 />
               </div>
@@ -98,9 +119,10 @@ const EditHouseStayRules = ({ houseData, loadingHouse }) => {
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button
             className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={()=>{}}
+            onClick={handleSubmit}
+            disabled={loadingSubmit}
           >
-            ثبت اطلاعات
+            {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
           </button>
         </div>
       </div>
