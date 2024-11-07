@@ -38,8 +38,10 @@ const tabSections = [
     keys: [{ key: 'pricing', label: 'قیمت گذاری' }],
   },
   {
-    label: 'تصاویر اقامتگاه',
-    keys: [{ key: 'images', label: 'تصاویر اقامتگاه' }],
+    label: 'تصاویر',
+    keys: [{ key: 'images', label: 'تصاویر اقامتگاه' },
+      { key: 'documents', label: 'مدارک مالکیت' }
+    ],
   },
   {
     label: 'ثبت نهایی اقامتگاه',

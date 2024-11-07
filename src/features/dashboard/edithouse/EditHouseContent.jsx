@@ -16,6 +16,7 @@ import EnvironmentInfo from './edithouse-components/EditHouseEnvironmentInfo ';
 import useFetchHouse from '../useFetchHouse';
 import useEditHouse from './useEditHouse';
 import Loading from '../../../ui/Loading';
+import EditHouseDocuments from './edithouse-components/EditHouseDocuments';
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams();
@@ -78,6 +79,8 @@ const EditHouseContent = ({ selectedTab }) => {
         return <Pricing {...commonProps} />;
       case 'images':
         return <Images {...commonProps} />;
+      case 'documents':
+          return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':
         return <div>Final Submit</div>;
       default:
