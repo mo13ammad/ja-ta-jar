@@ -45,7 +45,7 @@ const EditHouseContent = ({ selectedTab }) => {
   };
 
   const commonProps = {
-    houseData: houseData?.data || {},
+    houseData ,
     houseId: uuid,
     loadingHouse,
     isFetching,

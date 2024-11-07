@@ -21,7 +21,7 @@ const EditHouseAddressDetails = ({
   });
 
   const [errors, setErrors] = useState({});
-
+ console.log(houseData)
 
 
   useEffect(() => {

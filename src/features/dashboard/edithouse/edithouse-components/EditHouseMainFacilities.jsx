@@ -14,6 +14,7 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
 
   useEffect(() => {
     if (houseData && facilitiesData.length > 0) {
+      console.log(houseData);
       const initialSelectedFacilities = facilitiesData.reduce((acc, facility) => {
         const existingFacility = houseData.facilities?.find((f) => f.key === facility.key);
 
