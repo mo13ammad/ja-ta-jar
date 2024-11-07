@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { toast } from "react-hot-toast";
+// src/components/edithouse-components/EditHouseReservationRules.jsx
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Spinner from "../../../../ui/Loading";
 import TextField from "../../../../ui/TextField";
 import FormSelect from "../../../../ui/FormSelect";
+import { toast, Toaster } from "react-hot-toast";
 import { useFetchWeekendOptions } from "../../../../services/fetchDataService";
 
-const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, errors }) => {
+const EditHouseReservationRules = ({ houseData, handleEditHouse, loadingHouse, refetchHouseData }) => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { data: weekendOptions = [], isLoading: loadingWeekendOptions } = useFetchWeekendOptions();
@@ -33,6 +36,18 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
     weekendType: houseData?.weekendType?.key || ""
   });
 
+  useEffect(() => {
+    if (houseData?.reservation?.minimum_length_stay) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        minimum_length_stay: {
+          ...prevFormData.minimum_length_stay,
+          ...houseData.reservation.minimum_length_stay
+        }
+      }));
+    }
+  }, [houseData]);
+
   const handleInputChange = (key, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -53,8 +68,10 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     setErrorMessage("");
+    console.log("Submitting form data:", formData);
     try {
-      await onSubmit(formData);
+      await handleEditHouse(formData);
+      await refetchHouseData();
       toast.success("اطلاعات با موفقیت ثبت شد");
     } catch (error) {
       const message = error.response?.data?.message || "An unexpected error occurred.";
@@ -74,7 +91,7 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
     );
   };
 
-  if (loadingSubmit || loadingWeekendOptions) {
+  if (loadingHouse || loadingSubmit || loadingWeekendOptions) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Spinner />
@@ -84,8 +101,9 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
 
   return (
     <div className="container mx-auto p-4">
+      <Toaster />
       <h1 className="text-2xl font-bold mb-4 text-center">قوانین رزرو</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
           label="تعداد شب اقامت کوتاه مدت"
@@ -94,7 +112,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           onChange={(e) => handleInputChange("short_term_booking_length", e.target.value)}
           placeholder="تعداد شب رزرو کوتاه مدت"
         />
-        {renderErrorMessages(errors?.short_term_booking_length)}
 
         <TextField
           label="درصد تخفیف کوتاه مدت"
@@ -103,7 +120,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           onChange={(e) => handleInputChange("short_term_booking_discount", e.target.value)}
           placeholder="درصد تخفیف"
         />
-        {renderErrorMessages(errors?.short_term_booking_discount)}
 
         <TextField
           label="تعداد شب اقامت بلند مدت"
@@ -112,7 +128,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           onChange={(e) => handleInputChange("long_term_booking_length", e.target.value)}
           placeholder="تعداد شب رزرو بلند مدت"
         />
-        {renderErrorMessages(errors?.long_term_booking_length)}
 
         <TextField
           label="درصد تخفیف بلند مدت"
@@ -121,9 +136,7 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           onChange={(e) => handleInputChange("long_term_booking_discount", e.target.value)}
           placeholder="درصد تخفیف"
         />
-        {renderErrorMessages(errors?.long_term_booking_discount)}
 
-        {/* Separate Time Inputs with 24-hour format */}
         <div>
           <label className="block text-sm xl:text-lg font-medium mb-2">زمان ورود از</label>
           <input
@@ -132,7 +145,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
             onChange={(e) => handleInputChange("enter_from", e.target.value)}
             className="px-3 py-1.5 border rounded-2xl bg-white shadow-centered w-full outline-none"
           />
-          {renderErrorMessages(errors?.enter_from)}
         </div>
 
         <div>
@@ -143,7 +155,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
             onChange={(e) => handleInputChange("enter_until", e.target.value)}
             className="px-3 py-1.5 border rounded-2xl bg-white shadow-centered w-full outline-none"
           />
-          {renderErrorMessages(errors?.enter_until)}
         </div>
 
         <div>
@@ -154,7 +165,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
             onChange={(e) => handleInputChange("discharge_time", e.target.value)}
             className="px-3 py-1.5 border rounded-2xl bg-white shadow-centered w-full outline-none"
           />
-          {renderErrorMessages(errors?.discharge_time)}
         </div>
 
         <TextField
@@ -164,7 +174,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           value={formData.capacity}
           onChange={(e) => handleInputChange("capacity", e.target.value)}
         />
-        {renderErrorMessages(errors?.capacity)}
 
         <TextField
           label="حداکثر ظرفیت"
@@ -173,7 +182,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           value={formData.maximum_capacity}
           onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
         />
-        {renderErrorMessages(errors?.maximum_capacity)}
 
         <FormSelect
           label="تعیین روز های آخر هفته"
@@ -190,7 +198,6 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
         />
       </div>
 
-      {/* Minimum Stay Table for Persian Days */}
       <div className="mt-8 lg:col-span-2 lg:w-1/2">
         <label className="block text-sm xl:text-lg font-medium text-gray-700 mb-2">حداقل شب اقامت به ازای روزهای هفته</label>
         <table className="table-auto w-full rounded-xl text-right">
@@ -201,23 +208,15 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
             </tr>
           </thead>
           <tbody>
-            {[
-              { key: "Saturday", label: "شنبه" },
-              { key: "Sunday", label: "یکشنبه" },
-              { key: "Monday", label: "دوشنبه" },
-              { key: "Tuesday", label: "سه‌شنبه" },
-              { key: "Wednesday", label: "چهارشنبه" },
-              { key: "Thursday", label: "پنج‌شنبه" },
-              { key: "Friday", label: "جمعه" }
-            ].map((day) => (
-              <tr key={day.key}>
-                <td className="p-2">{day.label}</td>
+            {["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((dayKey, idx) => (
+              <tr key={dayKey}>
+                <td className="p-2">{["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"][idx]}</td>
                 <td className="p-2">
                   <TextField
-                    name={`minimum_length_stay.${day.key}`}
-                    value={formData.minimum_length_stay[day.key]}
-                    onChange={(e) => handleMinimumStayChange(day.key, e.target.value)}
-                    placeholder={`تعداد شب برای ${day.label}`}
+                    name={`minimum_length_stay.${dayKey}`}
+                    value={formData.minimum_length_stay[dayKey]}
+                    onChange={(e) => handleMinimumStayChange(dayKey, e.target.value)}
+                    placeholder={`تعداد شب برای ${dayKey}`}
                     type="number"
                     className="p-2 border rounded-xl max-w-[4rem] outline-none"
                   />
@@ -234,15 +233,16 @@ const EditHouseReservationRules = ({ token, houseUuid, houseData, onSubmit, erro
           <p>{errorMessage}</p>
         </div>
       )}
-   <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-          <button
-            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={()=>{}}
-          >
-            ثبت اطلاعات
-          </button>
-        </div>
-    
+      
+      <div className="mt-4 w-full lg:col-span-2 flex justify-end">
+        <button
+          onClick={handleSubmit}
+          className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
+          disabled={loadingSubmit}
+        >
+          {loadingSubmit ? "در حال ارسال..." : "ثبت اطلاعات"}
+        </button>
+      </div>
     </div>
   );
 };
