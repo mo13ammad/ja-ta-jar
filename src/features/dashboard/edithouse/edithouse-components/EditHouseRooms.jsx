@@ -9,21 +9,22 @@ import ToggleSwitch from '../../../../ui/ToggleSwitch';
 import ToggleSwitchGroup from '../../../../ui/ToggleSwitchGroup';
 import { useFetchRoomFacilities, useFetchCoolingAndHeatingOptions } from '../../../../services/fetchDataService';
 import { toast, Toaster } from 'react-hot-toast';
+import { createRoom, editRoom, deleteRoom } from '../../../../services/houseService';
 
-const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
+const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const [rooms, setRooms] = useState([]);
-  const [facilitiesOptions, setFacilitiesOptions] = useState([]);
-  const [airConditionOptions, setAirConditionOptions] = useState([]);
   const [hasLivingRoom, setHasLivingRoom] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchRoomFacilities();
   const { data: airConditionData = [], isLoading: loadingAirConditions } = useFetchCoolingAndHeatingOptions();
 
   useEffect(() => {
-    // Initialize room data based on houseData
-    if (houseData && houseData.room) {
+    if (houseData?.room) {
+      console.log('Received house data:', houseData);
       const initialRooms = houseData.room.map((room) => ({
         roomName: room.name || '',
         isMasterRoom: room.is_master || false,
@@ -37,14 +38,13 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
         isLivingRoom: room.is_living_room || false,
         uuid: room.uuid || null,
       }));
-      setRooms(initialRooms.reverse()); // Reverse to show newest rooms first
+      setRooms(initialRooms.reverse());
       setHasLivingRoom(initialRooms.some((room) => room.isLivingRoom));
     }
-    setFacilitiesOptions(facilitiesData);
-    setAirConditionOptions(airConditionData);
-  }, [houseData, facilitiesData, airConditionData]);
+  }, [houseData]);
 
   const addRoom = (isLivingRoom = false) => {
+    console.log(`Adding a new ${isLivingRoom ? 'living room' : 'room'}`);
     setRooms((prevRooms) => [
       ...prevRooms,
       {
@@ -65,6 +65,7 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
   };
 
   const handleInputChange = (index, key, value) => {
+    console.log(`Updating room index ${index}, setting ${key} to:`, value);
     setRooms((prevRooms) =>
       prevRooms.map((room, i) => (i === index ? { ...room, [key]: value } : room))
     );
@@ -72,6 +73,7 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
 
   const toggleSelection = (index, type, key) => {
     const keyName = type === 'facility' ? 'selectedFacilities' : 'selectedAirConditions';
+    console.log(`Toggling ${type} with key ${key} for room index ${index}`);
     setRooms((prevRooms) =>
       prevRooms.map((room, i) =>
         i === index
@@ -100,41 +102,58 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
       facilities: roomData.selectedFacilities,
       airConditions: roomData.selectedAirConditions,
     };
+
+    console.log('Submitting room data with payload:', payload);
+    setLoadingSubmit(true);
+
     try {
       if (roomData.uuid) {
-        await handleEditHouse({ ...payload, uuid: roomData.uuid });
+        console.log('Updating existing room with UUID:', roomData.uuid);
+        await editRoom(houseId, roomData.uuid, payload);
       } else {
-        await handleEditHouse(payload);
+        console.log('Creating a new room');
+        await createRoom(houseId, payload);
       }
       refetchHouseData();
       toast.success('اتاق با موفقیت ثبت شد');
     } catch (error) {
       console.error('Error submitting room:', error);
       toast.error('خطا در ثبت اتاق');
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
   const confirmDelete = (index) => {
     setDeleteIndex(index);
     setIsModalOpen(true);
+    console.log('Preparing to delete room at index:', index);
   };
 
   const handleDelete = async () => {
     const roomData = rooms[deleteIndex];
+    console.log('Deleting room data:', roomData);
+    setLoadingDelete(true);
+
     if (!roomData.uuid) {
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
       setIsModalOpen(false);
+      setLoadingDelete(false);
       return;
     }
+
     try {
-      await handleEditHouse({ uuid: roomData.uuid });
+      console.log('Deleting room with UUID:', roomData.uuid);
+      await deleteRoom(houseId, roomData.uuid);
       refetchHouseData();
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
       toast.success('اتاق با موفقیت حذف شد');
+      if (roomData.isLivingRoom) setHasLivingRoom(false);
     } catch (error) {
       console.error('Error deleting room:', error);
       toast.error('خطا در حذف اتاق');
     } finally {
+      setLoadingDelete(false);
       setIsModalOpen(false);
     }
   };
@@ -213,14 +232,14 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
 
                   <ToggleSwitchGroup
                     label="امکانات"
-                    options={facilitiesOptions}
+                    options={facilitiesData}
                     selectedOptions={room.selectedFacilities}
                     onChange={(key) => toggleSelection(index, 'facility', key)}
                   />
 
                   <ToggleSwitchGroup
                     label="امکانات سرمایشی و گرمایشی"
-                    options={airConditionOptions}
+                    options={airConditionData}
                     selectedOptions={room.selectedAirConditions}
                     onChange={(key) => toggleSelection(index, 'airCondition', key)}
                   />
@@ -238,15 +257,17 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
                     <button
                       onClick={() => handleRoomSubmit(index)}
                       className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                      disabled={loadingSubmit}
                     >
-                      {room.uuid ? 'ثبت تغییرات' : 'ثبت اتاق'}
+                      {loadingSubmit ? 'در حال ارسال...' : room.uuid ? 'ثبت تغییرات' : 'ثبت اتاق'}
                     </button>
                     {room.uuid && (
                       <button
                         onClick={() => confirmDelete(index)}
                         className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                        disabled={loadingDelete}
                       >
-                        حذف اتاق
+                        {loadingDelete ? 'در حال حذف...' : 'حذف اتاق'}
                       </button>
                     )}
                   </div>
@@ -257,7 +278,6 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
         ))}
       </div>
 
-      {/* Confirmation Modal */}
       <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -267,8 +287,9 @@ const EditHouseRooms = ({ houseData, handleEditHouse, refetchHouseData }) => {
               <button
                 onClick={handleDelete}
                 className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mr-4"
+                disabled={loadingDelete}
               >
-                بله حذف کن
+                {loadingDelete ? 'در حال حذف...' : 'بله حذف کن'}
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
