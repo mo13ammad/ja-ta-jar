@@ -5,7 +5,7 @@ import TextField from "../../../../ui/TextField";
 import { toast, Toaster } from "react-hot-toast";
 import { Disclosure } from "@headlessui/react";
 import Spinner from "../../../../ui/Loading";
-import axios from "axios";
+import { updateHousePrice, updateRoomPrice } from "../../../../services/houseService";
 
 const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }) => {
   const [formData, setFormData] = useState({});
@@ -60,22 +60,22 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
         weekend_spring: formatNumber(houseData.prices.spring?.weekend || ""),
         holiday_spring: formatNumber(houseData.prices.spring?.holiday || ""),
         peak_spring: formatNumber(houseData.prices.spring?.peak || ""),
-        extra_people_spring: formatNumber(houseData.prices.spring?.extra_people || ""),
+        extra_people_spring: formatNumber(houseData.prices.spring?.extra_people || "10000"),
         normal_summer: formatNumber(houseData.prices.summer?.normal || ""),
         weekend_summer: formatNumber(houseData.prices.summer?.weekend || ""),
         holiday_summer: formatNumber(houseData.prices.summer?.holiday || ""),
         peak_summer: formatNumber(houseData.prices.summer?.peak || ""),
-        extra_people_summer: formatNumber(houseData.prices.summer?.extra_people || ""),
+        extra_people_summer: formatNumber(houseData.prices.summer?.extra_people || "10000"),
         normal_autumn: formatNumber(houseData.prices.autumn?.normal || ""),
         weekend_autumn: formatNumber(houseData.prices.autumn?.weekend || ""),
         holiday_autumn: formatNumber(houseData.prices.autumn?.holiday || ""),
         peak_autumn: formatNumber(houseData.prices.autumn?.peak || ""),
-        extra_people_autumn: formatNumber(houseData.prices.autumn?.extra_people || ""),
+        extra_people_autumn: formatNumber(houseData.prices.autumn?.extra_people || "10000"),
         normal_winter: formatNumber(houseData.prices.winter?.normal || ""),
         weekend_winter: formatNumber(houseData.prices.winter?.weekend || ""),
         holiday_winter: formatNumber(houseData.prices.winter?.holiday || ""),
         peak_winter: formatNumber(houseData.prices.winter?.peak || ""),
-        extra_people_winter: formatNumber(houseData.prices.winter?.extra_people || ""),
+        extra_people_winter: formatNumber(houseData.prices.winter?.extra_people || "10000"),
       });
     }
   }, [houseData, priceHandleBy]);
@@ -111,29 +111,24 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
         .map(([key, value]) => [key, String(value).replace(/\//g, "")])
     );
 
-    if (priceHandleBy === "PerPerson") {
-      delete formattedData.extra_people_spring;
-      delete formattedData.extra_people_summer;
-      delete formattedData.extra_people_autumn;
-      delete formattedData.extra_people_winter;
+    if (priceHandleBy === "PerNight") {
+      // Set default for "extra_people" fields if "PerNight" is selected
+      formattedData.extra_people_spring = formattedData.extra_people_spring || "10000";
+      formattedData.extra_people_summer = formattedData.extra_people_summer || "10000";
+      formattedData.extra_people_autumn = formattedData.extra_people_autumn || "10000";
+      formattedData.extra_people_winter = formattedData.extra_people_winter || "10000";
     }
 
     try {
-      const apiUrl = houseData.is_rent_room && roomUuid
-        ? `/client/house/${houseId}/room/${roomUuid}/prices`
-        : `/client/house/${houseId}/prices`;
-
-      console.log("Sending data to API:", { apiUrl, formattedData });
-
-      const response = await axios.put(apiUrl, formattedData);
-
-      console.log("Received response data:", response.data);
-
-      if (response.status === 200) {
-        toast.success("قیمت‌ها با موفقیت به روز شد");
-        setErrorList([]);
-        refetchHouseData();  // Refresh data after successful submission
+      if (houseData.is_rent_room && roomUuid) {
+        await updateRoomPrice(houseId, roomUuid, formattedData);
+      } else {
+        await updateHousePrice(houseId, formattedData);
       }
+
+      toast.success("قیمت‌ها با موفقیت به روز شد");
+      setErrorList([]);
+      refetchHouseData();
     } catch (error) {
       if (error.response?.status === 422) {
         const errorsArray = Object.values(error.response.data.errors.fields || {}).flat();
@@ -159,7 +154,7 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
       <h2 className="text-lg font-semibold mt-7">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys
-          .filter(({ key }) => (priceHandleBy === "PerPerson" ? !key.includes("extra_people") : true))
+          .filter(({ key }) => (priceHandleBy === "PerPerson" || !key.includes("extra_people")))
           .map(({ key, label }) => (
             <TextField
               key={key}
@@ -169,6 +164,7 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
               onChange={(e) => handleInputChange(key, e.target.value, roomUuid)}
               placeholder="قیمت را به تومان وارد کنید"
               className={errors[key] ? "border-red-500" : ""}
+              error={errors[key]} // Show field error if exists
             />
           ))}
       </div>

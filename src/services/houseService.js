@@ -108,22 +108,34 @@ export function deleteRoom(houseId, roomId) {
 }
 
 
+// Function to update house-level prices
 export function updateHousePrice(houseId, prices) {
   if (!houseId || !prices) {
     console.error("Missing houseId or prices:", { houseId, prices });
     throw new Error("House ID or prices data is missing.");
   }
 
-  console.log("Updating house prices with data:", { houseId, prices });
-
   return http
     .put(`/client/house/${houseId}/prices`, prices)
-    .then(({ data }) => {
-      console.log("Prices updated successfully:", data);
-      return data.data;
-    })
+    .then(({ data }) => data.data)
     .catch((error) => {
       console.error("updateHousePrice - Error:", error);
+      throw error;
+    });
+}
+
+// Function to update room-specific prices
+export function updateRoomPrice(houseId, roomId, prices) {
+  if (!houseId || !roomId || !prices) {
+    console.error("Missing houseId, roomId, or prices:", { houseId, roomId, prices });
+    throw new Error("House ID, room ID, or prices data is missing.");
+  }
+
+  return http
+    .put(`/client/house/${houseId}/room/${roomId}/prices`, prices)
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("updateRoomPrice - Error:", error);
       throw error;
     });
 }
