@@ -2,8 +2,8 @@ import React from 'react';
 
 function TextField({ label, name, value, onChange, placeholder, readOnly }) {
   return (
-    <div>
-      <label htmlFor={name} className="text-xs md:text-sm  mb-3 font-medium">
+    <div className='my-4'>
+      <label htmlFor={name} className="text-xs md:text-sm  mb-1.5 font-medium">
         {label}
       </label>
       <input

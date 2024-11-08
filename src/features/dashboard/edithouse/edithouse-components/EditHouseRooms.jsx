@@ -28,10 +28,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       const initialRooms = houseData.room.map((room) => ({
         roomName: room.name || '',
         isMasterRoom: room.is_master || false,
-        numberSingleBeds: room.number_single_beds || 0,
-        numberDoubleBeds: room.number_double_beds || 0,
-        numberSofaBeds: room.number_sofa_beds || 0,
-        numberFloorService: room.number_floor_service || 0,
+        numberSingleBeds: room.number_single_beds || '',
+        numberDoubleBeds: room.number_double_beds || '',
+        numberSofaBeds: room.number_sofa_beds || '',
+        numberFloorService: room.number_floor_service || '',
         description: room.description || '',
         selectedFacilities: room.facilities?.map((f) => f.key) || [],
         selectedAirConditions: room.airConditions?.map((a) => a.key) || [],
@@ -50,10 +50,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       {
         roomName: '',
         isMasterRoom: false,
-        numberSingleBeds: 0,
-        numberDoubleBeds: 0,
-        numberSofaBeds: 0,
-        numberFloorService: 0,
+        numberSingleBeds: '',
+        numberDoubleBeds: '',
+        numberSofaBeds: '',
+        numberFloorService: '',
         description: '',
         selectedFacilities: [],
         selectedAirConditions: [],
@@ -103,18 +103,19 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       airConditions: roomData.selectedAirConditions,
     };
 
-    console.log('Submitting room data with payload:', payload);
+    console.log(`Submitting room data to ${roomData.uuid ? 'editRoom' : 'createRoom'} API`, payload);
     setLoadingSubmit(true);
 
     try {
       if (roomData.uuid) {
-        console.log('Updating existing room with UUID:', roomData.uuid);
+        console.log(`Editing room with UUID: ${roomData.uuid}`);
         await editRoom(houseId, roomData.uuid, payload);
       } else {
         console.log('Creating a new room');
         await createRoom(houseId, payload);
       }
       refetchHouseData();
+      console.log('Room submission successful');
       toast.success('اتاق با موفقیت ثبت شد');
     } catch (error) {
       console.error('Error submitting room:', error);
@@ -132,10 +133,11 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
 
   const handleDelete = async () => {
     const roomData = rooms[deleteIndex];
-    console.log('Deleting room data:', roomData);
+    console.log(`Attempting to delete room with UUID: ${roomData.uuid}`);
     setLoadingDelete(true);
 
     if (!roomData.uuid) {
+      console.log('Room does not have a UUID, removing locally');
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
       setIsModalOpen(false);
       setLoadingDelete(false);
@@ -143,10 +145,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
     }
 
     try {
-      console.log('Deleting room with UUID:', roomData.uuid);
       await deleteRoom(houseId, roomData.uuid);
       refetchHouseData();
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
+      console.log('Room deletion successful');
       toast.success('اتاق با موفقیت حذف شد');
       if (roomData.isLivingRoom) setHasLivingRoom(false);
     } catch (error) {
@@ -173,7 +175,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       <div className="w-full px-4 flex justify-end">
         <button
           onClick={() => addRoom(false)}
-          className="bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered mr-2"
+          className="bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ml-2"
         >
           اضافه کردن اتاق
         </button>
@@ -228,6 +230,34 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     type="number"
                     value={room.numberSingleBeds}
                     onChange={(e) => handleInputChange(index, 'numberSingleBeds', e.target.value)}
+                    placeholder=""
+                  />
+
+                  <TextField
+                    label="تعداد تخت‌های دو نفره"
+                    name="numberDoubleBeds"
+                    type="number"
+                    value={room.numberDoubleBeds}
+                    onChange={(e) => handleInputChange(index, 'numberDoubleBeds', e.target.value)}
+                    placeholder=""
+                  />
+
+                  <TextField
+                    label="تعداد مبل‌های تخت خواب شو"
+                    name="numberSofaBeds"
+                    type="number"
+                    value={room.numberSofaBeds}
+                    onChange={(e) => handleInputChange(index, 'numberSofaBeds', e.target.value)}
+                    placeholder=""
+                  />
+
+                  <TextField
+                    label="تعداد تشک‌های خواب"
+                    name="numberFloorService"
+                    type="number"
+                    value={room.numberFloorService}
+                    onChange={(e) => handleInputChange(index, 'numberFloorService', e.target.value)}
+                    placeholder=""
                   />
 
                   <ToggleSwitchGroup
@@ -293,7 +323,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl mr-2 shadow-xl"
               >
                 لغو
               </button>
