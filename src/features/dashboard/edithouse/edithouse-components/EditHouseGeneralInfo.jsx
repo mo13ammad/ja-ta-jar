@@ -1,5 +1,3 @@
-// src/components/edithouse-components/EditHouseGeneralInfo.jsx
-
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import Spinner from '../../../../ui/Loading';
@@ -19,7 +17,9 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
     description: houseData?.description || '',
     tip: houseData?.tip?.key || '',
     privacy: houseData?.privacy?.key || '',
-    rentType: houseData?.structure?.can_rent_room ? 'Rooms' : 'House',
+    rentType: houseData?.structure?.can_rent_room
+      ? (houseData?.is_rent_room ? 'Rooms' : 'House')
+      : 'House',
     price_handle_by: houseData?.price_handle_by?.key || 'PerNight',
   });
 
@@ -34,7 +34,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
 
   const priceHandleOptions = [
     { key: 'PerNight', label: 'براساس هر شب' },
-    { key: 'PerPerson', label: 'براساس هر نفر-شب' },
+    { key: 'PerPerson', label: 'براساس هر نفر - شب' },
   ];
 
   useEffect(() => {
@@ -47,12 +47,14 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
         description: houseData.description || '',
         tip: houseData.tip?.key || '',
         privacy: houseData.privacy?.key || '',
-        rentType: houseData.structure?.can_rent_room ? 'Rooms' : 'House',
+        rentType: houseData.structure?.can_rent_room
+          ? (houseData.is_rent_room ? 'Rooms' : 'House')
+          : 'House',
         price_handle_by: houseData.price_handle_by?.key || 'PerNight',
       });
     }
   }, [houseData]);
- console.log(houseData);
+
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -139,11 +141,28 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
               label: option.label,
             }))]}
           />
-          
-          {/* Conditionally render the Rent Type section */}
-          {houseData?.structure?.can_rent_room && (
-            <div className="mt-4 lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">اجاره بر اساس</label>
+
+        
+
+          <div className="mt-4 lg:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد</label>
+            <div className="flex space-x-4">
+              {priceHandleOptions.map((option) => (
+                <ToggleSwitch
+                  key={option.key}
+                  checked={formData.price_handle_by === option.key}
+                  onChange={() => handleInputChange("price_handle_by", option.key)}
+                  label={option.label}
+                />
+              ))}
+            </div>
+          </div>
+ 
+     
+            {/* Conditionally render the Rent Type section */}
+            {houseData?.structure?.can_rent_room && (
+            <div className="mt-4 lg:col-span-2 border-t pt-2">
+              <label className="block font-bold  text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد</label>
               <div className="flex space-x-4">
                 {rentTypeOptions.map((option) => (
                   <ToggleSwitch
@@ -157,19 +176,6 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             </div>
           )}
 
-          <div className="mt-4 lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">قیمت گذاری بر اساس</label>
-            <div className="flex space-x-4">
-              {priceHandleOptions.map((option) => (
-                <ToggleSwitch
-                  key={option.key}
-                  checked={formData.price_handle_by === option.key}
-                  onChange={() => handleInputChange("price_handle_by", option.key)}
-                  label={option.label}
-                />
-              ))}
-            </div>
-          </div>
           <div className="mt-4 w-full lg:col-span-2 flex justify-end">
             <button
               type="submit"

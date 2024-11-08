@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from "react";
-import Spinner from "../../../../ui/Loading";
-import TextField from "../../../../ui/TextField";
-import FormSelect from "../../../../ui/FormSelect";
-import { Disclosure } from "@headlessui/react";
-import { toast, Toaster } from "react-hot-toast";
+// src/components/edithouse-components/EditHousePricing.jsx
 
-const EditHousePricing = ({ houseData, loadingHouse }) => {
+import React, { useState, useEffect } from "react";
+import TextField from "../../../../ui/TextField";
+import { toast, Toaster } from "react-hot-toast";
+import { Disclosure } from "@headlessui/react";
+import Spinner from "../../../../ui/Loading";
+import axios from "axios";
+
+const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }) => {
   const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [errorList, setErrorList] = useState([]);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [priceHandleBy, setPriceHandleBy] = useState(houseData?.price_handle_by?.key);
 
   const priceHandleOptions = [
@@ -91,11 +96,67 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
         [key]: formattedValue,
       }));
     }
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: null,
+    }));
+  };
+
+  const handleSubmit = async (roomUuid = null) => {
+    setLoadingSubmit(true);
+    const priceData = roomUuid ? formData[roomUuid] : formData;
+    const formattedData = Object.fromEntries(
+      Object.entries(priceData)
+        .filter(([key, value]) => value !== "")
+        .map(([key, value]) => [key, String(value).replace(/\//g, "")])
+    );
+
+    if (priceHandleBy === "PerPerson") {
+      delete formattedData.extra_people_spring;
+      delete formattedData.extra_people_summer;
+      delete formattedData.extra_people_autumn;
+      delete formattedData.extra_people_winter;
+    }
+
+    try {
+      const apiUrl = houseData.is_rent_room && roomUuid
+        ? `/client/house/${houseId}/room/${roomUuid}/prices`
+        : `/client/house/${houseId}/prices`;
+
+      console.log("Sending data to API:", { apiUrl, formattedData });
+
+      const response = await axios.put(apiUrl, formattedData);
+
+      console.log("Received response data:", response.data);
+
+      if (response.status === 200) {
+        toast.success("قیمت‌ها با موفقیت به روز شد");
+        setErrorList([]);
+        refetchHouseData();  // Refresh data after successful submission
+      }
+    } catch (error) {
+      if (error.response?.status === 422) {
+        const errorsArray = Object.values(error.response.data.errors.fields || {}).flat();
+        setErrorList(errorsArray);
+        toast.error("خطا در ورود اطلاعات، لطفاً بررسی کنید");
+
+        const fieldErrors = error.response.data.errors.fields;
+        const updatedErrors = {};
+        for (let field in fieldErrors) {
+          updatedErrors[field] = fieldErrors[field][0];
+        }
+        setErrors(updatedErrors);
+      } else {
+        toast.error("مشکلی پیش آمده است");
+      }
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
   const renderInputSection = (roomUuid, title, keys) => (
-    <div className="">
-      <h2 className="my-2 mt-4">{`${title} :`}</h2>
+    <div className="mt-4">
+      <h2 className="text-lg font-semibold mt-7">{title}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {keys
           .filter(({ key }) => (priceHandleBy === "PerPerson" ? !key.includes("extra_people") : true))
@@ -107,6 +168,7 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
               value={formData[roomUuid]?.[key] || formData[key] || ""}
               onChange={(e) => handleInputChange(key, e.target.value, roomUuid)}
               placeholder="قیمت را به تومان وارد کنید"
+              className={errors[key] ? "border-red-500" : ""}
             />
           ))}
       </div>
@@ -124,9 +186,8 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
   return (
     <div className="relative p-2">
       <Toaster />
-      <div className="overflow-auto scrollbar-thin  pt-2 px-2 lg:px-4 w-full ">
-      <div className="text-right font-bold lg:text-lg ">قوانین اقامت :</div>
-
+      <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full">
+        <h2 className="text-right font-bold lg:text-lg mb-4">قیمت‌گذاری :</h2>
 
         {houseData.is_rent_room ? (
           houseData.room.map((room, index) => (
@@ -135,7 +196,6 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
                 <>
                   <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-gray-200 rounded-lg px-4 mb-2">
                     <span>{room.name || `اتاق ${index + 1}`}</span>
-                 
                   </Disclosure.Button>
 
                   <Disclosure.Panel className="p-4 border rounded-lg mb-4">
@@ -162,6 +222,27 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
                       { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
                       { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
                     ])}
+
+                    <div className="mt-4">
+                      <button
+                        onClick={() => handleSubmit(room.uuid)}
+                        className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
+                        disabled={loadingSubmit}
+                      >
+                        {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت اتاق"}
+                      </button>
+                    </div>
+
+                    {errorList.length > 0 && (
+                      <div className="mt-4 text-red-600">
+                        <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+                        <ul className="list-disc ml-5">
+                          {errorList.map((error, index) => (
+                            <li key={index}>{error}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </Disclosure.Panel>
                 </>
               )}
@@ -200,14 +281,18 @@ const EditHousePricing = ({ houseData, loadingHouse }) => {
             ])}
           </>
         )}
-        <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-          <button
-            className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={()=>{}}
-          >
-            ثبت اطلاعات
-          </button>
-        </div>
+
+        {!houseData.is_rent_room && (
+          <div className="mt-4">
+            <button
+              onClick={() => handleSubmit()}
+              className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
+              disabled={loadingSubmit}
+            >
+              {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت‌ها"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

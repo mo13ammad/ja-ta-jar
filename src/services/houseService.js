@@ -106,3 +106,24 @@ export function deleteRoom(houseId, roomId) {
       throw error;
     });
 }
+
+
+export function updateHousePrice(houseId, prices) {
+  if (!houseId || !prices) {
+    console.error("Missing houseId or prices:", { houseId, prices });
+    throw new Error("House ID or prices data is missing.");
+  }
+
+  console.log("Updating house prices with data:", { houseId, prices });
+
+  return http
+    .put(`/client/house/${houseId}/prices`, prices)
+    .then(({ data }) => {
+      console.log("Prices updated successfully:", data);
+      return data.data;
+    })
+    .catch((error) => {
+      console.error("updateHousePrice - Error:", error);
+      throw error;
+    });
+}
