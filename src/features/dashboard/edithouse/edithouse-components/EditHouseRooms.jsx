@@ -1,5 +1,3 @@
-// src/components/edithouse-components/EditHouseRooms.jsx
-
 import React, { useState, useEffect } from 'react';
 import { Disclosure, Dialog } from '@headlessui/react';
 import Spinner from '../../../../ui/Loading';
@@ -18,13 +16,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchRoomFacilities();
   const { data: airConditionData = [], isLoading: loadingAirConditions } = useFetchCoolingAndHeatingOptions();
 
   useEffect(() => {
     if (houseData?.room) {
-      console.log('Received house data:', houseData);
       const initialRooms = houseData.room.map((room) => ({
         roomName: room.name || '',
         isMasterRoom: room.is_master || false,
@@ -44,9 +42,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   }, [houseData]);
 
   const addRoom = (isLivingRoom = false) => {
-    console.log(`Adding a new ${isLivingRoom ? 'living room' : 'room'}`);
     setRooms((prevRooms) => [
-      ...prevRooms,
       {
         roomName: '',
         isMasterRoom: false,
@@ -60,20 +56,23 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         isLivingRoom,
         uuid: null,
       },
+      ...prevRooms,
     ]);
     if (isLivingRoom) setHasLivingRoom(true);
   };
 
   const handleInputChange = (index, key, value) => {
-    console.log(`Updating room index ${index}, setting ${key} to:`, value);
     setRooms((prevRooms) =>
       prevRooms.map((room, i) => (i === index ? { ...room, [key]: value } : room))
     );
+    setFieldErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: null, // Clear error message for this field on change
+    }));
   };
 
   const toggleSelection = (index, type, key) => {
     const keyName = type === 'facility' ? 'selectedFacilities' : 'selectedAirConditions';
-    console.log(`Toggling ${type} with key ${key} for room index ${index}`);
     setRooms((prevRooms) =>
       prevRooms.map((room, i) =>
         i === index
@@ -103,23 +102,27 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       airConditions: roomData.selectedAirConditions,
     };
 
-    console.log(`Submitting room data to ${roomData.uuid ? 'editRoom' : 'createRoom'} API`, payload);
     setLoadingSubmit(true);
+    setFieldErrors({});
 
     try {
       if (roomData.uuid) {
-        console.log(`Editing room with UUID: ${roomData.uuid}`);
         await editRoom(houseId, roomData.uuid, payload);
       } else {
-        console.log('Creating a new room');
         await createRoom(houseId, payload);
       }
       refetchHouseData();
-      console.log('Room submission successful');
       toast.success('اتاق با موفقیت ثبت شد');
     } catch (error) {
-      console.error('Error submitting room:', error);
-      toast.error('خطا در ثبت اتاق');
+      if (error.response?.status === 422) {
+        const errors = error.response.data.errors.fields;
+        setFieldErrors(errors);
+
+        // Show a summary toast with the first error message
+        toast.error('خطایی در ثبت اطلاعات رخ داد');
+      } else {
+        toast.error('خطا در ثبت اتاق');
+      }
     } finally {
       setLoadingSubmit(false);
     }
@@ -128,16 +131,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const confirmDelete = (index) => {
     setDeleteIndex(index);
     setIsModalOpen(true);
-    console.log('Preparing to delete room at index:', index);
   };
 
   const handleDelete = async () => {
     const roomData = rooms[deleteIndex];
-    console.log(`Attempting to delete room with UUID: ${roomData.uuid}`);
     setLoadingDelete(true);
 
     if (!roomData.uuid) {
-      console.log('Room does not have a UUID, removing locally');
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
       setIsModalOpen(false);
       setLoadingDelete(false);
@@ -148,11 +148,9 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       await deleteRoom(houseId, roomData.uuid);
       refetchHouseData();
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
-      console.log('Room deletion successful');
       toast.success('اتاق با موفقیت حذف شد');
       if (roomData.isLivingRoom) setHasLivingRoom(false);
     } catch (error) {
-      console.error('Error deleting room:', error);
       toast.error('خطا در حذف اتاق');
     } finally {
       setLoadingDelete(false);
@@ -169,10 +167,21 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   }
 
   return (
-    <div className="relative">
+    <div className="relative p-1.5 lg:p-3">
       <Toaster />
-      <div className="text-right font-bold lg:text-lg mb-2 px-4">اطلاعات اتاق‌ها :</div>
-      <div className="w-full px-4 flex justify-end">
+      <div className="text-right font-bold lg:text-lg ">اطلاعات اتاق‌ها :</div>
+     
+      <div className="w-full px-4 flex justify-between items-center">
+        <div>
+      {Object.keys(fieldErrors).length > 0 && (
+                      <div className="mt-2 text-red-600 text-sm pr-2">
+                        {Object.values(fieldErrors).map((error, idx) => (
+                          <div key={idx}>{error}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+        <div>
         <button
           onClick={() => addRoom(false)}
           className="bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ml-2"
@@ -188,6 +197,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         >
           اضافه کردن اتاق پذیرایی
         </button>
+        </div>
       </div>
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
         {rooms.map((room, index) => (
@@ -214,6 +224,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     value={room.roomName}
                     onChange={(e) => handleInputChange(index, 'roomName', e.target.value)}
                     placeholder="نام اتاق"
+                    error={fieldErrors.roomName}
                   />
 
                   <div className="my-3">
@@ -230,7 +241,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     type="number"
                     value={room.numberSingleBeds}
                     onChange={(e) => handleInputChange(index, 'numberSingleBeds', e.target.value)}
-                    placeholder=""
+                    error={fieldErrors.number_single_beds}
                   />
 
                   <TextField
@@ -239,7 +250,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     type="number"
                     value={room.numberDoubleBeds}
                     onChange={(e) => handleInputChange(index, 'numberDoubleBeds', e.target.value)}
-                    placeholder=""
+                    error={fieldErrors.number_double_beds}
                   />
 
                   <TextField
@@ -248,7 +259,6 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     type="number"
                     value={room.numberSofaBeds}
                     onChange={(e) => handleInputChange(index, 'numberSofaBeds', e.target.value)}
-                    placeholder=""
                   />
 
                   <TextField
@@ -257,7 +267,6 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     type="number"
                     value={room.numberFloorService}
                     onChange={(e) => handleInputChange(index, 'numberFloorService', e.target.value)}
-                    placeholder=""
                   />
 
                   <ToggleSwitchGroup
@@ -283,7 +292,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     className="mt-4"
                   />
 
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex gap-2  items-end">
                     <button
                       onClick={() => handleRoomSubmit(index)}
                       className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
@@ -291,6 +300,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     >
                       {loadingSubmit ? 'در حال ارسال...' : room.uuid ? 'ثبت تغییرات' : 'ثبت اتاق'}
                     </button>
+                  
                     {room.uuid && (
                       <button
                         onClick={() => confirmDelete(index)}
@@ -323,7 +333,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl mr-2 shadow-xl"
+                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
               >
                 لغو
               </button>

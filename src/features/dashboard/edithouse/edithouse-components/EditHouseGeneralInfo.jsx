@@ -113,14 +113,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             onChange={(e) => handleInputChange("number_stairs", e.target.value)}
             placeholder="تعداد پله"
           />
-          <TextArea
-            label="درباره اقامتگاه"
-            name="description"
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
-            className="lg:col-span-2"
-          />
+         
           <FormSelect
             label="تیپ سازه"
             name="tip"
@@ -141,7 +134,14 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
               label: option.label,
             }))]}
           />
-
+          <TextArea
+            label="درباره اقامتگاه"
+            name="description"
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
+            className="lg:col-span-2"
+          />
         
 
           <div className="mt-4 lg:col-span-2">
