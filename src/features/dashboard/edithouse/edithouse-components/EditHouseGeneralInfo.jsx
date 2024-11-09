@@ -1,6 +1,5 @@
-// src/components/edithouse-components/EditHouseGeneralInfo.jsx
-
 import React, { useState, useEffect, Fragment } from 'react';
+
 import { toast } from 'react-hot-toast';
 import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
@@ -11,8 +10,8 @@ import { useFetchHouseFloors, useFetchPrivacyOptions } from '../../../../service
 import useEditHouse from '../useEditHouse';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import NumberField from '../../../../ui/NumberField';
 
-// Ownership Options
 const ownershipOptions = [
   { key: 'Owner', label: 'مالک', value: 'Owner' },
   { key: 'LongTermTenant', label: 'مستأجر بلند مدت', value: 'LongTermTenant' },
@@ -21,7 +20,6 @@ const ownershipOptions = [
   { key: 'Gatekeeper', label: 'سرایدار', value: 'Gatekeeper' },
 ];
 
-// OwnershipSelect Component
 function OwnershipSelect({ label, value, onChange }) {
   return (
     <div className="w-full">
@@ -34,13 +32,10 @@ function OwnershipSelect({ label, value, onChange }) {
                 {ownershipOptions.find((option) => option.value === value)?.label || 'انتخاب کنید'}
               </span>
               <ChevronDownIcon
-                className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                  open ? 'rotate-180' : 'rotate-0'
-                }`}
+                className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
                 aria-hidden="true"
               />
             </Listbox.Button>
-
             <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
               <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-gray-400 scrollbar-track-gray-100">
                 {ownershipOptions.map((option) => (
@@ -48,9 +43,7 @@ function OwnershipSelect({ label, value, onChange }) {
                     key={option.key}
                     value={option.value}
                     className={({ active }) =>
-                      `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
-                        active ? 'bg-secondary-100 text-secondary-700' : 'text-gray-900'
-                      }`
+                      `cursor-pointer select-none relative py-2 pl-10 pr-4 ${active ? 'bg-secondary-100 text-secondary-700' : 'text-gray-900'}`
                     }
                   >
                     <span className="block truncate font-normal">{option.label}</span>
@@ -65,51 +58,45 @@ function OwnershipSelect({ label, value, onChange }) {
   );
 }
 
-// Main EditHouseGeneralInfo Component
 const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
-
-
   const [formData, setFormData] = useState({
-    name: houseData?.name || '',
-    land_size: houseData?.structure?.land_size || '',
-    structure_size: houseData?.structure?.size || '',
-    number_stairs: houseData?.structure?.number_stairs || '',
-    description: houseData?.description || '',
-    tip: houseData?.tip?.key || '',
-    privacy: houseData?.privacy?.key || '',
-    rentType: houseData?.structure?.can_rent_room
-      ? (houseData?.is_rent_room ? 'Rooms' : 'House')
-      : 'House',
-    price_handle_by: houseData?.price_handle_by?.key || 'PerNight',
-    ownership: houseData?.ownership || '', // Set initial ownership directly
+    name: '',
+    land_size: '',
+    structure_size: '',
+    number_stairs: '',
+    description: '',
+    tip: '',
+    privacy: '',
+    rentType: 'House',
+    price_handle_by: 'PerNight',
+    ownership: '',
   });
 
   const { data: houseFloorOptions = [], isLoading: loadingHouseFloors } = useFetchHouseFloors();
   const { data: privacyOptions = [], isLoading: loadingPrivacyOptions } = useFetchPrivacyOptions();
   const { mutateAsync, isLoading: editLoading } = useEditHouse();
 
-  const rentTypeOptions = [
-    { key: 'House', label: 'اقامتگاه' },
-    { key: 'Rooms', label: 'اتاق' },
-  ];
-
-  const priceHandleOptions = [
-    { key: 'PerNight', label: 'براساس هر شب' },
-    { key: 'PerPerson', label: 'براساس هر نفر - شب' },
-  ];
+  const [errors, setErrors] = useState({});
+  const [errorList, setErrorList] = useState([]);
 
   useEffect(() => {
     if (houseData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        ownership: houseData.ownership || '', // Set ownership based on houseData
-      }));
+      setFormData({
+        name: houseData.name || '',
+        land_size: houseData.structure?.land_size || '',
+        structure_size: houseData.structure?.size || '',
+        number_stairs: houseData.structure?.number_stairs || '',
+        description: houseData.description || '',
+        tip: houseData.tip?.key || '',
+        privacy: houseData.privacy?.key || '',
+        rentType: houseData.structure?.can_rent_room ? (houseData.is_rent_room ? 'Rooms' : 'House') : 'House',
+        price_handle_by: houseData.price_handle_by?.key || 'PerNight',
+        ownership: houseData.ownership || '',
+      });
     }
   }, [houseData]);
 
-
   const handleInputChange = (name, value) => {
-    console.log(`Input Change - Field: ${name}, Value: ${value}`);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -118,17 +105,34 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({});
+    setErrorList([]);
+
     if (!houseId) {
       toast.error("شناسه اقامتگاه موجود نیست. امکان ارسال داده وجود ندارد.");
       return;
     }
 
-    console.log("Submitting formData:", formData);
     try {
-      const response = await mutateAsync({ houseId, houseData: formData });
+      await mutateAsync({ houseId, houseData: formData });
       toast.success('جزئیات اقامتگاه با موفقیت به‌روزرسانی شد!');
     } catch (error) {
-      toast.error('به‌روزرسانی جزئیات اقامتگاه ناموفق بود. لطفاً دوباره تلاش کنید.');
+      if (error.response?.data?.errors?.fields) {
+        const fieldErrors = error.response.data.errors.fields;
+        const updatedErrors = {};
+        const errorsArray = Object.values(fieldErrors).flat();
+
+        for (let field in fieldErrors) {
+          updatedErrors[field] = fieldErrors[field];
+        }
+        setErrors(updatedErrors);
+        setErrorList(errorsArray);
+
+        const generalMessage = error.response.data.message || 'خطایی رخ داده است';
+        toast.error(generalMessage);
+      } else {
+        toast.error('به‌روزرسانی جزئیات اقامتگاه ناموفق بود. لطفاً دوباره تلاش کنید.');
+      }
     }
   };
 
@@ -146,96 +150,73 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
             placeholder="نام اقامتگاه"
+            errorMessages={errors.name}
           />
-          <TextField
+          <NumberField
             label="متراژ کل"
             name="land_size"
             value={formData.land_size}
             onChange={(e) => handleInputChange("land_size", e.target.value)}
             placeholder="متراژ کل به متر مربع"
+            errorMessages={errors.land_size}
           />
-          <TextField
+          <NumberField
             label="متراژ زیر بنا"
             name="structure_size"
             value={formData.structure_size}
             onChange={(e) => handleInputChange("structure_size", e.target.value)}
             placeholder="متراژ زیر بنا به متر مربع"
+            errorMessages={errors.structure_size}
           />
-          <TextField
+          <NumberField
             label="تعداد پله"
             name="number_stairs"
             value={formData.number_stairs}
             onChange={(e) => handleInputChange("number_stairs", e.target.value)}
             placeholder="تعداد پله"
+            errorMessages={errors.number_stairs}
           />
-
           <FormSelect
             label="تیپ سازه"
             name="tip"
-            value={formData.tip || ''} // Ensure controlled input
+            value={formData.tip || ''}
             onChange={(e) => handleInputChange("tip", e.target.value)}
             options={loadingHouseFloors ? [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }] : [{ key: 'default', value: '', label: 'انتخاب نوع' }, ...houseFloorOptions.map((option) => ({
               key: option.key,
               value: option.key,
               label: option.label,
             }))]}
+            errorMessages={errors.tip}
           />
           <FormSelect
             label="وضعیت حریم"
             name="privacy"
-            value={formData.privacy || ''} // Ensure controlled input
+            value={formData.privacy || ''}
             onChange={(e) => handleInputChange("privacy", e.target.value)}
             options={loadingPrivacyOptions ? [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }] : [{ key: 'default', value: '', label: 'انتخاب حریم' }, ...privacyOptions.map((option) => ({
               key: option.key,
               value: option.key,
               label: option.label,
             }))]}
+            errorMessages={errors.privacy}
           />
-
           <OwnershipSelect
             label="نوع ارتباط مالک با اقامتگاه"
             value={formData.ownership || ''}
             onChange={(value) => handleInputChange("ownership", value)}
           />
-
+          <div className='w-full lg:col-span-2'>
           <TextArea
             label="درباره اقامتگاه"
             name="description"
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
+            errorMessages={errors.description}
             className="lg:col-span-2"
           />
-
-          <div className="mt-4 lg:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد</label>
-            <div className="flex space-x-4">
-              {priceHandleOptions.map((option) => (
-                <ToggleSwitch
-                  key={option.key}
-                  checked={formData.price_handle_by === option.key}
-                  onChange={() => handleInputChange("price_handle_by", option.key)}
-                  label={option.label}
-                />
-              ))}
-            </div>
-          </div>
-
-          {houseData?.structure?.can_rent_room && (
-            <div className="mt-4 lg:col-span-2 border-t pt-2">
-              <label className="block font-bold text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد</label>
-              <div className="flex space-x-4">
-                {rentTypeOptions.map((option) => (
-                  <ToggleSwitch
-                    key={option.key}
-                    checked={formData.rentType === option.key}
-                    onChange={() => handleInputChange("rentType", option.key)}
-                    label={option.label}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+         </div>
+       
 
           <div className="mt-4 w-full lg:col-span-2 flex justify-end">
             <button

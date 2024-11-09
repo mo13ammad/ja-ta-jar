@@ -1,3 +1,5 @@
+// src/components/EditHouseContent.jsx
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
@@ -51,8 +53,8 @@ const EditHouseContent = ({ selectedTab }) => {
       // Update houseData with the response from edit
       setHouseData(response);
 
-      // Optionally refetch to ensure the data is in sync with the server
-      refetchHouseData();
+      // Refetch immediately to ensure state sync
+      await refetchHouseData(); // Fetches latest data from the server
     } catch (error) {
       console.error('Edit House Error:', error.response?.data || error.message);
       throw error.response?.data || error;
