@@ -34,6 +34,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         selectedFacilities: room.facilities?.map((f) => f.key) || [],
         selectedAirConditions: room.airConditions?.map((a) => a.key) || [],
         isLivingRoom: room.is_living_room || false,
+        quantity: room.quantity || '', // Set initial quantity if it exists
         uuid: room.uuid || null,
       }));
       setRooms(initialRooms.reverse());
@@ -54,6 +55,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         selectedFacilities: [],
         selectedAirConditions: [],
         isLivingRoom,
+        quantity: houseData.is_rent_room ? '' : null, // Only add quantity if is_rent_room is true
         uuid: null,
       },
       ...prevRooms,
@@ -100,6 +102,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       description: roomData.description,
       facilities: roomData.selectedFacilities,
       airConditions: roomData.selectedAirConditions,
+      quantity: houseData.is_rent_room ? roomData.quantity : undefined, // Include quantity only if is_rent_room is true
     };
 
     setLoadingSubmit(true);
@@ -117,8 +120,6 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       if (error.response?.status === 422) {
         const errors = error.response.data.errors.fields;
         setFieldErrors(errors);
-
-        // Show a summary toast with the first error message
         toast.error('خطایی در ثبت اطلاعات رخ داد');
       } else {
         toast.error('خطا در ثبت اتاق');
@@ -173,32 +174,33 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
      
       <div className="w-full px-4 flex justify-between items-center">
         <div>
-      {Object.keys(fieldErrors).length > 0 && (
-                      <div className="mt-2 text-red-600 text-sm pr-2">
-                        {Object.values(fieldErrors).map((error, idx) => (
-                          <div key={idx}>{error}</div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+          {Object.keys(fieldErrors).length > 0 && (
+            <div className="mt-2 text-red-600 text-sm pr-2">
+              {Object.values(fieldErrors).map((error, idx) => (
+                <div key={idx}>{error}</div>
+              ))}
+            </div>
+          )}
+        </div>
         <div>
-        <button
-          onClick={() => addRoom(false)}
-          className="bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ml-2"
-        >
-          اضافه کردن اتاق
-        </button>
-        <button
-          onClick={() => addRoom(true)}
-          className={`bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ${
-            hasLivingRoom ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={hasLivingRoom}
-        >
-          اضافه کردن اتاق پذیرایی
-        </button>
+          <button
+            onClick={() => addRoom(false)}
+            className="bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ml-2"
+          >
+            اضافه کردن اتاق
+          </button>
+          <button
+            onClick={() => addRoom(true)}
+            className={`bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ${
+              hasLivingRoom ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={hasLivingRoom}
+          >
+            اضافه کردن اتاق پذیرایی
+          </button>
         </div>
       </div>
+
       <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
         {rooms.map((room, index) => (
           <Disclosure key={index}>
@@ -226,6 +228,18 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     placeholder="نام اتاق"
                     error={fieldErrors.roomName}
                   />
+
+                  {/* Conditionally render quantity field based on houseData.is_rent_room */}
+                  {houseData.is_rent_room && (
+                    <TextField
+                      label="تعداد اتاق"
+                      name="quantity"
+                      type="number"
+                      value={room.quantity}
+                      onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                      error={fieldErrors.quantity}
+                    />
+                  )}
 
                   <div className="my-3">
                     <ToggleSwitch
@@ -292,7 +306,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     className="mt-4"
                   />
 
-                  <div className="mt-4 flex gap-2  items-end">
+                  <div className="mt-4 flex gap-2 items-end">
                     <button
                       onClick={() => handleRoomSubmit(index)}
                       className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
@@ -300,7 +314,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     >
                       {loadingSubmit ? 'در حال ارسال...' : room.uuid ? 'ثبت تغییرات' : 'ثبت اتاق'}
                     </button>
-                  
+
                     {room.uuid && (
                       <button
                         onClick={() => confirmDelete(index)}
