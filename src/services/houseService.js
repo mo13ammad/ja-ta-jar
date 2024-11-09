@@ -139,3 +139,27 @@ export function updateRoomPrice(houseId, roomId, prices) {
       throw error;
     });
 }
+
+
+
+// Function to upload a document for a house
+export function uploadHouseDocument(houseId, documentData) {
+  if (!houseId || !documentData) {
+    console.error("Missing houseId or documentData:", { houseId, documentData });
+    throw new Error("House ID or document data is missing.");
+  }
+
+  const formData = new FormData();
+  formData.append("document_type", documentData.document_type);
+  formData.append("document", documentData.document);
+
+  return http
+    .post(`/client/house/${houseId}/document`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("uploadHouseDocument - Error:", error);
+      throw error;
+    });
+}
