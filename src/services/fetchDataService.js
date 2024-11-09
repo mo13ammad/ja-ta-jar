@@ -32,7 +32,7 @@ export function getProvinces(data) {
   
   
   
-
+  
   
   export function getSanitaryOptions() {
     return http.get('/assets/types/sanitaryFacilities/detail').then(({ data }) => data.data);
@@ -45,11 +45,11 @@ export function getProvinces(data) {
   export function getRules() {
     return http.get('/assets/types/rules/detail').then(({ data }) => data.data);
   }
-
+  
   export function getWeekendOptions() {
     return http.get('/assets/types/weekendHoliday/detail').then(({ data }) => data.data);
   }
-    
+  
   export function getRoomFacilities() {
     return http.get('/assets/types/roomFacilities/detail').then(({ data }) => data.data);
   }
@@ -58,8 +58,19 @@ export function getProvinces(data) {
     return http.get('/assets/types/coolingAndHeating/detail').then(({ data }) => data.data);
   }
   
+  export function getCancellationRules() {
+    return http.get('/client/house/cancellation/rules').then(({ data }) => data.data);
+  }
+  
   // Custom hooks for each fetch function
-
+  export function useFetchCancellationRules() {
+    return useQuery({
+      queryKey: ["get-cancellation-rules"],
+      queryFn: getCancellationRules,
+      retry: false,
+    });
+  }
+  
   export function useFetchRoomFacilities() {
     return useQuery({
       queryKey: ["get-room-facilities"],
@@ -75,6 +86,7 @@ export function getProvinces(data) {
       retry: false,
     });
   }
+  
 
   export function useFetchWeekendOptions() {
     return useQuery({

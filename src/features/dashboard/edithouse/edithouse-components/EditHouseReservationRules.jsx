@@ -1,7 +1,6 @@
 // src/components/edithouse-components/EditHouseReservationRules.jsx
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Spinner from "../../../../ui/Loading";
 import TextField from "../../../../ui/TextField";
 import FormSelect from "../../../../ui/FormSelect";
@@ -68,7 +67,6 @@ const EditHouseReservationRules = ({ houseData, handleEditHouse, loadingHouse, r
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     setErrorMessage("");
-    console.log("Submitting form data:", formData);
     try {
       await handleEditHouse(formData);
       await refetchHouseData();
@@ -82,15 +80,6 @@ const EditHouseReservationRules = ({ houseData, handleEditHouse, loadingHouse, r
     }
   };
 
-  const renderErrorMessages = (fieldErrors) => {
-    if (!fieldErrors) return null;
-    return (
-      <div className="mt-0.5 text-red-500 text-sm xl:text-lg">
-        {Array.isArray(fieldErrors) ? fieldErrors.map((error, index) => <p key={index}>{error}</p>) : <p>{fieldErrors}</p>}
-      </div>
-    );
-  };
-
   if (loadingHouse || loadingSubmit || loadingWeekendOptions) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -102,7 +91,7 @@ const EditHouseReservationRules = ({ houseData, handleEditHouse, loadingHouse, r
   return (
     <div className="container mx-auto p-4">
       <Toaster />
-      <h1 className="text-2xl font-bold mb-4 text-center">قوانین رزرو</h1>
+      <h1 className="text-xl font-bold mb-4">قوانین رزرو</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TextField
@@ -208,17 +197,25 @@ const EditHouseReservationRules = ({ houseData, handleEditHouse, loadingHouse, r
             </tr>
           </thead>
           <tbody>
-            {["Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"].map((dayKey, idx) => (
-              <tr key={dayKey}>
-                <td className="p-2">{["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"][idx]}</td>
-                <td className="p-2">
+            {[
+              { key: "Saturday", label: "شنبه" },
+              { key: "Sunday", label: "یکشنبه" },
+              { key: "Monday", label: "دوشنبه" },
+              { key: "Tuesday", label: "سه‌شنبه" },
+              { key: "Wednesday", label: "چهارشنبه" },
+              { key: "Thursday", label: "پنج‌شنبه" },
+              { key: "Friday", label: "جمعه" },
+            ].map((day) => (
+              <tr key={day.key}>
+                <td className="p-1">{day.label}</td>
+                <td className="p-1">
                   <TextField
-                    name={`minimum_length_stay.${dayKey}`}
-                    value={formData.minimum_length_stay[dayKey]}
-                    onChange={(e) => handleMinimumStayChange(dayKey, e.target.value)}
-                    placeholder={`تعداد شب برای ${dayKey}`}
+                    name={`minimum_length_stay.${day.key}`}
+                    value={formData.minimum_length_stay[day.key]}
+                    onChange={(e) => handleMinimumStayChange(day.key, e.target.value)}
+                    placeholder={`تعداد شب برای ${day.label}`}
                     type="number"
-                    className="p-2 border rounded-xl max-w-[4rem] outline-none"
+                    className="p-1 border rounded-xl max-w-[4rem] outline-none"
                   />
                 </td>
               </tr>

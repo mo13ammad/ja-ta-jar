@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { toast } from 'react-hot-toast';
-import { Listbox, Transition, Dialog } from '@headlessui/react';
+import { Listbox, Transition } from '@headlessui/react';
 import Loading from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
 import useFetchProvinces from '../../useFetchProvinces';
@@ -10,7 +10,7 @@ import L from 'leaflet';
 import customMarkerImage from '../../../../../public/assets/location.png';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
-// Configure Leaflet to use custom marker icon
+// Configure custom marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: customMarkerImage,
@@ -34,9 +34,9 @@ const EditHouseLocationDetails = ({
   isFetching,
   handleEditHouse,
   editLoading,
-  editError,
+  refetchHouseData,
 }) => {
-  const { data: provinces = [], isLoading: loadingProvinces } = useFetchProvinces();
+  const { data: provinces = [], isLoading: loadingProvinces, error: provincesError } = useFetchProvinces();
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
@@ -46,31 +46,51 @@ const EditHouseLocationDetails = ({
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
-  // Set initial data based on houseData
+  console.log("Component Rendered");
+
+  // Log loading state for each data source
+  console.log("Loading house data:", loadingHouse, "Provinces loading:", loadingProvinces, "Cities loading:", isFetching);
+
   useEffect(() => {
-    if (houseData) {
+    if (provincesError) {
+      console.error("Error fetching provinces:", provincesError);
+      toast.error("خطا در بارگیری استان‌ها");
+    }
+  }, [provincesError]);
+
+  // Initialize data from houseData
+  useEffect(() => {
+    if (houseData && provinces.length) {
+      console.log("Initializing house data", houseData);
       const initialLat = houseData.address?.geography?.latitude || DEFAULT_LAT;
       const initialLng = houseData.address?.geography?.longitude || DEFAULT_LNG;
       setLatitude(initialLat);
       setLongitude(initialLng);
+      console.log("Set initial latitude and longitude:", initialLat, initialLng);
 
-      // Initialize selected province and city from houseData
       const provinceName = houseData.address?.province?.name || houseData.address?.city?.province?.name;
       const cityName = houseData.address?.city?.name;
       const initialProvince = provinces.find((p) => p.name === provinceName);
+
       if (initialProvince) {
         setSelectedProvince({ value: initialProvince.id, label: initialProvince.name });
         setCityOptions(houseData.address.city ? [{ value: houseData.address.city.id, label: cityName }] : []);
+        console.log("Set initial city options based on house data:", cityOptions);
       }
     }
   }, [houseData, provinces]);
 
-  // Fetch cities when province changes
-  const { data: citiesData, isLoading: loadingCities } = useFetchCities(selectedProvince?.value);
+  const { data: citiesData, isLoading: loadingCities, error: citiesError } = useFetchCities(selectedProvince?.value);
+
   useEffect(() => {
+    if (citiesError) {
+      console.error("Error fetching cities:", citiesError);
+      toast.error("خطا در بارگیری شهرها");
+    }
+
     if (selectedProvince && citiesData?.cities) {
+      console.log("Fetching cities for selected province", selectedProvince);
       const newCityOptions = citiesData.cities.map((city) => ({
         value: city.id,
         label: city.name,
@@ -78,13 +98,15 @@ const EditHouseLocationDetails = ({
         longitude: city.longitude,
       }));
       setCityOptions(newCityOptions);
+      console.log("Set city options based on selected province:", newCityOptions);
     }
-  }, [selectedProvince, citiesData]);
+  }, [selectedProvince, citiesData, citiesError]);
 
   // Initialize the map
-  const initializeMap = (containerRef, latitude, longitude) => {
-    if (containerRef.current && !mapRef.current) {
-      mapRef.current = L.map(containerRef.current).setView([latitude, longitude], 11);
+  const initializeMap = (latitude, longitude) => {
+    console.log("Initializing map with coordinates:", latitude, longitude);
+    if (!mapRef.current && mapContainerRef.current) {
+      mapRef.current = L.map(mapContainerRef.current).setView([latitude, longitude], 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
       }).addTo(mapRef.current);
@@ -98,6 +120,7 @@ const EditHouseLocationDetails = ({
         const coords = e.target.getLatLng();
         setLatitude(coords.lat);
         setLongitude(coords.lng);
+        console.log("Marker dragged to:", coords.lat, coords.lng);
         toast.success('موقعیت جدید انتخاب شد');
       });
 
@@ -106,34 +129,36 @@ const EditHouseLocationDetails = ({
         setLatitude(lat);
         setLongitude(lng);
         markerRef.current.setLatLng([lat, lng]);
+        console.log("Map clicked and marker moved to:", lat, lng);
         toast.success('موقعیت جدید انتخاب شد');
       });
     }
   };
 
   useEffect(() => {
-    if (isMapModalOpen) {
-      setTimeout(() => initializeMap(mapContainerRef, latitude, longitude), 0);
+    if (!mapRef.current) {
+      console.log("Attempting to initialize map for the first time");
+      initializeMap(latitude, longitude);
     }
-  }, [isMapModalOpen, latitude, longitude]);
+  }, [latitude, longitude]);
 
-  // Update marker and map view when coordinates change
   useEffect(() => {
     if (mapRef.current && markerRef.current) {
       mapRef.current.setView([latitude, longitude], 11);
       markerRef.current.setLatLng([latitude, longitude]);
+      console.log("Map and marker view updated to:", latitude, longitude);
     }
   }, [latitude, longitude]);
 
-  // Handle province change
   const handleProvinceChange = (option) => {
+    console.log("Province changed to:", option);
     setSelectedProvince(option);
     setSelectedCity(null);
     setCityOptions([]);
   };
 
-  // Handle city change and update coordinates accordingly
   const handleCityChange = (option) => {
+    console.log("City changed to:", option);
     setSelectedCity(option);
     setLatitude(option.latitude);
     setLongitude(option.longitude);
@@ -141,6 +166,7 @@ const EditHouseLocationDetails = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form submitted with selected city:", selectedCity, "and coordinates:", latitude, longitude);
     setErrors({});
 
     if (!selectedCity) {
@@ -152,9 +178,12 @@ const EditHouseLocationDetails = ({
     const dataToSend = { city_id: selectedCity.value, latitude, longitude };
 
     try {
+      console.log("Sending data to handleEditHouse:", dataToSend);
       await handleEditHouse(dataToSend);
+      refetchHouseData(); // Trigger refetch after successful edit
       toast.success('موقعیت مکانی با موفقیت به‌روزرسانی شد');
     } catch (error) {
+      console.error("Error in handleSubmit:", error);
       if (error.response?.data?.errors?.fields) {
         setErrors(error.response.data.errors.fields);
       }
@@ -163,8 +192,10 @@ const EditHouseLocationDetails = ({
   };
 
   const isLoading = loadingHouse || isFetching || loadingProvinces || loadingCities;
+  console.log("Loading state:", isLoading);
 
   if (isLoading) {
+    console.log("Component is loading...");
     return (
       <div className="min-h-[60vh] flex justify-center items-center">
         <Loading />
@@ -173,6 +204,7 @@ const EditHouseLocationDetails = ({
   }
 
   const provinceOptions = provinces.map((p) => ({ value: p.id, label: p.name }));
+  console.log("Province options:", provinceOptions);
 
   return (
     <div className="relative p-4">
@@ -231,7 +263,7 @@ const EditHouseLocationDetails = ({
           <TextField label="طول جغرافیایی" name="longitude" value={longitude} readOnly />
         </div>
 
-        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-20" ref={mapContainerRef}  />
+        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-20" ref={mapContainerRef} />
 
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button type="submit" className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200" disabled={editLoading}>

@@ -18,6 +18,7 @@ import useEditHouse from './useEditHouse';
 import Loading from '../../../ui/Loading';
 import EditHouseDocuments from './edithouse-components/EditHouseDocuments';
 import EditHouseFinalSubmit from './edithouse-components/EditHouseFinalSubmit';
+import EditHouseCancellationRules from './edithouse-components/EditHouseCancellationRules';
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams();
@@ -76,6 +77,8 @@ const EditHouseContent = ({ selectedTab }) => {
         return <ReservationRules {...commonProps} />;
       case 'stayRules':
         return <StayRules {...commonProps} />;
+        case 'cancellationRules':
+              return <EditHouseCancellationRules {...commonProps} />;
       case 'pricing':
         return <Pricing {...commonProps} />;
       case 'images':

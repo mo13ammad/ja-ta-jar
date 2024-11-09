@@ -30,6 +30,7 @@ const tabSections = [
     label: 'قوانین اقامتگاه',
     keys: [
       { key: 'reservationRules', label: 'قوانین رزرو' },
+      { key: 'cancellationRules', label: 'قوانین کنسلی' },
       { key: 'stayRules', label: 'قوانین اقامت' },
     ],
   },
