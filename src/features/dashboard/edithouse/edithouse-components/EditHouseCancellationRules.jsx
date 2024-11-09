@@ -16,7 +16,7 @@ function EditHouseCancellationRules({ houseData, handleEditHouse, editLoading })
     }
   }, [houseData, cancellationRules]);
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return  <div className='flex justify-center items-center min-h-[50vh]'><Loading /></div>;
   if (error) return <div>Error fetching cancellation rules.</div>;
 
   // Handle toggle selection without submitting

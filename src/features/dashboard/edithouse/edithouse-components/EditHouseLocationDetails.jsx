@@ -36,7 +36,6 @@ const EditHouseLocationDetails = ({
   editLoading,
   refetchHouseData,
 }) => {
-  const { data: provinces = [], isLoading: loadingProvinces, error: provincesError } = useFetchProvinces();
   const [selectedProvince, setSelectedProvince] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
@@ -47,27 +46,33 @@ const EditHouseLocationDetails = ({
   const mapRef = useRef(null);
   const markerRef = useRef(null);
 
-  console.log("Component Rendered");
+  const { data: provinces = [], isLoading: loadingProvinces, error: provincesError } = useFetchProvinces();
+  const { data: citiesData, isLoading: loadingCities, error: citiesError } = useFetchCities(selectedProvince?.value);
 
-  // Log loading state for each data source
-  console.log("Loading house data:", loadingHouse, "Provinces loading:", loadingProvinces, "Cities loading:", isFetching);
+  // Log initial states
+  useEffect(() => {
+    console.log("Initial House Data:", houseData);
+    console.log("Loading States - loadingHouse:", loadingHouse, ", isFetching:", isFetching);
+  }, [houseData, loadingHouse, isFetching]);
 
   useEffect(() => {
-    if (provincesError) {
-      console.error("Error fetching provinces:", provincesError);
-      toast.error("خطا در بارگیری استان‌ها");
-    }
-  }, [provincesError]);
+    console.log("Provinces Data:", provinces);
+    console.log("Provinces Loading State:", loadingProvinces);
+    console.log("Provinces Error:", provincesError);
+  }, [provinces, loadingProvinces, provincesError]);
 
-  // Initialize data from houseData
+  useEffect(() => {
+    console.log("Cities Data:", citiesData);
+    console.log("Cities Loading State:", loadingCities);
+    console.log("Cities Error:", citiesError);
+  }, [citiesData, loadingCities, citiesError]);
+
   useEffect(() => {
     if (houseData && provinces.length) {
-      console.log("Initializing house data", houseData);
       const initialLat = houseData.address?.geography?.latitude || DEFAULT_LAT;
       const initialLng = houseData.address?.geography?.longitude || DEFAULT_LNG;
       setLatitude(initialLat);
       setLongitude(initialLng);
-      console.log("Set initial latitude and longitude:", initialLat, initialLng);
 
       const provinceName = houseData.address?.province?.name || houseData.address?.city?.province?.name;
       const cityName = houseData.address?.city?.name;
@@ -76,21 +81,12 @@ const EditHouseLocationDetails = ({
       if (initialProvince) {
         setSelectedProvince({ value: initialProvince.id, label: initialProvince.name });
         setCityOptions(houseData.address.city ? [{ value: houseData.address.city.id, label: cityName }] : []);
-        console.log("Set initial city options based on house data:", cityOptions);
       }
     }
   }, [houseData, provinces]);
 
-  const { data: citiesData, isLoading: loadingCities, error: citiesError } = useFetchCities(selectedProvince?.value);
-
   useEffect(() => {
-    if (citiesError) {
-      console.error("Error fetching cities:", citiesError);
-      toast.error("خطا در بارگیری شهرها");
-    }
-
     if (selectedProvince && citiesData?.cities) {
-      console.log("Fetching cities for selected province", selectedProvince);
       const newCityOptions = citiesData.cities.map((city) => ({
         value: city.id,
         label: city.name,
@@ -98,13 +94,10 @@ const EditHouseLocationDetails = ({
         longitude: city.longitude,
       }));
       setCityOptions(newCityOptions);
-      console.log("Set city options based on selected province:", newCityOptions);
     }
-  }, [selectedProvince, citiesData, citiesError]);
+  }, [selectedProvince, citiesData]);
 
-  // Initialize the map
   const initializeMap = (latitude, longitude) => {
-    console.log("Initializing map with coordinates:", latitude, longitude);
     if (!mapRef.current && mapContainerRef.current) {
       mapRef.current = L.map(mapContainerRef.current).setView([latitude, longitude], 11);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -120,7 +113,6 @@ const EditHouseLocationDetails = ({
         const coords = e.target.getLatLng();
         setLatitude(coords.lat);
         setLongitude(coords.lng);
-        console.log("Marker dragged to:", coords.lat, coords.lng);
         toast.success('موقعیت جدید انتخاب شد');
       });
 
@@ -129,36 +121,29 @@ const EditHouseLocationDetails = ({
         setLatitude(lat);
         setLongitude(lng);
         markerRef.current.setLatLng([lat, lng]);
-        console.log("Map clicked and marker moved to:", lat, lng);
         toast.success('موقعیت جدید انتخاب شد');
       });
     }
   };
 
   useEffect(() => {
-    if (!mapRef.current) {
-      console.log("Attempting to initialize map for the first time");
-      initializeMap(latitude, longitude);
-    }
+    if (!mapRef.current) initializeMap(latitude, longitude);
   }, [latitude, longitude]);
 
   useEffect(() => {
     if (mapRef.current && markerRef.current) {
       mapRef.current.setView([latitude, longitude], 11);
       markerRef.current.setLatLng([latitude, longitude]);
-      console.log("Map and marker view updated to:", latitude, longitude);
     }
   }, [latitude, longitude]);
 
   const handleProvinceChange = (option) => {
-    console.log("Province changed to:", option);
     setSelectedProvince(option);
     setSelectedCity(null);
     setCityOptions([]);
   };
 
   const handleCityChange = (option) => {
-    console.log("City changed to:", option);
     setSelectedCity(option);
     setLatitude(option.latitude);
     setLongitude(option.longitude);
@@ -166,7 +151,6 @@ const EditHouseLocationDetails = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted with selected city:", selectedCity, "and coordinates:", latitude, longitude);
     setErrors({});
 
     if (!selectedCity) {
@@ -178,12 +162,10 @@ const EditHouseLocationDetails = ({
     const dataToSend = { city_id: selectedCity.value, latitude, longitude };
 
     try {
-      console.log("Sending data to handleEditHouse:", dataToSend);
       await handleEditHouse(dataToSend);
-      refetchHouseData(); // Trigger refetch after successful edit
+      refetchHouseData();
       toast.success('موقعیت مکانی با موفقیت به‌روزرسانی شد');
     } catch (error) {
-      console.error("Error in handleSubmit:", error);
       if (error.response?.data?.errors?.fields) {
         setErrors(error.response.data.errors.fields);
       }
@@ -191,20 +173,7 @@ const EditHouseLocationDetails = ({
     }
   };
 
-  const isLoading = loadingHouse || isFetching || loadingProvinces || loadingCities;
-  console.log("Loading state:", isLoading);
-
-  if (isLoading) {
-    console.log("Component is loading...");
-    return (
-      <div className="min-h-[60vh] flex justify-center items-center">
-        <Loading />
-      </div>
-    );
-  }
-
   const provinceOptions = provinces.map((p) => ({ value: p.id, label: p.name }));
-  console.log("Province options:", provinceOptions);
 
   return (
     <div className="relative p-4">
@@ -263,7 +232,7 @@ const EditHouseLocationDetails = ({
           <TextField label="طول جغرافیایی" name="longitude" value={longitude} readOnly />
         </div>
 
-        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-20" ref={mapContainerRef} />
+        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-[400px]" ref={mapContainerRef} />
 
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button type="submit" className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200" disabled={editLoading}>
