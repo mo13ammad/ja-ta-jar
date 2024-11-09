@@ -163,3 +163,21 @@ export function uploadHouseDocument(houseId, documentData) {
       throw error;
     });
 }
+
+
+
+// Function to publish a house
+export function publishHouse(houseId) {
+  if (!houseId) {
+    console.error("Missing houseId:", { houseId });
+    throw new Error("House ID is missing.");
+  }
+  
+  return http
+    .put(`/client/house/${houseId}/publish`)
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("publishHouse - Error:", error);
+      throw error;
+    });
+}

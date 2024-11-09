@@ -62,7 +62,6 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
       <h2 className="font-bold mb-4">مدارک مورد نیاز</h2>
 
       {houseData?.documents?.map((doc, index) => {
-        console.log("Rendering document:", doc);
 
         return (
           <div key={`${doc.key}-${index}`} className="mb-6">

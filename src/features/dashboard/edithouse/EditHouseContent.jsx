@@ -17,6 +17,7 @@ import useFetchHouse from '../useFetchHouse';
 import useEditHouse from './useEditHouse';
 import Loading from '../../../ui/Loading';
 import EditHouseDocuments from './edithouse-components/EditHouseDocuments';
+import EditHouseFinalSubmit from './edithouse-components/EditHouseFinalSubmit';
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams();
@@ -82,7 +83,7 @@ const EditHouseContent = ({ selectedTab }) => {
       case 'documents':
           return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':
-        return <div>Final Submit</div>;
+        return <EditHouseFinalSubmit {...commonProps} />;
       default:
         return <AddressDetails {...commonProps} />;
     }
