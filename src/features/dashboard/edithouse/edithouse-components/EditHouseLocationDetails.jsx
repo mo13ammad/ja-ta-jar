@@ -49,24 +49,6 @@ const EditHouseLocationDetails = ({
   const { data: provinces = [], isLoading: loadingProvinces, error: provincesError } = useFetchProvinces();
   const { data: citiesData, isLoading: loadingCities, error: citiesError } = useFetchCities(selectedProvince?.value);
 
-  // Log initial states
-  useEffect(() => {
-    console.log("Initial House Data:", houseData);
-    console.log("Loading States - loadingHouse:", loadingHouse, ", isFetching:", isFetching);
-  }, [houseData, loadingHouse, isFetching]);
-
-  useEffect(() => {
-    console.log("Provinces Data:", provinces);
-    console.log("Provinces Loading State:", loadingProvinces);
-    console.log("Provinces Error:", provincesError);
-  }, [provinces, loadingProvinces, provincesError]);
-
-  useEffect(() => {
-    console.log("Cities Data:", citiesData);
-    console.log("Cities Loading State:", loadingCities);
-    console.log("Cities Error:", citiesError);
-  }, [citiesData, loadingCities, citiesError]);
-
   useEffect(() => {
     if (houseData && provinces.length) {
       const initialLat = houseData.address?.geography?.latitude || DEFAULT_LAT;
@@ -80,7 +62,11 @@ const EditHouseLocationDetails = ({
 
       if (initialProvince) {
         setSelectedProvince({ value: initialProvince.id, label: initialProvince.name });
-        setCityOptions(houseData.address.city ? [{ value: houseData.address.city.id, label: cityName }] : []);
+      }
+
+      if (houseData.address.city) {
+        setCityOptions([{ value: houseData.address.city.id, label: cityName }]);
+        setSelectedCity({ value: houseData.address.city.id, label: cityName });
       }
     }
   }, [houseData, provinces]);
@@ -94,8 +80,13 @@ const EditHouseLocationDetails = ({
         longitude: city.longitude,
       }));
       setCityOptions(newCityOptions);
+
+      if (houseData?.address?.city && selectedCity == null) {
+        const city = newCityOptions.find((city) => city.value === houseData.address.city.id);
+        if (city) setSelectedCity(city); // Set the city based on houseData
+      }
     }
-  }, [selectedProvince, citiesData]);
+  }, [selectedProvince, citiesData, houseData]);
 
   const initializeMap = (latitude, longitude) => {
     if (!mapRef.current && mapContainerRef.current) {
@@ -232,7 +223,7 @@ const EditHouseLocationDetails = ({
           <TextField label="طول جغرافیایی" name="longitude" value={longitude} readOnly />
         </div>
 
-        <div className="mt-6 w-full shadow-centered rounded-lg overflow-hidden border h-[400px]" ref={mapContainerRef} />
+        <div className="mt-6 w-full lg:col-span-2 shadow-centered rounded-lg overflow-hidden border h-[400px]" ref={mapContainerRef} />
 
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button type="submit" className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200" disabled={editLoading}>
