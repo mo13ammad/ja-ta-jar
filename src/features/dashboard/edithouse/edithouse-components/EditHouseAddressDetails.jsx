@@ -2,15 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import TextField from '../../../../ui/TextField'; // Adjust the path based on your project structure
-import Loading from '../../../../ui/Loading'; // Adjust the path based on your project structure
+import TextField from '../../../../ui/TextField';
+import Loading from '../../../../ui/Loading';
 
 const EditHouseAddressDetails = ({
   houseData,
   loadingHouse,
   handleEditHouse,
   editLoading,
-  editError,
 }) => {
   const [formData, setFormData] = useState({
     address: '',
@@ -19,16 +18,14 @@ const EditHouseAddressDetails = ({
     plaqueNumber: '',
     postalCode: '',
   });
-
   const [errors, setErrors] = useState({});
- console.log(houseData)
-
+  const [errorList, setErrorList] = useState([]);
 
   useEffect(() => {
     if (houseData?.address) {
       setFormData({
         address: houseData.address.address || '',
-        neighborhood: houseData.address.village || '', // Use 'village' when receiving data
+        neighborhood: houseData.address.village || '',
         floor: houseData.address.floor || '',
         plaqueNumber: houseData.address.house_number || '',
         postalCode: houseData.address.postal_code || '',
@@ -46,7 +43,8 @@ const EditHouseAddressDetails = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({}); // Reset errors
+    setErrors({});
+    setErrorList([]);
 
     // Client-side validation for postal code
     if (formData.postalCode && !/^\d{10}$/.test(formData.postalCode)) {
@@ -58,31 +56,37 @@ const EditHouseAddressDetails = ({
       return;
     }
 
-    // Prepare data to send
     const dataToSend = {
       address: formData.address,
-      village_name: formData.neighborhood, // Use 'village_name' when sending data
+      village_name: formData.neighborhood,
       floor: formData.floor,
       house_number: formData.plaqueNumber,
       postal_code: formData.postalCode,
     };
 
-    console.log('handleSubmit - Form data to be sent:', dataToSend); // Log data being sent
-
     try {
       await handleEditHouse(dataToSend);
       toast.success('آدرس با موفقیت به‌روزرسانی شد');
-    } catch (error) {
-      console.error('Error submitting data:', error);
-      if (error.response && error.response.data) {
-        const { data } = error.response;
-        console.log('Error response data:', data); // Log the error response data for debugging
+    } catch (errorData) {
+      console.error('Edit House Error:', errorData);
 
-        if (data.errors && data.errors.fields) {
-          setErrors(data.errors.fields);
+      if (errorData.errors || errorData.message) {
+        if (errorData.errors?.fields) {
+          const fieldErrors = errorData.errors.fields;
+          const updatedErrors = {};
+          const errorsArray = Object.values(fieldErrors).flat();
+
+          for (let field in fieldErrors) {
+            updatedErrors[field] = fieldErrors[field];
+          }
+          setErrors(updatedErrors);
+          setErrorList(errorsArray);
+          errorsArray.forEach((msg) => toast.error(msg));
         }
 
-        toast.error(data.message || 'خطایی رخ داده است.');
+        if (errorData.message) {
+          toast.error(errorData.message);
+        }
       } else {
         toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
       }
@@ -106,7 +110,7 @@ const EditHouseAddressDetails = ({
           value={formData.address}
           onChange={handleInputChange}
           placeholder='آدرس اقامتگاه'
-          errorMessages={errors.address}
+          errorMessages={errors.address} // Pass the address-specific errors
         />
 
         <TextField
@@ -115,7 +119,7 @@ const EditHouseAddressDetails = ({
           value={formData.neighborhood}
           onChange={handleInputChange}
           placeholder='روستا / محله'
-          errorMessages={errors.village_name} // Use 'village_name' to match the error key from the server
+          errorMessages={errors.village_name} // Pass the neighborhood-specific errors
         />
 
         <TextField
@@ -124,7 +128,7 @@ const EditHouseAddressDetails = ({
           value={formData.floor}
           onChange={handleInputChange}
           placeholder='اقامتگاه در طبقه'
-          errorMessages={errors.floor}
+          errorMessages={errors.floor} // Pass the floor-specific errors
         />
 
         <TextField
@@ -133,7 +137,7 @@ const EditHouseAddressDetails = ({
           value={formData.plaqueNumber}
           onChange={handleInputChange}
           placeholder='شماره پلاک'
-          errorMessages={errors.house_number}
+          errorMessages={errors.house_number} // Pass the plaqueNumber-specific errors
         />
 
         <TextField
@@ -142,12 +146,17 @@ const EditHouseAddressDetails = ({
           value={formData.postalCode}
           onChange={handleInputChange}
           placeholder='کد پستی'
-          errorMessages={errors.postal_code}
+          errorMessages={errors.postal_code} // Pass the postalCode-specific errors
         />
 
-        {Object.keys(errors).length > 0 && (
-          <div className='text-red-500 col-span-2'>
-            خطایی در ثبت اطلاعات وجود دارد. لطفا موارد زیر را بررسی کنید.
+        {errorList.length > 0 && (
+          <div className="mt-4 text-red-600 col-span-2">
+            <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+            <ul className="list-disc ml-5">
+              {errorList.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
           </div>
         )}
 

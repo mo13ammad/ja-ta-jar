@@ -1,6 +1,4 @@
-// src/components/EditHouseContent.jsx
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
 import GeneralInfo from './edithouse-components/EditHouseGeneralInfo';
@@ -24,37 +22,51 @@ const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams();
   
   const {
-    data: houseData,
+    data: fetchedHouseData,
     isLoading: loadingHouse,
     isFetching,
-    refetch: refetchHouseData, // Add refetch to manually refresh data
+    refetch: refetchHouseData,
   } = useFetchHouse(uuid);
 
   const {
     mutateAsync: editHouseAsync,
     isLoading: editLoading,
-    error: editError,
   } = useEditHouse();
+
+  // Local state to store the house data, initialized with fetched data
+  const [houseData, setHouseData] = useState(fetchedHouseData);
+
+  // Update local state when fetchedHouseData changes
+  useEffect(() => {
+    if (fetchedHouseData) {
+      setHouseData(fetchedHouseData);
+    }
+  }, [fetchedHouseData]);
 
   const handleEditHouse = async (updatedData) => {
     try {
       const response = await editHouseAsync({ houseId: uuid, houseData: updatedData });
       console.log('Edit response:', response);
-      refetchHouseData(); // Trigger refetch on successful edit
+
+      // Update houseData with the response from edit
+      setHouseData(response);
+
+      // Optionally refetch to ensure the data is in sync with the server
+      refetchHouseData();
     } catch (error) {
-      console.error('Edit House Error:', error);
+      console.error('Edit House Error:', error.response?.data || error.message);
+      throw error.response?.data || error;
     }
   };
 
   const commonProps = {
-    houseData ,
+    houseData,
     houseId: uuid,
     loadingHouse,
     isFetching,
     editLoading,
-    editError,
     handleEditHouse,
-    refetchHouseData, // Pass refetchHouseData to child components
+    refetchHouseData,
   };
 
   const renderContent = () => {
@@ -77,14 +89,14 @@ const EditHouseContent = ({ selectedTab }) => {
         return <ReservationRules {...commonProps} />;
       case 'stayRules':
         return <StayRules {...commonProps} />;
-        case 'cancellationRules':
-              return <EditHouseCancellationRules {...commonProps} />;
+      case 'cancellationRules':
+        return <EditHouseCancellationRules {...commonProps} />;
       case 'pricing':
         return <Pricing {...commonProps} />;
       case 'images':
         return <Images {...commonProps} />;
       case 'documents':
-          return <EditHouseDocuments {...commonProps} />;
+        return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':
         return <EditHouseFinalSubmit {...commonProps} />;
       default:

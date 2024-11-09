@@ -10,11 +10,10 @@ export default function useEditHouse() {
     mutationFn: ({ houseId, houseData }) => editHouse(houseId, houseData),
     onSuccess: (data, variables) => {
       console.log('useEditHouse - Mutation successful:', data);
-      // Invalidate the 'get-house' query to refetch the data
       queryClient.invalidateQueries(['get-house', variables.houseId]);
     },
     onError: (error) => {
-      console.error('useEditHouse - Mutation error:', error);
+      console.error('useEditHouse - Mutation error:', error.response?.data || error.message);
     },
   });
 }
