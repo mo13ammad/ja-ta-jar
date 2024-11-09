@@ -7,14 +7,13 @@ import { useFetchFacilities } from '../../../../services/fetchDataService';
 import { toast } from 'react-hot-toast';
 import { editHouseFacilities } from '../../../../services/houseService';
 
-const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
+const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse, refetchHouseData }) => {
   const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchFacilities();
   const [selectedFacilities, setSelectedFacilities] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   useEffect(() => {
     if (houseData && facilitiesData.length > 0) {
-      console.log(houseData);
       const initialSelectedFacilities = facilitiesData.reduce((acc, facility) => {
         const existingFacility = houseData.facilities?.find((f) => f.key === facility.key);
 
@@ -35,13 +34,11 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
         return acc;
       }, {});
 
-      console.log("Initialized selected facilities:", initialSelectedFacilities);
       setSelectedFacilities(initialSelectedFacilities);
     }
   }, [houseData, facilitiesData]);
 
   const toggleFacility = (key) => {
-    console.log(`Toggling facility ${key}`);
     setSelectedFacilities((prevSelected) => ({
       ...prevSelected,
       [key]: {
@@ -50,11 +47,9 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
         fields: !prevSelected[key].checked ? {} : prevSelected[key].fields, // Clear fields if unchecked
       },
     }));
-    console.log("Updated selected facilities after toggle:", selectedFacilities);
   };
 
   const handleInputChange = (facilityKey, fieldTitle, value) => {
-    console.log(`Changing field ${fieldTitle} of facility ${facilityKey} to`, value);
     setSelectedFacilities((prevState) => ({
       ...prevState,
       [facilityKey]: {
@@ -65,15 +60,13 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
         },
       },
     }));
-    console.log("Updated selected facilities after input change:", selectedFacilities);
   };
 
   const handleSubmit = async () => {
     setLoadingSubmit(true);
     try {
-      // Filter out only checked facilities
       const facilitiesData = Object.keys(selectedFacilities)
-        .filter((key) => selectedFacilities[key].checked) // Include only checked facilities
+        .filter((key) => selectedFacilities[key].checked)
         .map((key) => ({
           type: key,
           fields: Object.entries(selectedFacilities[key].fields || {}).map(
@@ -87,11 +80,11 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
           ),
         }));
 
-      console.log("Sending facilities data to API:", facilitiesData);
       const response = await editHouseFacilities(houseId, facilitiesData);
-      console.log("Received response from API:", response);
-
-      toast.success('اطلاعات با موفقیت ثبت شد');
+      if (response.ok) { // Assuming response.ok is true if the request was successful
+        toast.success('اطلاعات با موفقیت ثبت شد');
+        refetchHouseData(); // Update data after successful submission
+      }
     } catch (error) {
       console.error('Error submitting data:', error);
       toast.error('خطایی در ثبت اطلاعات پیش آمد');
@@ -124,7 +117,6 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
               icon={facility.icon}
             />
 
-            {/* Show fields only if the facility is checked */}
             {selectedFacilities[facility.key]?.checked && (
               <div className="mt-4 bg-white p-2 rounded-xl">
                 {facility.fields?.map((field, index) => (
@@ -147,7 +139,7 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
                         placeholder={field.placeholder}
                         value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
                         onChange={(e) =>
-                          handleInputChange(facility.key, field.title, e.target.value.trim())
+                          handleInputChange(facility.key, field.title, e.target.value)
                         }
                       />
                     ) : (
@@ -157,7 +149,7 @@ const EditHouseMainFacilities = ({ houseId, houseData, loadingHouse }) => {
                         placeholder={field.placeholder}
                         value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
                         onChange={(e) =>
-                          handleInputChange(facility.key, field.title, e.target.value.trim())
+                          handleInputChange(facility.key, field.title, e.target.value)
                         }
                       />
                     )}

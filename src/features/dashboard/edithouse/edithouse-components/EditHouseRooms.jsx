@@ -26,8 +26,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       const initialRooms = houseData.room.map((room) => ({
         roomName: room.name || '',
         isMasterRoom: room.is_master || false,
-        numberSingleBeds: room.number_single_beds || '',
-        numberDoubleBeds: room.number_double_beds || '',
+        numberSingleBeds: room.number_single_beds || 0,
+        numberDoubleBeds: room.number_double_beds || 0,
         numberSofaBeds: room.number_sofa_beds || '',
         numberFloorService: room.number_floor_service || '',
         description: room.description || '',
@@ -47,8 +47,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       {
         roomName: '',
         isMasterRoom: false,
-        numberSingleBeds: '',
-        numberDoubleBeds: '',
+        numberSingleBeds: 0,
+        numberDoubleBeds: 0,
         numberSofaBeds: '',
         numberFloorService: '',
         description: '',
@@ -95,8 +95,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       name: roomData.roomName,
       is_master: roomData.isMasterRoom,
       is_living_room: roomData.isLivingRoom ? 1 : 0,
-      number_single_beds: roomData.numberSingleBeds,
-      number_double_beds: roomData.numberDoubleBeds,
+      number_single_beds: roomData.numberSingleBeds || 0,
+      number_double_beds: roomData.numberDoubleBeds || 0,
       number_sofa_beds: roomData.numberSofaBeds,
       number_floor_service: roomData.numberFloorService,
       description: roomData.description,
@@ -170,7 +170,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   return (
     <div className="relative p-1.5 lg:p-3">
       <Toaster />
-      <div className="text-right font-bold lg:text-lg ">اطلاعات اتاق‌ها :</div>
+      <div className="text-right font-bold lg:text-lg">اطلاعات اتاق‌ها :</div>
      
       <div className="w-full px-4 flex justify-between items-center">
         <div>
@@ -207,7 +207,14 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
             {({ open }) => (
               <>
                 <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4 mb-2">
-                  <span>{room.roomName || `اتاق ${rooms.length - index}`}</span>
+                  <span>
+                    {room.roomName || `اتاق ${rooms.length - index}`}
+                    {room.isLivingRoom && (
+                      <span className="mr-6 bg-secondary-500 text-white text-xs px-2 py-1 rounded-full">
+                        اتاق پذیرایی
+                      </span>
+                    )}
+                  </span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${open ? 'rotate-180' : 'rotate-0'}`}
                     fill="none"
@@ -232,7 +239,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                   {/* Conditionally render quantity field based on houseData.is_rent_room */}
                   {houseData.is_rent_room && (
                     <TextField
-                      label="تعداد اتاق"
+                      label="تعداد موجود از این اتاق"
                       name="quantity"
                       type="number"
                       value={room.quantity}
@@ -254,7 +261,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     name="numberSingleBeds"
                     type="number"
                     value={room.numberSingleBeds}
-                    onChange={(e) => handleInputChange(index, 'numberSingleBeds', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'numberSingleBeds', e.target.value || 0)}
                     error={fieldErrors.number_single_beds}
                   />
 
@@ -263,7 +270,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     name="numberDoubleBeds"
                     type="number"
                     value={room.numberDoubleBeds}
-                    onChange={(e) => handleInputChange(index, 'numberDoubleBeds', e.target.value)}
+                    onChange={(e) => handleInputChange(index, 'numberDoubleBeds', e.target.value || 0)}
                     error={fieldErrors.number_double_beds}
                   />
 
@@ -315,15 +322,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                       {loadingSubmit ? 'در حال ارسال...' : room.uuid ? 'ثبت تغییرات' : 'ثبت اتاق'}
                     </button>
 
-                    {room.uuid && (
-                      <button
-                        onClick={() => confirmDelete(index)}
-                        className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
-                        disabled={loadingDelete}
-                      >
-                        {loadingDelete ? 'در حال حذف...' : 'حذف اتاق'}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => confirmDelete(index)}
+                      className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                      disabled={loadingDelete}
+                    >
+                      {loadingDelete ? 'در حال حذف...' : 'حذف اتاق'}
+                    </button>
                   </div>
                 </Disclosure.Panel>
               </>
@@ -337,19 +342,20 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <Dialog.Title className="text-lg font-medium">آیا مطمئن هستید که می‌خواهید اتاق را حذف کنید؟</Dialog.Title>
-            <div className="mt-4">
+            <div className="mt-4 flex justify-end">
+            
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+              >
+                لغو
+              </button>
               <button
                 onClick={handleDelete}
                 className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mr-4"
                 disabled={loadingDelete}
               >
                 {loadingDelete ? 'در حال حذف...' : 'بله حذف کن'}
-              </button>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-gray-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
-              >
-                لغو
               </button>
             </div>
           </Dialog.Panel>
