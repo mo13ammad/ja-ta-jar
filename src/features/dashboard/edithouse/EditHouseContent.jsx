@@ -1,5 +1,3 @@
-// src/components/EditHouseContent.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
@@ -22,7 +20,7 @@ import EditHouseCancellationRules from './edithouse-components/EditHouseCancella
 
 const EditHouseContent = ({ selectedTab }) => {
   const { uuid } = useParams();
-  
+
   const {
     data: fetchedHouseData,
     isLoading: loadingHouse,
@@ -37,11 +35,13 @@ const EditHouseContent = ({ selectedTab }) => {
 
   // Local state to store the house data, initialized with fetched data
   const [houseData, setHouseData] = useState(fetchedHouseData);
+  const [isRefetching, setIsRefetching] = useState(false);
 
   // Update local state when fetchedHouseData changes
   useEffect(() => {
     if (fetchedHouseData) {
       setHouseData(fetchedHouseData);
+      setIsRefetching(false); // Stop loading after data is updated
     }
   }, [fetchedHouseData]);
 
@@ -53,7 +53,8 @@ const EditHouseContent = ({ selectedTab }) => {
       // Update houseData with the response from edit
       setHouseData(response);
 
-      // Refetch immediately to ensure state sync
+      // Set refetching to true and refetch the latest data
+      setIsRefetching(true);
       await refetchHouseData(); // Fetches latest data from the server
     } catch (error) {
       console.error('Edit House Error:', error.response?.data || error.message);
@@ -63,6 +64,7 @@ const EditHouseContent = ({ selectedTab }) => {
 
   const commonProps = {
     houseData,
+    setHouseData, // Add setHouseData here
     houseId: uuid,
     loadingHouse,
     isFetching,
@@ -82,7 +84,7 @@ const EditHouseContent = ({ selectedTab }) => {
       case 'environmentInfo':
         return <EnvironmentInfo {...commonProps} />;
       case 'mainFacilities':
-        return <MainFacilities {...commonProps} />;
+        return <MainFacilities {...commonProps} />; // setHouseData will now be passed
       case 'rooms':
         return <Rooms {...commonProps} />;
       case 'sanitaries':
@@ -108,7 +110,7 @@ const EditHouseContent = ({ selectedTab }) => {
 
   return (
     <div>
-      {loadingHouse ? (
+      {loadingHouse || isRefetching ? (
         <div className="min-h-[60vh] flex justify-center items-center">
           <Loading />
         </div>

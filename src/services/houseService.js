@@ -40,12 +40,13 @@ export function editHouseFacilities(houseId, facilitiesData) {
   }
   return http
     .put(`/client/house/${houseId}/facility`, { facilities: facilitiesData })
-    .then(({ data }) => data.data)
+    .then(({ data }) => data.data) // Return updated house data directly
     .catch((error) => {
       console.error("editHouseFacilities - Error:", error);
       throw error;
     });
 }
+
 
 // House Media Functions
 export function getHouseTypes(data) {
