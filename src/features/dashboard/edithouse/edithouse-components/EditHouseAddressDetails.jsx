@@ -81,7 +81,7 @@ const EditHouseAddressDetails = ({
           }
           setErrors(updatedErrors);
           setErrorList(errorsArray);
-          errorsArray.forEach((msg) => toast.error(msg));
+          
         }
 
         if (errorData.message) {
@@ -149,16 +149,7 @@ const EditHouseAddressDetails = ({
           errorMessages={errors.postal_code} // Pass the postalCode-specific errors
         />
 
-        {errorList.length > 0 && (
-          <div className="mt-4 text-red-600 col-span-2">
-            <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
-            <ul className="list-disc ml-5">
-              {errorList.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+       
 
         <div className='mt-4 w-full lg:col-span-2 flex justify-end'>
           <button
