@@ -1,3 +1,5 @@
+// src/components/edithouse-components/EditHouseRooms.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Disclosure, Dialog } from '@headlessui/react';
 import Spinner from '../../../../ui/Loading';
@@ -34,13 +36,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         isMasterRoom: room.is_master || false,
         numberSingleBeds: room.number_single_beds ?? 0, // Default to 0
         numberDoubleBeds: room.number_double_beds ?? 0, // Default to 0
-        numberSofaBeds: room.number_sofa_beds ?? '', // Allow empty string
-        numberFloorService: room.number_floor_service ?? '', // Allow empty string
+        numberSofaBeds: room.number_sofa_beds ?? 0, // Default to 0
+        numberFloorService: room.number_floor_service ?? 0, // Default to 0
         description: room.description || '',
         selectedFacilities: room.facilities?.map((f) => f.key) || [],
         selectedAirConditions: room.airConditions?.map((a) => a.key) || [],
         isLivingRoom: room.is_living_room || false,
-        quantity: room.quantity ?? '', // Allow empty string
+        quantity: room.quantity ?? '', // Default to empty string
         uuid: room.uuid || null,
         hasUnsavedChanges: false,
       }));
@@ -56,13 +58,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         isMasterRoom: false,
         numberSingleBeds: 0, // Default to 0
         numberDoubleBeds: 0, // Default to 0
-        numberSofaBeds: '',
-        numberFloorService: '',
+        numberSofaBeds: 0, // Default to 0
+        numberFloorService: 0, // Default to 0
         description: '',
         selectedFacilities: [],
         selectedAirConditions: [],
         isLivingRoom,
-        quantity: houseData.is_rent_room ? '' : null,
+        quantity: houseData.is_rent_room ? '' : null, // Default to empty string
         uuid: null,
         hasUnsavedChanges: true,
       },
@@ -107,14 +109,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       name: roomData.roomName,
       is_master: roomData.isMasterRoom,
       is_living_room: roomData.isLivingRoom ? 1 : 0,
-      number_single_beds:
-        roomData.numberSingleBeds === '' ? null : parseInt(roomData.numberSingleBeds, 10),
-      number_double_beds:
-        roomData.numberDoubleBeds === '' ? null : parseInt(roomData.numberDoubleBeds, 10),
-      number_sofa_beds:
-        roomData.numberSofaBeds === '' ? null : parseInt(roomData.numberSofaBeds, 10),
-      number_floor_service:
-        roomData.numberFloorService === '' ? null : parseInt(roomData.numberFloorService, 10),
+      number_single_beds: parseInt(roomData.numberSingleBeds, 10) || 0,
+      number_double_beds: parseInt(roomData.numberDoubleBeds, 10) || 0,
+      number_sofa_beds: parseInt(roomData.numberSofaBeds, 10) || 0,
+      number_floor_service: parseInt(roomData.numberFloorService, 10) || 0,
       description: roomData.description,
       facilities: roomData.selectedFacilities,
       airConditions: roomData.selectedAirConditions,
@@ -223,7 +221,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         </div>
       </div>
 
-      <div className="overflow-auto scrollbar-thin max-h-[70vh] pt-2 px-2 lg:px-4 w-full min-h-[70vh]">
+      <div className="overflow-auto scrollbar-thin max-h-[70vh] mt-2 px-2 lg:px-4 w-full min-h-[70vh]">
         {rooms.map((room, index) => (
           <Disclosure
             key={index}
@@ -233,7 +231,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
           >
             {({ open }) => (
               <>
-                <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4">
+                <Disclosure.Button className="py-2 flex justify-between items-center w-full z-40 bg-white mt-2 shadow-centered rounded-xl px-4">
                   <span className="flex items-center">
                     {room.roomName || `اتاق ${rooms.length - index}`}
                     {room.isLivingRoom && (
@@ -262,7 +260,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                   </svg>
                 </Disclosure.Button>
 
-                <Disclosure.Panel className="p-4 rounded-xl bg-white shadow-centered shadow-sm">
+                <Disclosure.Panel className="p-4 rounded-xl bg-white shadow-centered mt-1.5">
                   <TextField
                     label="نام اتاق"
                     name="roomName"
@@ -273,13 +271,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                   />
 
                   {houseData.is_rent_room && (
-                    <NumberField
+                    <TextField
                       label="تعداد موجود از این اتاق"
                       name="quantity"
                       value={room.quantity}
                       onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
-                      errorMessages={fieldErrors.quantity}
-                      min="0"
+                      error={fieldErrors.quantity}
+                      placeholder="تعداد موجود از این اتاق"
                     />
                   )}
 
@@ -352,10 +350,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     className="mt-4"
                   />
 
-                  <div className="mt-4 flex gap-2 items-end">
+                  <div className="mt-4 flex gap-2 justify-end">
                     <button
                       onClick={() => handleRoomSubmit(index)}
-                      className="bg-green-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                      className=" btn  bg-green-500 cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered hover:bg-green-600"
                       disabled={loadingSubmit}
                     >
                       {loadingSubmit
@@ -367,7 +365,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
 
                     <button
                       onClick={() => confirmDelete(index)}
-                      className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl"
+                      className="bg-red-500 hover:bg-red-600 btn cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered"
                       disabled={loadingDelete}
                     >
                       {loadingDelete ? 'در حال حذف...' : 'حذف اتاق'}

@@ -254,7 +254,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
           {/* Rent Type Options */}
           {houseData?.structure?.can_rent_room && (
             <div className="mt-4 lg:col-span-2 border-t pt-2">
-              <label className="block font-bold text-gray-700 mb-2">نوع اجاره دهی اقامتگاه</label>
+              <label className="block font-bold text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد </label>
               <div className="flex space-x-4">
                 {rentTypeOptions.map((option) => (
                   <ToggleSwitch

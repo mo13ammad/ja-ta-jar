@@ -81,7 +81,7 @@
       @apply bg-secondary-100 text-secondary-700;
     }
     .btn{
-      @apply transition-all duration-300 bg-white text-white  opacity-80 rounded-2xl px-2 lg:px-4 py-0.5 lg:py-1.5 shadow-sm 
+      @apply transition-all duration-300 bg-white text-white   rounded-2xl px-2 lg:px-4 py-0.5 lg:py-1.5 shadow-sm 
     }
     .tab {
       @apply text-xs md:text-sm opacity-80 w-full  flex justify-end outline-none pr-2 lg:pr-4 flex-row-reverse items-center transition py-1.5 lg:py-3 rounded-xl;
