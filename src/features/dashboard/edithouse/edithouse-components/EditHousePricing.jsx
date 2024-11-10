@@ -46,6 +46,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
       console.log("Initializing formData for rooms");
       const initialFormData = {};
       houseData.room.forEach((room) => {
+        if (room.is_living_room) {
+          // Skip living rooms
+          return;
+        }
         console.log(`Processing room: ${room.uuid}`);
         initialFormData[room.uuid] = {
           nowruz: formatNumber(room.prices?.nowruz || ""),
@@ -253,97 +257,94 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
         <h2 className="text-right font-bold lg:text-lg mb-4">قیمت‌گذاری :</h2>
 
         {houseData?.is_rent_room ? (
-          houseData.room && houseData.room.length > 0 ? (
-            houseData.room.map((room, index) => (
-              <Disclosure
-                key={room.uuid}
-                as="div"
-                className="mb-2"
-                defaultOpen={false}
-              >
-                {({ open }) => (
-                  <>
-                    <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4">
-                      <span className="flex items-center">
-                        {room.name || `اتاق ${index + 1}`}
-                        {room.is_living_room && (
-                          <span className="mr-4 bg-secondary-500 text-white text-xs px-2 py-1 rounded-full">
-                            اتاق پذیرایی
-                          </span>
-                        )}
-                        {/* Add more badges or indicators if needed */}
-                      </span>
-                      <svg
-                        className={`w-5 h-5 transition-transform duration-200 ${
-                          open ? 'rotate-180' : 'rotate-0'
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </Disclosure.Button>
-
-                    <Disclosure.Panel className="p-4 rounded-xl bg-white shadow-centered mt-1.5">
-                      {renderInputSection(
-                        room.uuid,
-                        `قیمت‌گذاری برای اتاق ${room.name || index + 1}`,
-                        [
-                          { key: "nowruz", label: "تعطیلات نوروز" },
-                          { key: "normal_spring", label: "روز های اول هفته (بهار)" },
-                          { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
-                          { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
-                          { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
-                          { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
-                          { key: "normal_summer", label: "روز های اول هفته (تابستان)" },
-                          { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
-                          { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
-                          { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
-                          { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
-                          { key: "normal_autumn", label: "روز های اول هفته (پاییز)" },
-                          { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
-                          { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
-                          { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
-                          { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
-                          { key: "normal_winter", label: "روز های اول هفته (زمستان)" },
-                          { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
-                          { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
-                          { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
-                          { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
-                        ]
-                      )}
-
-                      <div className="mt-4 flex gap-2 justify-end">
-                        <button
-                          onClick={() => handleSubmit(room.uuid)}
-                          className="btn bg-green-500 cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered hover:bg-green-600"
-                          disabled={loadingSubmit}
+          houseData.room && houseData.room.filter(room => !room.is_living_room).length > 0 ? (
+            houseData.room
+              .filter(room => !room.is_living_room)
+              .map((room, index) => (
+                <Disclosure
+                  key={room.uuid}
+                  as="div"
+                  className="mb-2"
+                  defaultOpen={false}
+                >
+                  {({ open }) => (
+                    <>
+                      <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4">
+                        <span className="flex items-center">
+                          {room.name || `اتاق ${index + 1}`}
+                          {/* Other badges if needed */}
+                        </span>
+                        <svg
+                          className={`w-5 h-5 transition-transform duration-200 ${
+                            open ? 'rotate-180' : 'rotate-0'
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت اتاق"}
-                        </button>
-                      </div>
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </Disclosure.Button>
 
-                      {errorList.length > 0 && (
-                        <div className="mt-4 text-red-600">
-                          <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
-                          <ul className="list-disc ml-5">
-                            {errorList.map((error, index) => (
-                              <li key={index}>{error}</li>
-                            ))}
-                          </ul>
+                      <Disclosure.Panel className="p-4 rounded-xl bg-white shadow-centered mt-1.5">
+                        {renderInputSection(
+                          room.uuid,
+                          `قیمت‌گذاری برای اتاق ${room.name || index + 1}`,
+                          [
+                            { key: "nowruz", label: "تعطیلات نوروز" },
+                            { key: "normal_spring", label: "روز های اول هفته (بهار)" },
+                            { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
+                            { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
+                            { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
+                            { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
+                            { key: "normal_summer", label: "روز های اول هفته (تابستان)" },
+                            { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
+                            { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
+                            { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
+                            { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
+                            { key: "normal_autumn", label: "روز های اول هفته (پاییز)" },
+                            { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
+                            { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
+                            { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
+                            { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
+                            { key: "normal_winter", label: "روز های اول هفته (زمستان)" },
+                            { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
+                            { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
+                            { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
+                            { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
+                          ]
+                        )}
+
+                        <div className="mt-4 flex gap-2 justify-end">
+                          <button
+                            onClick={() => handleSubmit(room.uuid)}
+                            className="btn bg-green-500 cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered hover:bg-green-600"
+                            disabled={loadingSubmit}
+                          >
+                            {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت اتاق"}
+                          </button>
                         </div>
-                      )}
-                    </Disclosure.Panel>
-                  </>
-                )}
-              </Disclosure>
-            ))
+
+                        {errorList.length > 0 && (
+                          <div className="mt-4 text-red-600">
+                            <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+                            <ul className="list-disc ml-5">
+                              {errorList.map((error, index) => (
+                                <li key={index}>{error}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </Disclosure.Panel>
+                    </>
+                  )}
+                </Disclosure>
+              ))
           ) : (
             // Show the message when there are no rooms
             <p className="text-center text-red-500 mt-4">
