@@ -1,19 +1,26 @@
 // src/components/edithouse-components/EditHouseReservationRules.jsx
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import Spinner from "../../../../ui/Loading";
 import NumberField from "../../../../ui/NumberField";
 import FormSelect from "../../../../ui/FormSelect";
 import { toast, Toaster } from "react-hot-toast";
 import { useFetchWeekendOptions } from "../../../../services/fetchDataService";
 
-const EditHouseReservationRules = ({
-  houseData,
-  handleEditHouse,
-  loadingHouse,
-  refetchHouseData,
-  editLoading,
-}) => {
+const EditHouseReservationRules = forwardRef((props, ref) => {
+  const {
+    houseData,
+    handleEditHouse,
+    loadingHouse,
+    refetchHouseData,
+  } = props;
+
+  const [isModified, setIsModified] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isRefetching, setIsRefetching] = useState(false);
   const [errors, setErrors] = useState({});
@@ -79,6 +86,7 @@ const EditHouseReservationRules = ({
       ...prevErrors,
       [key]: null,
     }));
+    setIsModified(true);
   };
 
   const handleMinimumStayChange = (day, value) => {
@@ -93,6 +101,7 @@ const EditHouseReservationRules = ({
       ...prevErrors,
       minimum_length_stay: null,
     }));
+    setIsModified(true);
   };
 
   const validateForm = () => {
@@ -123,21 +132,29 @@ const EditHouseReservationRules = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      toast.error("لطفاً خطاهای فرم را بررسی کنید");
-      return;
+  const validateAndSubmit = async () => {
+    if (!isModified) {
+      console.log('No changes detected, submission skipped.');
+      return true;
     }
 
     setLoadingSubmit(true);
     setErrors({});
     setErrorList([]);
 
+    if (!validateForm()) {
+      toast.error("لطفاً خطاهای فرم را بررسی کنید");
+      setLoadingSubmit(false);
+      return false;
+    }
+
     try {
       await handleEditHouse(formData);
       setIsRefetching(true);
       await refetchHouseData();
       toast.success("اطلاعات با موفقیت ثبت شد");
+      setIsModified(false);
+      return true;
     } catch (errorData) {
       console.error("Edit House Error:", errorData);
 
@@ -161,16 +178,22 @@ const EditHouseReservationRules = ({
       } else {
         toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
       }
+      return false;
     } finally {
       setLoadingSubmit(false);
       setIsRefetching(false);
     }
   };
 
-  if (loadingHouse || loadingSubmit || loadingWeekendOptions || isRefetching) {
+  useImperativeHandle(ref, () => ({
+    validateAndSubmit,
+  }));
+
+  if (loadingHouse || loadingWeekendOptions || isRefetching) {
+    console.log('Loading data...');
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
-        <Spinner message={loadingSubmit ? "در حال ارسال..." : "در حال بارگذاری..."} />
+        <Spinner message="در حال بارگذاری..." />
       </div>
     );
   }
@@ -178,6 +201,15 @@ const EditHouseReservationRules = ({
   return (
     <div className="container mx-auto p-4">
       <Toaster />
+      {errorList.length > 0 && (
+        <div className="error-list mb-4">
+          {errorList.map((error, index) => (
+            <div key={index} className="text-red-500 text-sm">
+              {error}
+            </div>
+          ))}
+        </div>
+      )}
       <h1 className="text-xl font-bold mb-4">قوانین رزرو</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -287,6 +319,7 @@ const EditHouseReservationRules = ({
           errorMessages={errors.maximum_capacity}
           min="1"
         />
+        
 
         <FormSelect
           label="تعیین روزهای آخر هفته"
@@ -317,6 +350,7 @@ const EditHouseReservationRules = ({
           </thead>
           <tbody>
             {[
+              { key: "all", label: "حداقل شب اقامت" },
               { key: "Saturday", label: "شنبه" },
               { key: "Sunday", label: "یکشنبه" },
               { key: "Monday", label: "دوشنبه" },
@@ -347,20 +381,8 @@ const EditHouseReservationRules = ({
           <p className="text-red-500 text-sm mt-1">{errors.minimum_length_stay[0]}</p>
         )}
       </div>
-
- 
-
-      <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-        <button
-          onClick={handleSubmit}
-          className="btn bg-primary-600 text-white px-4 py-2 shadow-xl hover:bg-primary-800 transition-colors duration-200"
-          disabled={loadingSubmit || isRefetching}
-        >
-          {loadingSubmit ? "در حال ارسال..." : "ثبت اطلاعات"}
-        </button>
-      </div>
     </div>
   );
-};
+});
 
 export default EditHouseReservationRules;

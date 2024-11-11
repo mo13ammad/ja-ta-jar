@@ -100,7 +100,7 @@ const EditHouseContent = ({
       case 'mainFacilities':
         return <MainFacilities ref={childRef} {...commonProps} />;
       case 'rooms':
-        return <Rooms ref={childRef} {...commonProps} />;
+        return <Rooms  {...commonProps} />;
       case 'sanitaries':
         return <Sanitaries ref={childRef} {...commonProps} />;
       case 'reservationRules':

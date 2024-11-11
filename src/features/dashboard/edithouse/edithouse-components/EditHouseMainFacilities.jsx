@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from 'react';
+// src/components/edithouse-components/EditHouseMainFacilities.jsx
+
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react';
 import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
 import TextArea from '../../../../ui/TextArea';
 import ToggleSwitch from '../../../../ui/ToggleSwitch';
 import { useFetchFacilities } from '../../../../services/fetchDataService';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import { editHouseFacilities } from '../../../../services/houseService';
 
-const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHouse, refetchHouseData }) => {
+const EditHouseMainFacilities = forwardRef((props, ref) => {
+  const { houseId, houseData, setHouseData, loadingHouse, refetchHouseData } = props;
   const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchFacilities();
   const [selectedFacilities, setSelectedFacilities] = useState({});
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [errorList, setErrorList] = useState([]);
+  const [isModified, setIsModified] = useState(false);
   const [isRefetching, setIsRefetching] = useState(false);
 
   useEffect(() => {
     if (houseData && facilitiesData.length > 0) {
       const initialSelectedFacilities = facilitiesData.reduce((acc, facility) => {
         const existingFacility = houseData.facilities?.find((f) => f.key === facility.key);
-        
+
         acc[facility.key] = {
           checked: !!existingFacility,
           fields: facility.fields?.reduce((fieldAcc, field) => {
@@ -40,31 +50,48 @@ const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHous
   }, [houseData, facilitiesData]);
 
   const toggleFacility = (key) => {
-    setSelectedFacilities((prevSelected) => ({
-      ...prevSelected,
-      [key]: {
-        ...prevSelected[key],
-        checked: !prevSelected[key].checked,
-        fields: !prevSelected[key].checked ? {} : prevSelected[key].fields, // Clear fields if unchecked
-      },
-    }));
+    setSelectedFacilities((prevSelected) => {
+      const isChecked = !prevSelected[key].checked;
+      setIsModified(true);
+      return {
+        ...prevSelected,
+        [key]: {
+          ...prevSelected[key],
+          checked: isChecked,
+          fields: isChecked ? prevSelected[key].fields : {}, // Clear fields if unchecked
+        },
+      };
+    });
   };
 
   const handleInputChange = (facilityKey, fieldTitle, value) => {
-    setSelectedFacilities((prevState) => ({
-      ...prevState,
-      [facilityKey]: {
-        ...prevState[facilityKey],
-        fields: {
-          ...prevState[facilityKey].fields,
-          [fieldTitle.trim()]: value,
+    setSelectedFacilities((prevState) => {
+      setIsModified(true);
+      return {
+        ...prevState,
+        [facilityKey]: {
+          ...prevState[facilityKey],
+          fields: {
+            ...prevState[facilityKey].fields,
+            [fieldTitle.trim()]: value,
+          },
         },
-      },
-    }));
+      };
+    });
   };
 
-  const handleSubmit = async () => {
-    setLoadingSubmit(true);
+  const validateAndSubmit = async () => {
+    if (!isModified) {
+      console.log('No changes detected, submission skipped.');
+      return true;
+    }
+
+    setErrors({});
+    setErrorList([]);
+    console.log('Validating and submitting data.');
+
+    setIsRefetching(true);
+
     try {
       const facilitiesDataToSend = Object.keys(selectedFacilities)
         .filter((key) => selectedFacilities[key].checked)
@@ -81,6 +108,8 @@ const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHous
           ),
         }));
 
+      console.log('Data to send:', facilitiesDataToSend);
+
       const updatedHouseData = await editHouseFacilities(houseId, facilitiesDataToSend);
 
       if (updatedHouseData) {
@@ -88,20 +117,30 @@ const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHous
         toast.success('اطلاعات با موفقیت ثبت شد');
         setIsRefetching(true);
         await refetchHouseData();
+        setIsRefetching(false);
+        setIsModified(false);
+        return true;
+      } else {
+        throw new Error('Failed to update facilities.');
       }
     } catch (error) {
+      console.error('Submission Error:', error);
       toast.error('خطایی در ثبت اطلاعات پیش آمد');
-    } finally {
-      setLoadingSubmit(false);
       setIsRefetching(false);
+      return false;
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    validateAndSubmit,
+  }));
 
   const halfIndex = Math.ceil(facilitiesData.length / 2);
   const leftFacilities = facilitiesData.slice(0, halfIndex);
   const rightFacilities = facilitiesData.slice(halfIndex);
 
   if (loadingHouse || loadingFacilities || isRefetching) {
+    console.log('Loading data...');
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <Spinner />
@@ -110,7 +149,17 @@ const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHous
   }
 
   return (
-    <div className="px-2 py-1">
+    <div className="relative px-2 py-1">
+      <Toaster />
+      {errorList.length > 0 && (
+        <div className="error-list mb-4">
+          {errorList.map((error, index) => (
+            <div key={index} className="text-red-500 text-sm">
+              {error}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="text-right font-bold lg:text-lg mb-2">امکانات اصلی</div>
       <div className="flex flex-col gap-4 p-2 lg:flex-row">
         <div className="flex-1 space-y-4">
@@ -136,18 +185,9 @@ const EditHouseMainFacilities = ({ houseId, houseData, setHouseData, loadingHous
           ))}
         </div>
       </div>
-      <div className="mt-4 w-full flex justify-end">
-        <button
-          className="btn bg-primary-600 text-white px-4 py-2 shadow-centered hover:bg-primary-700 transition-colors duration-200"
-          onClick={handleSubmit}
-          disabled={loadingSubmit}
-        >
-          {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
-        </button>
-      </div>
     </div>
   );
-};
+});
 
 // Component to render each facility item
 const FacilityItem = ({ facility, selectedFacilities, toggleFacility, handleInputChange }) => (

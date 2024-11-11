@@ -1,12 +1,22 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { toast } from 'react-hot-toast';
+// src/components/edithouse-components/EditHouseGeneralInfo.jsx
+
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+  Fragment,
+} from 'react';
+import { toast, Toaster } from 'react-hot-toast';
 import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
 import TextArea from '../../../../ui/TextArea';
 import FormSelect from '../../../../ui/FormSelect';
 import ToggleSwitch from '../../../../ui/ToggleSwitch';
-import { useFetchHouseFloors, useFetchPrivacyOptions } from '../../../../services/fetchDataService';
-import useEditHouse from '../useEditHouse';
+import {
+  useFetchHouseFloors,
+  useFetchPrivacyOptions,
+} from '../../../../services/fetchDataService';
 import { Listbox, Transition } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
@@ -29,7 +39,8 @@ function OwnershipSelect({ label, value, onChange }) {
           <div className="relative bg-white rounded-xl">
             <Listbox.Button className="listbox__button">
               <span>
-                {ownershipOptions.find((option) => option.value === value)?.label || 'انتخاب کنید'}
+                {ownershipOptions.find((option) => option.value === value)?.label ||
+                  'انتخاب کنید'}
               </span>
               <ChevronDownIcon
                 className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
@@ -69,27 +80,55 @@ function OwnershipSelect({ label, value, onChange }) {
 }
 
 // Main EditHouseGeneralInfo Component
-const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
-  const [formData, setFormData] = useState({
-    name: houseData?.name || '',
-    land_size: houseData?.structure?.land_size || '',
-    structure_size: houseData?.structure?.size || '',
-    number_stairs: houseData?.structure?.number_stairs || '',
-    description: houseData?.description || '',
-    tip: houseData?.tip?.key || '',
-    privacy: houseData?.privacy?.key || '',
-    rentType: houseData?.structure?.can_rent_room
-      ? houseData?.is_rent_room
-        ? 'Rooms'
-        : 'House'
-      : 'House',
-    price_handle_by: houseData?.price_handle_by?.key || 'PerNight',
-    ownership: houseData?.ownership || '',
-  });
+const EditHouseGeneralInfo = forwardRef((props, ref) => {
+  const { houseData, loadingHouse, handleEditHouse, houseId } = props;
 
-  const { data: houseFloorOptions = [], isLoading: loadingHouseFloors } = useFetchHouseFloors();
-  const { data: privacyOptions = [], isLoading: loadingPrivacyOptions } = useFetchPrivacyOptions();
-  const { mutateAsync, isLoading: editLoading } = useEditHouse();
+  const [formData, setFormData] = useState({
+    name: '',
+    land_size: '',
+    structure_size: '',
+    number_stairs: '',
+    description: '',
+    tip: '',
+    privacy: '',
+    rentType: '',
+    price_handle_by: '',
+    ownership: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [errorList, setErrorList] = useState([]);
+  const [isModified, setIsModified] = useState(false);
+
+  const {
+    data: houseFloorOptions = [],
+    isLoading: loadingHouseFloors,
+  } = useFetchHouseFloors();
+  const {
+    data: privacyOptions = [],
+    isLoading: loadingPrivacyOptions,
+  } = useFetchPrivacyOptions();
+
+  useEffect(() => {
+    if (houseData) {
+      console.log('Received houseData:', houseData);
+      setFormData({
+        name: houseData?.name || '',
+        land_size: houseData?.structure?.land_size || '',
+        structure_size: houseData?.structure?.size || '',
+        number_stairs: houseData?.structure?.number_stairs || '',
+        description: houseData?.description || '',
+        tip: houseData?.tip?.key || '',
+        privacy: houseData?.privacy?.key || '',
+        rentType: houseData?.structure?.can_rent_room
+          ? houseData?.is_rent_room
+            ? 'Rooms'
+            : 'House'
+          : 'House',
+        price_handle_by: houseData?.price_handle_by?.key || 'PerNight',
+        ownership: houseData?.ownership || '',
+      });
+    }
+  }, [houseData]);
 
   // Rent type and price options
   const rentTypeOptions = [
@@ -102,46 +141,69 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
     { key: 'PerPerson', label: 'براساس هر نفر - شب' },
   ];
 
-  useEffect(() => {
-    if (houseData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        ownership: houseData.ownership || '',
-        rentType: houseData?.structure?.can_rent_room
-          ? houseData?.is_rent_room
-            ? 'Rooms'
-            : 'House'
-          : 'House',
-        price_handle_by: houseData?.price_handle_by?.key || 'PerNight',
-      }));
-    }
-  }, [houseData]);
-
   const handleInputChange = (name, value) => {
     console.log(`Input Change - Field: ${name}, Value: ${value}`);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    setIsModified(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const validateAndSubmit = async () => {
+    if (!isModified) {
+      console.log('No changes detected, submission skipped.');
+      return true;
+    }
+
+    setErrors({});
+    setErrorList([]);
+    console.log('Validating and submitting data:', formData);
+
     if (!houseId) {
       toast.error('شناسه اقامتگاه موجود نیست. امکان ارسال داده وجود ندارد.');
-      return;
+      console.error('Validation error: houseId is missing.');
+      return false;
     }
 
-    console.log('Submitting formData:', formData);
     try {
-      await mutateAsync({ houseId, houseData: formData });
+      await handleEditHouse(formData);
       toast.success('جزئیات اقامتگاه با موفقیت به‌روزرسانی شد!');
-    } catch (error) {
-      toast.error('به‌روزرسانی جزئیات اقامتگاه ناموفق بود. لطفاً دوباره تلاش کنید.');
+      console.log('Data successfully sent and received.');
+      setIsModified(false);
+      return true;
+    } catch (errorData) {
+      console.error('Edit House Error:', errorData);
+
+      if (errorData.errors || errorData.message) {
+        if (errorData.errors?.fields) {
+          const fieldErrors = errorData.errors.fields;
+          const updatedErrors = {};
+          const errorsArray = Object.values(fieldErrors).flat();
+
+          for (let field in fieldErrors) {
+            updatedErrors[field] = fieldErrors[field];
+          }
+          setErrors(updatedErrors);
+          setErrorList(errorsArray);
+        }
+
+        if (errorData.message) {
+          toast.error(errorData.message);
+        }
+      } else {
+        toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
+      }
+      return false;
     }
   };
 
-  if (loadingUser || loadingHouseFloors || loadingPrivacyOptions) {
+  useImperativeHandle(ref, () => ({
+    validateAndSubmit,
+  }));
+
+  if (loadingHouse || loadingHouseFloors || loadingPrivacyOptions) {
+    console.log('Loading data...');
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <Spinner />
@@ -151,14 +213,16 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
 
   return (
     <div className="relative">
+      <Toaster />   
       <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full h-full">
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <form className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TextField
             label="نام اقامتگاه"
             name="name"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             placeholder="نام اقامتگاه"
+            errorMessages={errors.name}
           />
           <TextField
             label="متراژ کل"
@@ -166,6 +230,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             value={formData.land_size}
             onChange={(e) => handleInputChange('land_size', e.target.value)}
             placeholder="متراژ کل به متر مربع"
+            errorMessages={errors.land_size}
           />
           <TextField
             label="متراژ زیر بنا"
@@ -173,6 +238,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             value={formData.structure_size}
             onChange={(e) => handleInputChange('structure_size', e.target.value)}
             placeholder="متراژ زیر بنا به متر مربع"
+            errorMessages={errors.structure_size}
           />
           <TextField
             label="تعداد پله"
@@ -180,6 +246,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             value={formData.number_stairs}
             onChange={(e) => handleInputChange('number_stairs', e.target.value)}
             placeholder="تعداد پله"
+            errorMessages={errors.number_stairs}
           />
 
           <FormSelect
@@ -199,6 +266,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
                     })),
                   ]
             }
+            errorMessages={errors.tip}
           />
           <FormSelect
             label="وضعیت حریم"
@@ -217,6 +285,7 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
                     })),
                   ]
             }
+            errorMessages={errors.privacy}
           />
 
           <OwnershipSelect
@@ -224,6 +293,9 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             value={formData.ownership || ''}
             onChange={(value) => handleInputChange('ownership', value)}
           />
+          {errors.ownership && (
+            <p className="mt-2 text-sm text-red-600">{errors.ownership[0]}</p>
+          )}
 
           <TextArea
             label="درباره اقامتگاه"
@@ -232,9 +304,9 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
             onChange={(e) => handleInputChange('description', e.target.value)}
             placeholder="امکاناتی که میخواهید به مهمانان نمایش داده شود را بنویسید"
             className="lg:col-span-2"
+            errorMessages={errors.description}
           />
 
-          {/* Price Handle Options */}
           <div className="mt-4 lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               قیمت اقامتگاه بر چه اساسی باشد
@@ -249,12 +321,16 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
                 />
               ))}
             </div>
+            {errors.price_handle_by && (
+              <p className="mt-2 text-sm text-red-600">{errors.price_handle_by[0]}</p>
+            )}
           </div>
 
-          {/* Rent Type Options */}
           {houseData?.structure?.can_rent_room && (
             <div className="mt-4 lg:col-span-2 border-t pt-2">
-              <label className="block font-bold text-gray-700 mb-2">نوع اجاره دهی اقامتگاه بر چه اساسی باشد </label>
+              <label className="block font-bold text-gray-700 mb-2">
+                نوع اجاره دهی اقامتگاه بر چه اساسی باشد{' '}
+              </label>
               <div className="flex space-x-4">
                 {rentTypeOptions.map((option) => (
                   <ToggleSwitch
@@ -265,22 +341,15 @@ const EditHouseGeneralInfo = ({ houseData, loadingUser, houseId }) => {
                   />
                 ))}
               </div>
+              {errors.rentType && (
+                <p className="mt-2 text-sm text-red-600">{errors.rentType[0]}</p>
+              )}
             </div>
           )}
-
-          <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-            <button
-              type="submit"
-              className="btn bg-primary-600 text-white px-3 py-1.6 shadow-xl hover:bg-primary-800 transition-colors duration-200"
-              disabled={editLoading}
-            >
-              {editLoading ? 'در حال ذخیره...' : 'ثبت اطلاعات'}
-            </button>
-          </div>
         </form>
       </div>
     </div>
   );
-};
+});
 
 export default EditHouseGeneralInfo;
