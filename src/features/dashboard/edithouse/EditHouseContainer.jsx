@@ -1,7 +1,8 @@
+// EditHouseContainer.js
+
 import React, { useState } from 'react';
 import EditHouseSidebar from './EditHouseSidebar';
 import EditHouseContent from './EditHouseContent';
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
 
 const tabSections = [
   {
@@ -40,8 +41,9 @@ const tabSections = [
   },
   {
     label: 'تصاویر',
-    keys: [{ key: 'images', label: 'تصاویر اقامتگاه' },
-      { key: 'documents', label: 'مدارک مالکیت' }
+    keys: [
+      { key: 'images', label: 'تصاویر اقامتگاه' },
+      { key: 'documents', label: 'مدارک مالکیت' },
     ],
   },
   {
@@ -81,29 +83,13 @@ function EditHouseContainer() {
         />
       </div>
 
-      <div className="md:col-span-9 flex-grow w-full bg-gray-50 border-gray-200 border-t border-opacity-50 shadow-centered rounded-xl">
-       
-        <div className=''>
-        <EditHouseContent selectedTab={selectedTab} />
-        </div>
-        <div className=" flex justify-between items-center p-2 py-3 lg:p-3 ">
-          <button
-            onClick={handlePreviousTab}
-            disabled={selectedTab === 'address'}
-            className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${selectedTab === 'address' ? 'bg-primary-100 cursor-not-allowed' : 'bg-primary-500'}`}
-          >
-            <ArrowRightIcon className="w-4 h-4 ml-1" />
-            صفحه قبل
-          </button>
-          <button
-            onClick={handleNextTab}
-            disabled={selectedTab === 'finalSubmit'}
-            className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${selectedTab === 'finalSubmit' ? ' bg-primary-100 cursor-not-allowed' : 'bg-primary-500'}`}
-          >
-            صفحه بعد
-            <ArrowLeftIcon className="w-4 h-4 mr-1" />
-          </button>
-        </div>
+      <div className="md:col-span-9 flex flex-col h-full w-full bg-gray-50 border-gray-200 border-t border-opacity-50 shadow-centered rounded-xl">
+        <EditHouseContent
+          selectedTab={selectedTab}
+          handleNextTab={handleNextTab}
+          handlePreviousTab={handlePreviousTab}
+          tabSections={tabSections}
+        />
       </div>
     </div>
   );

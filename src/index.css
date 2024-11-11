@@ -135,3 +135,31 @@
 .otp-input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* styles.css */
+
+/* Custom scrollbar styles for WebKit-based browsers */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px; /* Adjust the width as needed */
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent; /* Make scrollbar track transparent */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(160, 174, 192, 0.5); /* Gray color with reduced opacity */
+  border-radius: 9999px; /* Rounded corners */
+  border: 2px solid transparent; /* Space around thumb */
+  background-clip: content-box; /* Prevent the background from bleeding */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(113, 128, 150, 0.7); /* Slightly more opaque on hover */
+}
+
+/* Custom scrollbar styles for Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(160, 174, 192, 0.5) transparent;
+}
