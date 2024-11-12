@@ -159,12 +159,11 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
 
     console.log("Formatted data to be sent:", formattedData);
 
-    if (priceHandleBy === "PerNight") {
-      formattedData.extra_people_spring = formattedData.extra_people_spring || "10000";
-      formattedData.extra_people_summer = formattedData.extra_people_summer || "10000";
-      formattedData.extra_people_autumn = formattedData.extra_people_autumn || "10000";
-      formattedData.extra_people_winter = formattedData.extra_people_winter || "10000";
-    }
+    // Always set default values for extra people fields
+    formattedData.extra_people_spring = formattedData.extra_people_spring || "10000";
+    formattedData.extra_people_summer = formattedData.extra_people_summer || "10000";
+    formattedData.extra_people_autumn = formattedData.extra_people_autumn || "10000";
+    formattedData.extra_people_winter = formattedData.extra_people_winter || "10000";
 
     try {
       let response;
@@ -215,24 +214,22 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
       <div className="mt-4">
         <h2 className="text-lg font-semibold mt-7">{title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {keys
-            .filter(({ key }) => priceHandleBy === "PerPerson" || !key.includes("extra_people"))
-            .map(({ key, label }) => (
-              <TextField
-                key={key}
-                label={label}
-                name={key}
-                value={
-                  houseData?.is_rent_room && roomUuid
-                    ? formData[roomUuid]?.[key] || ""
-                    : formData[key] || ""
-                }
-                onChange={(e) => handleInputChange(key, e.target.value, roomUuid)}
-                placeholder={placeholderText}
-                className={errors[key] ? "border-red-500" : ""}
-                error={errors[key]}
-              />
-            ))}
+          {keys.map(({ key, label }) => (
+            <TextField
+              key={key}
+              label={label}
+              name={key}
+              value={
+                houseData?.is_rent_room && roomUuid
+                  ? formData[roomUuid]?.[key] || ""
+                  : formData[key] || ""
+              }
+              onChange={(e) => handleInputChange(key, e.target.value, roomUuid)}
+              placeholder={placeholderText}
+              className={errors[key] ? "border-red-500" : ""}
+              error={errors[key]}
+            />
+          ))}
         </div>
       </div>
     );
