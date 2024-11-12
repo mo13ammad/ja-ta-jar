@@ -1,11 +1,10 @@
-// src/components/edithouse-components/EditHouseGeneralInfo.jsx
-
 import React, {
   useState,
   useEffect,
   useImperativeHandle,
   forwardRef,
   Fragment,
+  useMemo,
 } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import Spinner from '../../../../ui/Loading';
@@ -24,24 +23,26 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 const ownershipOptions = [
   { key: 'Owner', label: 'مالک', value: 'Owner' },
   { key: 'LongTermTenant', label: 'مستأجر بلند مدت', value: 'LongTermTenant' },
-  { key: 'Intermediary', label: 'واسطه', value: 'Intermediary' },
-  { key: 'FamiliarWithTheOwner', label: 'آشنا با مالک', value: 'FamiliarWithTheOwner' },
+  { key: 'Intermediary', label: 'ناظر رزرو', value: 'Intermediary' },
+  { key: 'FamiliarWithTheOwner', label: 'مشاور املاک', value: 'FamiliarWithTheOwner' },
   { key: 'Gatekeeper', label: 'سرایدار', value: 'Gatekeeper' },
 ];
 
 // OwnershipSelect Component
 function OwnershipSelect({ label, value, onChange }) {
+  const selectedOption =
+    ownershipOptions.find((option) => option.value === value) || {};
   return (
     <div className="w-full">
       <label className="block font-medium text-gray-700 mb-2">{label}</label>
-      <Listbox value={value} onChange={(val) => onChange(val)}>
+      <Listbox
+        value={selectedOption}
+        onChange={(val) => onChange('ownership', val.value)}
+      >
         {({ open }) => (
           <div className="relative bg-white rounded-xl">
             <Listbox.Button className="listbox__button">
-              <span>
-                {ownershipOptions.find((option) => option.value === value)?.label ||
-                  'انتخاب کنید'}
-              </span>
+              <span>{selectedOption.label || 'انتخاب کنید'}</span>
               <ChevronDownIcon
                 className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
                   open ? 'rotate-180' : 'rotate-0'
@@ -60,7 +61,7 @@ function OwnershipSelect({ label, value, onChange }) {
                 {ownershipOptions.map((option) => (
                   <Listbox.Option
                     key={option.key}
-                    value={option.value}
+                    value={option}
                     className={({ active }) =>
                       `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
                         active ? 'bg-secondary-100 text-secondary-700' : 'text-gray-900'
@@ -107,6 +108,37 @@ const EditHouseGeneralInfo = forwardRef((props, ref) => {
     data: privacyOptions = [],
     isLoading: loadingPrivacyOptions,
   } = useFetchPrivacyOptions();
+
+  // Memoize options to prevent unnecessary re-renders
+  const houseFloorOptionsData = useMemo(() => {
+    if (loadingHouseFloors) {
+      return [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }];
+    } else {
+      return [
+        { key: 'default', value: '', label: 'انتخاب نوع' },
+        ...houseFloorOptions.map((option) => ({
+          key: option.key,
+          value: option.key,
+          label: option.label,
+        })),
+      ];
+    }
+  }, [loadingHouseFloors, houseFloorOptions]);
+
+  const privacyOptionsData = useMemo(() => {
+    if (loadingPrivacyOptions) {
+      return [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }];
+    } else {
+      return [
+        { key: 'default', value: '', label: 'انتخاب حریم' },
+        ...privacyOptions.map((option) => ({
+          key: option.key,
+          value: option.key,
+          label: option.label,
+        })),
+      ];
+    }
+  }, [loadingPrivacyOptions, privacyOptions]);
 
   useEffect(() => {
     if (houseData) {
@@ -213,7 +245,7 @@ const EditHouseGeneralInfo = forwardRef((props, ref) => {
 
   return (
     <div className="relative">
-      <Toaster />   
+      <Toaster />
       <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full h-full">
         <form className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TextField
@@ -253,45 +285,23 @@ const EditHouseGeneralInfo = forwardRef((props, ref) => {
             label="تیپ سازه"
             name="tip"
             value={formData.tip || ''}
-            onChange={(e) => handleInputChange('tip', e.target.value)}
-            options={
-              loadingHouseFloors
-                ? [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }]
-                : [
-                    { key: 'default', value: '', label: 'انتخاب نوع' },
-                    ...houseFloorOptions.map((option) => ({
-                      key: option.key,
-                      value: option.key,
-                      label: option.label,
-                    })),
-                  ]
-            }
+            onChange={handleInputChange}
+            options={houseFloorOptionsData}
             errorMessages={errors.tip}
           />
           <FormSelect
             label="وضعیت حریم"
             name="privacy"
             value={formData.privacy || ''}
-            onChange={(e) => handleInputChange('privacy', e.target.value)}
-            options={
-              loadingPrivacyOptions
-                ? [{ key: 'loading', value: '', label: 'در حال بارگذاری...' }]
-                : [
-                    { key: 'default', value: '', label: 'انتخاب حریم' },
-                    ...privacyOptions.map((option) => ({
-                      key: option.key,
-                      value: option.key,
-                      label: option.label,
-                    })),
-                  ]
-            }
+            onChange={handleInputChange}
+            options={privacyOptionsData}
             errorMessages={errors.privacy}
           />
 
           <OwnershipSelect
             label="نوع ارتباط مالک با اقامتگاه"
             value={formData.ownership || ''}
-            onChange={(value) => handleInputChange('ownership', value)}
+            onChange={handleInputChange}
           />
           {errors.ownership && (
             <p className="mt-2 text-sm text-red-600">{errors.ownership[0]}</p>
@@ -322,7 +332,9 @@ const EditHouseGeneralInfo = forwardRef((props, ref) => {
               ))}
             </div>
             {errors.price_handle_by && (
-              <p className="mt-2 text-sm text-red-600">{errors.price_handle_by[0]}</p>
+              <p className="mt-2 text-sm text-red-600">
+                {errors.price_handle_by[0]}
+              </p>
             )}
           </div>
 

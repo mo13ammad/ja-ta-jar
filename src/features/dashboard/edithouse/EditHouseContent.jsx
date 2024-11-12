@@ -70,6 +70,7 @@ const EditHouseContent = ({
 
       // Ensure isRefetching is set back to false after refetch completes
       setIsRefetching(false);
+      return true; // Return success status
     } catch (error) {
       console.error('Edit House Error:', error.response?.data || error.message);
       setIsRefetching(false); // Set isRefetching to false in case of error
@@ -114,7 +115,7 @@ const EditHouseContent = ({
       case 'images':
         return <Images ref={childRef} {...commonProps} />;
       case 'documents':
-        return <EditHouseDocuments ref={childRef} {...commonProps} />;
+        return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':
         return <EditHouseFinalSubmit {...commonProps} />;
       default:
@@ -126,15 +127,14 @@ const EditHouseContent = ({
     setIsSaving(true); // Start saving
     try {
       console.log('Next button clicked.');
-      console.log('childRef.current:', childRef.current);
       if (childRef.current && childRef.current.validateAndSubmit) {
         const success = await childRef.current.validateAndSubmit();
         if (success) {
-          handleNextTab(); // Navigate to next tab
+          await handleNextTab(); // Navigate to next tab after successful save
         }
       } else {
         // If childRef or validateAndSubmit is not available, proceed
-        handleNextTab();
+        await handleNextTab();
       }
     } catch (error) {
       console.error('Error during next click:', error);
@@ -150,11 +150,11 @@ const EditHouseContent = ({
       if (childRef.current && childRef.current.validateAndSubmit) {
         const success = await childRef.current.validateAndSubmit();
         if (success) {
-          handlePreviousTab(); // Navigate to previous tab
+          await handlePreviousTab(); // Navigate to previous tab after successful save
         }
       } else {
         // If childRef or validateAndSubmit is not available, proceed
-        handlePreviousTab();
+        await handlePreviousTab();
       }
     } catch (error) {
       console.error('Error during previous click:', error);

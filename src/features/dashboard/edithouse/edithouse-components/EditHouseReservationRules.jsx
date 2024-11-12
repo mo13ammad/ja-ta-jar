@@ -310,6 +310,16 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           min="1"
         />
 
+<NumberField
+          label="حداقل شب اقامت"
+          name="minimum_length_stay.all"
+          type="number"
+          value={formData.minimum_length_stay.all ?? ""}
+          onChange={(e) => handleMinimumStayChange("all", e.target.value)}
+          errorMessages={errors["minimum_length_stay.all"]}
+          min="0"
+        />
+
         <NumberField
           label="حداکثر ظرفیت"
           name="maximum_capacity"
@@ -319,6 +329,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           errorMessages={errors.maximum_capacity}
           min="1"
         />
+
         
 
         <FormSelect
@@ -337,6 +348,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
         />
       </div>
 
+   
       <div className="mt-8 lg:col-span-2 lg:w-1/2">
         <label className="block text-sm xl:text-lg font-medium text-gray-700 mb-2">
           حداقل شب اقامت به ازای روزهای هفته
@@ -350,7 +362,6 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           </thead>
           <tbody>
             {[
-              { key: "all", label: "حداقل شب اقامت" },
               { key: "Saturday", label: "شنبه" },
               { key: "Sunday", label: "یکشنبه" },
               { key: "Monday", label: "دوشنبه" },
@@ -377,9 +388,6 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
             ))}
           </tbody>
         </table>
-        {errors.minimum_length_stay && (
-          <p className="text-red-500 text-sm mt-1">{errors.minimum_length_stay[0]}</p>
-        )}
       </div>
     </div>
   );

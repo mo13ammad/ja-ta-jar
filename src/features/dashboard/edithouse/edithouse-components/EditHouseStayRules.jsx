@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+// src/components/edithouse-components/EditHouseStayRules.jsx
+
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import Spinner from '../../../../ui/Loading';
 import TextField from '../../../../ui/TextField';
 import ToggleSwitch from '../../../../ui/ToggleSwitch';
@@ -12,11 +14,13 @@ const statusOptions = [
   { key: 'NotNeeded', label: 'نیاز نیست' },
 ];
 
-const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse, refetchHouseData }) => {
+const EditHouseStayRules = forwardRef(({ houseData, handleEditHouse, loadingHouse, refetchHouseData }, ref) => {
   const { data: rulesData = [], isLoading: loadingRules } = useFetchRules();
   const [selectedRules, setSelectedRules] = useState({});
   const [descriptions, setDescriptions] = useState({});
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [isModified, setIsModified] = useState(false);
+  const [errorList, setErrorList] = useState([]);
 
   useEffect(() => {
     if (rulesData.length > 0 && Array.isArray(houseData?.rules?.types)) {
@@ -42,6 +46,7 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
       ...prev,
       [ruleKey]: prev[ruleKey] === optionKey ? null : optionKey, // Toggle selection
     }));
+    setIsModified(true);
   };
 
   const handleNoteChange = (ruleKey, value) => {
@@ -49,10 +54,18 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
       ...prev,
       [ruleKey]: value,
     }));
+    setIsModified(true);
   };
 
-  const handleSubmit = async () => {
+  const validateAndSubmit = async () => {
+    if (!isModified) {
+      console.log('No changes detected, submission skipped.');
+      return true;
+    }
+
     setLoadingSubmit(true);
+    setErrorList([]);
+
     try {
       const updatedData = {
         rules: Object.keys(selectedRules)
@@ -67,13 +80,21 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
       await handleEditHouse(updatedData);
       await refetchHouseData(); // Refetch house data after submission
       toast.success('اطلاعات با موفقیت ثبت شد');
+      setIsModified(false);
+      return true;
     } catch (error) {
       console.error('Error submitting rules:', error);
       toast.error('خطایی در ثبت اطلاعات پیش آمد');
+      setErrorList(['Failed to update rules. Please try again.']);
+      return false;
     } finally {
       setLoadingSubmit(false);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    validateAndSubmit,
+  }));
 
   if (loadingHouse || loadingRules) {
     return (
@@ -87,6 +108,17 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
     <div className="relative">
       <div className="overflow-auto scrollbar-thin pt-2 px-2 lg:px-4 w-full">
         <div className="text-right font-bold lg:text-lg mb-4">قوانین اقامت :</div>
+        
+        {errorList.length > 0 && (
+          <div className="error-list mb-4">
+            {errorList.map((error, index) => (
+              <div key={index} className="text-red-500 text-sm">
+                {error}
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {rulesData.map((rule) => (
             <div key={rule.key} className="mt-4 p-4 border rounded-xl shadow-centered">
@@ -99,7 +131,6 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
                     checked={selectedRules[rule.key] === option.key}
                     onChange={() => handleOptionToggle(rule.key, option.key)}
                     label={option.label}
-                    icon={null} // Optional: you can set an icon here if available
                   />
                 ))}
               </div>
@@ -119,7 +150,7 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
         <div className="mt-4 w-full lg:col-span-2 flex justify-end">
           <button
             className="btn bg-primary-600 text-white px-4 py-2 shadow-lg hover:bg-primary-800 transition-colors duration-200"
-            onClick={handleSubmit}
+            onClick={validateAndSubmit}
             disabled={loadingSubmit}
           >
             {loadingSubmit ? 'در حال بارگذاری...' : 'ثبت اطلاعات'}
@@ -128,6 +159,6 @@ const EditHouseStayRules = ({ houseData, houseId, handleEditHouse, loadingHouse,
       </div>
     </div>
   );
-};
+});
 
 export default EditHouseStayRules;

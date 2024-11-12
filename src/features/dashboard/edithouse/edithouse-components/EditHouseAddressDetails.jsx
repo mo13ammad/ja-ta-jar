@@ -194,15 +194,7 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
           errorMessages={errors.postal_code}
         />
 
-        <div className="mt-4 w-full lg:col-span-2 flex justify-end">
-          <button
-            type="submit"
-            className="btn bg-primary-600 text-white px-3 py-1.5 shadow-xl hover:bg-primary-800 transition-colors duration-200"
-            disabled={editLoading}
-          >
-            {editLoading ? 'در حال ذخیره...' : 'ثبت اطلاعات'}
-          </button>
-        </div>
+        
       </form>
     </div>
   );
