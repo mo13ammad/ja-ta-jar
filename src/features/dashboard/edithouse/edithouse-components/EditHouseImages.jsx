@@ -21,6 +21,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
 
+  // New state to track loading state of delete button in modal
+  const [deleteModalLoading, setDeleteModalLoading] = useState(false);
+
   useEffect(() => {
     if (houseData?.medias) {
       setImages(houseData.medias);
@@ -88,15 +91,20 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       return await deleteHousePicture(houseId, imageToDelete);
     },
     {
+      onMutate: () => {
+        setDeleteModalLoading(true); // Set loading state when mutation starts
+      },
       onSuccess: () => {
         setImages((prev) => prev.filter((img) => img.id !== imageToDelete));
         toast.success('تصویر با موفقیت حذف شد');
         setDeleteModalOpen(false);
+        setDeleteModalLoading(false); // Reset loading state
         refetchHouseData();
       },
       onError: (error) => {
         console.error('Error deleting image:', error);
         displayError(error);
+        setDeleteModalLoading(false); // Reset loading state
       },
     }
   );
@@ -126,25 +134,24 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       {images.length > 0 ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {[...images].reverse().map((image) => (
-            <div key={image.id} className="relative border rounded-lg flex items-center">
+            <div key={image.id} className="relative border rounded-2xl flex items-center">
               <img
                 src={image.media}
                 alt="House"
-                className="w-32 h-32 object-cover rounded-tl-lg"
+                className="w-36 h-36 object-cover rounded-tl-lg"
               />
               <div className="p-3 w-full flex flex-col">
                 <p className="font-semibold mb-1">عنوان: {image.title || 'بدون عنوان'}</p>
                 <div className="flex gap-2 mt-2">
                   <button
                     onClick={() => handleDeleteClick(image.id)}
-                    className="text-white bg-red-500 rounded-lg px-3 py-1"
-                    disabled={deleteImageMutation.isLoading}
+                    className="text-white bg-red-500 rounded-2xl px-3 py-1"
                   >
-                    {deleteImageMutation.isLoading ? 'در حال حذف...' : 'حذف'}
+                    حذف
                   </button>
                 </div>
                 {image.main && (
-                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                  <span className="absolute top-2 left-2 bg-primary-500 text-white text-xs px-2 py-1 rounded-2xl">
                     تصویر اصلی
                   </span>
                 )}
@@ -159,7 +166,7 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       {/* Add Image Modal */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
-          <Dialog.Panel className="w-full max-w-lg bg-white rounded-lg p-6">
+          <Dialog.Panel className="w-full max-w-lg bg-white rounded-2xl p-6">
             <Dialog.Title>اضافه کردن تصویر</Dialog.Title>
             <input type="file" accept="image/*" onChange={handleFileChange} className="w-full my-2" />
             {imagePreview && (
@@ -170,7 +177,7 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="عنوان تصویر"
-              className="w-full border rounded-lg p-2 my-2 focus:outline-none focus:ring-0"
+              className="w-full border rounded-2xl p-2 my-2 focus:outline-none focus:ring-0"
             />
             {/* Use ToggleSwitch for isMain */}
             <div className="flex items-center mt-2">
@@ -185,14 +192,14 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg"
+                className="bg-gray-500 text-white px-4 py-2 rounded-2xl"
               >
                 انصراف
               </button>
               <button
                 type="button"
                 onClick={handleAddImage}
-                className="bg-primary-600 text-white px-4 py-2 rounded-lg"
+                className="bg-primary-600 text-white px-4 py-2 rounded-2xl flex items-center justify-center"
                 disabled={addImageMutation.isLoading}
               >
                 {addImageMutation.isLoading ? <Spinner size={20} /> : 'اضافه کردن'}
@@ -205,22 +212,22 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
-          <Dialog.Panel className="w-full max-w-md bg-white rounded-lg p-6">
+          <Dialog.Panel className="w-full max-w-md bg-white rounded-2xl p-6">
             <Dialog.Title>حذف تصویر</Dialog.Title>
             <p className="my-4">آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟</p>
             <div className="flex justify-end gap-4 mt-4">
               <button
                 onClick={() => setDeleteModalOpen(false)}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+                className="px-4 py-2 bg-gray-500 text-white rounded-2xl"
               >
                 لغو
               </button>
               <button
                 onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg"
-                disabled={deleteImageMutation.isLoading}
+                className="px-4 py-2 bg-red-600 text-white rounded-2xl flex items-center justify-center"
+                disabled={deleteModalLoading}
               >
-                {deleteImageMutation.isLoading ? 'در حال حذف...' : 'بله، حذفش کن'}
+                {deleteModalLoading ? <Spinner size={20} /> : 'بله، حذفش کن'}
               </button>
             </div>
           </Dialog.Panel>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { useMutation } from '@tanstack/react-query';
 import { uploadHouseDocument } from "../../../../services/houseService";
 
 const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
@@ -11,6 +12,13 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
   useEffect(() => {
     console.log("Loaded houseData:", houseData);
   }, [houseData]);
+
+  // Function to display errors based on error.response.data.message
+  const displayError = (error) => {
+    const errorMessage =
+      error.response?.data?.message || error.message || 'خطایی رخ داده است';
+    toast.error(errorMessage);
+  };
 
   const handleDocumentChange = (event, documentType) => {
     const file = event.target.files[0];
@@ -33,23 +41,34 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
 
     try {
       await uploadHouseDocument(houseId, documentData);
-      toast.success(`${documentType} بارگذاری شد.`);
+      // Removed individual success toast
     } catch (error) {
-      toast.error(`خطا در بارگذاری ${documentType}`);
+      displayError(error);
       console.error("Document Upload Error:", error);
+      // Re-throw to propagate error to handleSubmitAll
+      throw error;
     }
   };
 
   const handleSubmitAll = async () => {
     setLoading(true);
+
     const uploadPromises = Object.entries(documentFiles).map(([documentType, file]) =>
       handleDocumentUpload(documentType, file)
     );
 
     try {
-      await Promise.all(uploadPromises);
-      toast.success("تمام مدارک با موفقیت بارگذاری شدند.");
+      const results = await Promise.allSettled(uploadPromises);
+
+      const allFulfilled = results.every(result => result.status === 'fulfilled');
+      if (allFulfilled) {
+        toast.success(" مدارک با موفقیت بارگذاری شدند.");
+      } else {
+        toast.error("خطا در بارگذاری برخی مدارک.");
+      }
       refetchHouseData();
+      // Clear selected files
+      setDocumentFiles({});
     } catch (error) {
       toast.error("خطا در بارگذاری مدارک.");
     } finally {
@@ -64,7 +83,7 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
       {houseData?.documents?.map((doc, index) => {
 
         return (
-          <div key={`${doc.key}-${index}`} className="mb-6">
+          <div key={`${doc.type.key}-${index}`} className="mb-6">
             <div className="flex gap-2 m-1"> 
               <img src={doc?.type?.icon} alt={`${doc?.type?.label} icon`} className="w-6 h-6" />
               <label className="block font-medium mb-1">{doc?.type?.label}</label>
@@ -73,7 +92,7 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
               <input
                 type="file"
                 disabled={!doc.can_edit}
-                onChange={(event) => handleDocumentChange(event, doc.key)}
+                onChange={(event) => handleDocumentChange(event, doc.type.key)}
                 className={`border rounded-lg p-2 w-full ${doc.can_edit ? 'bg-white' : 'bg-gray-200'}`}
               />
             </div>
