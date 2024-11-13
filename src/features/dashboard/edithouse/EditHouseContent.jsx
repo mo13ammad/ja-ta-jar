@@ -116,7 +116,7 @@ const EditHouseContent = ({
       case 'pricing':
         return <Pricing ref={childRef} {...commonProps} />;
       case 'images':
-        return <Images ref={childRef} {...commonProps} />;
+        return <Images  {...commonProps} />;
       case 'documents':
         return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':

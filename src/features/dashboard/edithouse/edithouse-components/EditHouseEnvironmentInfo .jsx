@@ -9,7 +9,6 @@ import React, {
 import { Switch } from "@headlessui/react";
 import Spinner from "../../../../ui/Loading";
 import TextArea from "../../../../ui/TextArea";
-import FormSelect from "../../../../ui/FormSelect";
 import toast, { Toaster } from "react-hot-toast";
 import {
   useFetchTextures,
@@ -17,6 +16,7 @@ import {
   useFetchNeighbours,
   useFetchRoutes,
 } from "../../../../services/fetchDataService";
+import NeighbourSelect from "./NeighbourSelect";
 
 const EditHouseEnvironmentDetails = forwardRef((props, ref) => {
   const { houseData, loadingHouse, handleEditHouse, houseId } = props;
@@ -170,7 +170,6 @@ const EditHouseEnvironmentDetails = forwardRef((props, ref) => {
   return (
     <div className="relative">
       <Toaster />
-     
       <div className="overflow-auto scrollbar-thin px-3 lg:px-4 w-full">
         <div className="text-right font-bold lg:text-lg">اطلاعات محیطی :</div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-4">
@@ -281,19 +280,13 @@ const EditHouseEnvironmentDetails = forwardRef((props, ref) => {
           </div>
 
           {/* Neighbourhood Type */}
-          <div className="mt-4 lg:col-span-2 w-1/2">
-            <FormSelect
+          <div className="mt-4  w-full">
+            <NeighbourSelect
               label="نوع همسایگی"
-              name="neighbour"
+              name="selectedNeighbour"
               value={formData.selectedNeighbour}
-              onChange={(e) => handleInputChange("selectedNeighbour", e.target.value)}
-              options={[
-                { value: "", label: "انتخاب نوع همسایگی" },
-                ...neighbourOptions.map((option) => ({
-                  value: option.key,
-                  label: option.label,
-                })),
-              ]}
+              onChange={handleInputChange}
+              options={neighbourOptions}
               errorMessages={errors.neighbour}
             />
           </div>
@@ -358,9 +351,6 @@ const EditHouseEnvironmentDetails = forwardRef((props, ref) => {
           </div>
         </div>
       </div>
-
-      {/* Submit Button */}
-      {/* Removed the submit button, as submission is handled via `validateAndSubmit` */}
     </div>
   );
 });

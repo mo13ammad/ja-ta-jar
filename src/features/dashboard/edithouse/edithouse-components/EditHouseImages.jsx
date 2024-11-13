@@ -7,9 +7,10 @@ import Spinner from '../../../../ui/Loading';
 import {
   createHousePicture,
   deleteHousePicture,
+  changeHouseMainPicture,
 } from '../../../../services/houseService';
 import { useMutation } from '@tanstack/react-query';
-import ToggleSwitch from '../../../../ui/ToggleSwitch'; // Adjust the import path as necessary
+import ToggleSwitch from '../../../../ui/ToggleSwitch';
 
 const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,8 +22,10 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
 
-  // New state to track loading state of delete button in modal
+  // New state to track loading states
   const [deleteModalLoading, setDeleteModalLoading] = useState(false);
+  const [makeMainLoading, setMakeMainLoading] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // Loading state for refetching data
 
   useEffect(() => {
     if (houseData?.medias) {
@@ -52,10 +55,19 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   // Mutation to add a new image
   const addImageMutation = useMutation(
     async (formData) => {
+      // Log the data being sent
+      console.log('Sending data to createHousePicture:');
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
       return await createHousePicture(houseId, formData);
     },
     {
       onSuccess: (data) => {
+        // Log the data received
+        console.log('Received data from createHousePicture:', data);
+
         setImages(data.medias);
         toast.success('تصویر با موفقیت اضافه شد');
         setIsOpen(false);
@@ -63,7 +75,10 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         setImagePreview(null);
         setTitle('');
         setIsMain(false);
-        refetchHouseData();
+        setIsLoading(true); // Start loading
+        refetchHouseData().then(() => {
+          setIsLoading(false); // Stop loading after data is fetched
+        });
       },
       onError: (error) => {
         console.error('Error adding image:', error);
@@ -82,12 +97,20 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     formData.append('title', title);
     if (isMain) formData.append('main', 1);
 
+    // Log the formData being sent
+    console.log('FormData to be sent in handleAddImage:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
     addImageMutation.mutate(formData);
   };
 
   // Mutation to delete an image
   const deleteImageMutation = useMutation(
     async () => {
+      // Log the data being sent
+      console.log('Sending request to deleteHousePicture for imageId:', imageToDelete);
       return await deleteHousePicture(houseId, imageToDelete);
     },
     {
@@ -95,11 +118,17 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         setDeleteModalLoading(true); // Set loading state when mutation starts
       },
       onSuccess: () => {
+        // Log success
+        console.log('Image deleted successfully:', imageToDelete);
+
         setImages((prev) => prev.filter((img) => img.id !== imageToDelete));
         toast.success('تصویر با موفقیت حذف شد');
         setDeleteModalOpen(false);
         setDeleteModalLoading(false); // Reset loading state
-        refetchHouseData();
+        setIsLoading(true); // Start loading
+        refetchHouseData().then(() => {
+          setIsLoading(false); // Stop loading after data is fetched
+        });
       },
       onError: (error) => {
         console.error('Error deleting image:', error);
@@ -117,6 +146,71 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const confirmDelete = () => {
     deleteImageMutation.mutate();
   };
+
+  // Mutation to set image as main
+  const makeMainImageMutation = useMutation(
+    async (imageId) => {
+      const imageToUpdate = images.find((img) => img.id === imageId);
+      if (!imageToUpdate) {
+        throw new Error('تصویر مورد نظر یافت نشد');
+      }
+
+      // Include the title in the request data
+      const data = {
+        title: imageToUpdate.title || '',
+        main: 1,
+      };
+
+      // Log the data being sent
+      console.log('Sending data to changeHouseMainPicture:', data);
+
+      return await changeHouseMainPicture(houseId, imageId, data);
+    },
+    {
+      onSuccess: (data) => {
+        // Log the data received
+        console.log('Received data from changeHouseMainPicture:', data);
+
+        // Update the images state
+        setImages((prevImages) =>
+          prevImages.map((img) => {
+            if (img.id === data.id) {
+              return { ...img, main: true };
+            } else if (img.main) {
+              return { ...img, main: false };
+            }
+            return img;
+          })
+        );
+        toast.success('تصویر اصلی تغییر کرد');
+        setIsLoading(true); // Start loading
+        refetchHouseData().then(() => {
+          setIsLoading(false); // Stop loading after data is fetched
+        });
+      },
+      onError: (error) => {
+        console.error('Error setting image as main:', error);
+        displayError(error);
+      },
+      onSettled: (data, error, variables) => {
+        const imageId = variables;
+        setMakeMainLoading((prev) => ({ ...prev, [imageId]: false }));
+      },
+    }
+  );
+
+  const handleMakeMain = (imageId) => {
+    setMakeMainLoading((prev) => ({ ...prev, [imageId]: true }));
+    makeMainImageMutation.mutate(imageId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Spinner size={50} />
+      </div>
+    );
+  }
 
   return (
     <div className="edit-house-images p-4">
@@ -149,6 +243,15 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
                   >
                     حذف
                   </button>
+                  {!image.main && (
+                    <button
+                      onClick={() => handleMakeMain(image.id)}
+                      className="text-white bg-secondary-900 rounded-2xl px-3 py-1"
+                      disabled={makeMainLoading[image.id]}
+                    >
+                      {makeMainLoading[image.id] ? 'در حال تبدیل...' : 'تبدیل به تصویر اصلی'}
+                    </button>
+                  )}
                 </div>
                 {image.main && (
                   <span className="absolute top-2 left-2 bg-primary-500 text-white text-xs px-2 py-1 rounded-2xl">

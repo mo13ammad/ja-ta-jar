@@ -1,13 +1,14 @@
+// Profile.jsx
+
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Loading from '../../ui/Loading.jsx';
 import useUser from '../dashboard/useUser.js';
 import { becomeVendor } from '../../services/userService';
+import dayjs from 'dayjs';
+import jalaliday from 'jalaliday';
 
-const persianMonths = [
-  'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-  'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
-];
+dayjs.extend(jalaliday);
 
 const Profile = () => {
   const { data: user, isLoading } = useUser();
@@ -35,11 +36,13 @@ const Profile = () => {
 
   const formatPersianDate = (date) => {
     if (!date) return 'تاریخ تولد شما وارد نشده است';
-    const gregorianDate = new Date(date);
-    const yearFormatted = 1379;
-    const monthFormatted = persianMonths[gregorianDate.getMonth()];
-    const dayFormatted = gregorianDate.getDate();
-    return `${yearFormatted} ${monthFormatted} ${dayFormatted}`;
+
+    // Parse the date string and convert it to Jalali calendar
+    const jalaliDate = dayjs(date).calendar('jalali');
+
+    // Format the date in Persian
+    const formattedDate = jalaliDate.locale('fa').format('YYYY MMMM DD');
+    return formattedDate;
   };
 
   if (isLoading) return <Loading />;
@@ -64,7 +67,7 @@ const Profile = () => {
         <UserInfo label="جنسیت :" value={sexLabel} />
         <UserInfo label="درباره شما :" value={user?.bio || 'اطلاعاتی وارد نشده'} />
       </div>
-      
+
       {/* Display error message if exists */}
       {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
 

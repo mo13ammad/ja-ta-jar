@@ -61,9 +61,10 @@ export function deleteHousePicture(houseId, imageToDelete) {
   return http.delete(`/client/house/${houseId}/media/${imageToDelete}`).then(({ data }) => data.data);
 }
 
-export function changeHouseMainPicture(houseId, imageId) {
-  return http.put(`/client/house/${houseId}/media/${imageId}`, { main: 1 }).then(({ data }) => data.data);
+export function changeHouseMainPicture(houseId, imageId, data) {
+  return http.put(`/client/house/${houseId}/media/${imageId}`, data).then(({ data }) => data.data);
 }
+
 
 // Room Functions
 export function createRoom(houseId, roomData) {
