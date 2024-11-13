@@ -1,5 +1,7 @@
+// src/components/Houses.jsx
+
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogPanel, DialogTitle, RadioGroup, Label } from '@headlessui/react';
+import { Dialog, RadioGroup } from '@headlessui/react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -8,6 +10,7 @@ import useFetchHouses from './useFetchHouses';
 import useFetchHouseTypes from './useFetchHouseTypes';
 import Loading from '../../ui/Loading';
 import { createHouse, deleteHouse } from '../../services/houseService';
+import CustomInfoIcon from './../../ui/CustomInfoIcon';
 
 const Houses = () => {
   const navigate = useNavigate();
@@ -33,6 +36,7 @@ const Houses = () => {
   const [selectedOption, setSelectedOption] = useState('');
   const [dialogErrorMessage, setDialogErrorMessage] = useState('');
   const [houseToDelete, setHouseToDelete] = useState(null);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false); // State for info modal
 
   useEffect(() => {
     if (isAddDialogOpen && houseTypes.length > 0) {
@@ -104,12 +108,19 @@ const Houses = () => {
     <div className="w-full h-full p-4">
       <div className="w-full flex justify-between items-center mb-2 lg:mb-4">
         <h2 className="text-xl">اقامتگاه ها :</h2>
-        <button
-          className="btn bg-primary-600 hover:opacity-100"
-          onClick={() => setIsAddDialogOpen(true)}
-        >
-          اضافه کردن اقامتگاه
-        </button>
+
+        <div className="flex items-center">
+          <CustomInfoIcon
+            className="w-6 h-6 text-gray-500 cursor-pointer ml-2"
+            onClick={() => setIsInfoModalOpen(true)}
+          />
+          <button
+            className="btn bg-primary-600 hover:opacity-100"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            اضافه کردن اقامتگاه
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -123,11 +134,12 @@ const Houses = () => {
         ))}
       </div>
 
+      {/* Add House Modal */}
       <Dialog open={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="max-w-lg space-y-4 border bg-white p-12 rounded-3xl w-full">
-            <DialogTitle className="font-bold text-xl">افزودن اقامتگاه</DialogTitle>
+          <Dialog.Panel className="max-w-lg space-y-4 border bg-white p-12 rounded-3xl w-full">
+            <Dialog.Title className="font-bold text-xl">افزودن اقامتگاه</Dialog.Title>
             <p>لطفاً نوع اقامتگاه خود را وارد کنید :</p>
             {isHouseTypesFetching ? (
               <Loading message="در حال بارگذاری نوع اقامتگاه..." />
@@ -138,7 +150,7 @@ const Houses = () => {
                     <RadioGroup.Option key={option.key} value={option.key} className="flex items-center">
                       {({ checked }) => (
                         <div
-                          className={`flex items-center p-4 border rounded-lg cursor-pointer w-full ${
+                          className={`flex items-center px-4 py-2 border rounded-lg cursor-pointer w-full ${
                             checked ? 'bg-gray-100' : ''
                           }`}
                         >
@@ -146,7 +158,7 @@ const Houses = () => {
                             <img src={option.icon} alt={option.label} className="w-6 h-6" />
                           </div>
                           <div className="ml-3 flex flex-col">
-                            <Label className="text-lg font-medium mr-2">{option.label}</Label>
+                            <label className="text-lg font-medium mr-2">{option.label}</label>
                           </div>
                         </div>
                       )}
@@ -174,15 +186,16 @@ const Houses = () => {
                 {createHouseMutation.isLoading ? 'در حال اضافه کردن ...' : 'اضافه کردن'}
               </button>
             </div>
-          </DialogPanel>
+          </Dialog.Panel>
         </div>
       </Dialog>
 
+      {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteConfirmDialogOpen} onClose={() => setIsDeleteConfirmDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="max-w-lg space-y-4 border bg-white p-6 rounded-3xl w-full">
-            <DialogTitle className="font-bold text-xl">ایا از حذف کردن این اقامتگاه مطمعن هستید ؟</DialogTitle>
+          <Dialog.Panel className="max-w-lg space-y-4 border bg-white p-6 rounded-3xl w-full">
+            <Dialog.Title className="font-bold text-xl">آیا از حذف کردن این اقامتگاه مطمئن هستید؟</Dialog.Title>
             <div className="flex gap-4 mt-4">
               <button
                 className="btn bg-gray-300 text-gray-800"
@@ -199,7 +212,28 @@ const Houses = () => {
                 {deleteHouseMutation.isLoading ? 'در حال حذف...' : 'بله'}
               </button>
             </div>
-          </DialogPanel>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+      {/* Info Modal */}
+      <Dialog open={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="max-w-lg border bg-white p-6 rounded-3xl w-full">
+            <Dialog.Title className="font-bold text-xl">میزبان گرامی</Dialog.Title>
+            <p className="mt-4 text-justify leading-7">
+              میزبان گرامی، به دلیل تنوع انواع اقامتگاه و اطلاعات متفاوت آن‌ها در سایت ممکن است ثبت اقامتگاه برای شما کمی زمان‌بر و پیچیده باشد. توجه داشته باشید که ثبت و تایید اقامتگاه در سایت برای هر اقامتگاه فقط یک‌بار می‌باشد و در آینده تنها احتیاج به به‌روز نگهداری تقویم قیمت اقامتگاه است. پس با حوصله و دقیق به این کار اقدام فرمایید و در صورت هرگونه ایراد یا اشکال با پشتیبانی سایت تماس بگیرید.
+            </p>
+            <div className="flex justify-end mt-6">
+              <button
+                className="btn bg-primary-600 text-white"
+                onClick={() => setIsInfoModalOpen(false)}
+              >
+                بستن
+              </button>
+            </div>
+          </Dialog.Panel>
         </div>
       </Dialog>
     </div>
