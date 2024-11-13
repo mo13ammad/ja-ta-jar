@@ -20,6 +20,8 @@ import EditHouseDocuments from './edithouse-components/EditHouseDocuments';
 import EditHouseFinalSubmit from './edithouse-components/EditHouseFinalSubmit';
 import EditHouseCancellationRules from './edithouse-components/EditHouseCancellationRules';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/solid';
+import { Dialog } from '@headlessui/react';
+import CustomInfoIcon from '../../../ui/CustomInfoIcon'; // Adjust the import path as necessary
 
 const EditHouseContent = ({
   selectedTab,
@@ -41,6 +43,7 @@ const EditHouseContent = ({
   const [houseData, setHouseData] = useState(fetchedHouseData);
   const [isRefetching, setIsRefetching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false); // State for info modal
 
   const childRef = useRef(null); // Reference to child component
 
@@ -101,7 +104,7 @@ const EditHouseContent = ({
       case 'mainFacilities':
         return <MainFacilities ref={childRef} {...commonProps} />;
       case 'rooms':
-        return <Rooms  {...commonProps} />;
+        return <Rooms {...commonProps} />;
       case 'sanitaries':
         return <Sanitaries ref={childRef} {...commonProps} />;
       case 'reservationRules':
@@ -163,10 +166,29 @@ const EditHouseContent = ({
     }
   };
 
+  // Content for the info modal based on selectedTab
+  const infoContent = {
+    address: 'این بخش مربوط به اطلاعات آدرس می‌باشد.',
+    location: 'بعد از انتخاب استان و نزدیکترین شهر ، محل اقامتگاه خود را در نقشه مشخص نمایید ',
+    generalInfo: 'نوع اجاره و نوع قیمت‌گذاری را انتخاب کنید (بهتر است در یک تب جداگانه گذاشته شود). نوع اجاره: ۱. بر اساس اقامتگاه یعنی تمام اقامتگاه یک‌جا اجاره داده شود مانند ویلا، سوئیت و ... . ۲. براساس اتاق یعنی قسمتی یا اتاقی از کل یک اقامتگاه اجاره داده شود مثل اتاقی از یک هتل، اقامتگاه بوم‌گردی، مهمان‌خانه و ... . قیمت‌گذاری بر اساس: ۱. براساس هر شب یعنی کل اقامتگاه برای هر شب قیمت‌گذاری شود. ۲. براساس نفر شب یعنی صاحب اقامتگاه بابت اقامت هر نفر در هر شب مبلغی دریافت می‌کند؛ مانند بعضی از اقامتگاه‌های بوم‌گردی یا کلبه‌ها یا مجتمع‌ها از این نوع قیمت‌گذاری استفاده می‌کنند.',
+    environmentInfo: 'این بخش مربوط به اطلاعات محیطی می‌باشد.',
+    mainFacilities: 'این بخش مربوط به امکانات اصلی می‌باشد.',
+    rooms: 'میزبان عزیز توجه داشته باشید چند خوابه بودن و فضای خواب اقامتگاه شما به تعداد اضافه شدن اتاق خواب و تخت‌ها در این صفحه بستگی دارد. در صورت انتخاب نوع اجاره بر اساس اتاق در مرحله قبل، اتاق‌های اضافه شده در این بخش مبنای اجاره و قیمت‌گذاری خواهند بود.',
+    sanitaries: 'این بخش مربوط به سرویس‌های بهداشتی می‌باشد.',
+    reservationRules: 'این بخش مربوط به قوانین رزرو می‌باشد.',
+    stayRules: 'میزبان عزیز مبنای نمایش اطلاعات در صفحه اقامتگاه برای قوانین ، انتخاب گزینه های غیر مجاز یا نیاز است توسط شماست  که میهمان را از کاری منع یا موظف به انجام کاری میکند.',
+    cancellationRules: 'این بخش مربوط به قوانین کنسلی می‌باشد.',
+    pricing: 'برای بسته شدنه تقویم قیمت اقامتگاه یا اتاق لطفا با دقت تمامی بخشهای قیمتی پر شوند .',
+    images: 'میزبان عزیز از عکس هایی با نور و کیفیت خوب و ترجیحا عرضی برای نمایش بهتر اقامتگاه خود استفاده بفرمایید',
+    documents: 'این بخش مربوط به مدارک مورد نیاز می‌باشد.',
+    finalSubmit: 'این بخش مربوط به ثبت نهایی اطلاعات می‌باشد.',
+    // Add more as needed
+  };
+
   return (
     <div className="flex flex-col h-full">
       {loadingHouse || isRefetching ? (
-        <div className="min-h-[60vh] flex justify-center items-center">
+        <div className="min-h-[60vh] flex flex-col justify-center items-center">
           <Loading />
         </div>
       ) : (
@@ -189,22 +211,48 @@ const EditHouseContent = ({
             </button>
 
             {isSaving && (
-              <span className="text-gray-500 text-sm">در حال ارسال اطلاعات</span>
+              <span className="text-gray-500 text-sm">در حال ارسال اطلاعات ...</span>
             )}
 
-            <button
-              onClick={handleNextClick}
-              disabled={selectedTab === 'finalSubmit' || isSaving}
-              className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${
-                selectedTab === 'finalSubmit' || isSaving
-                  ? ' bg-primary-100 cursor-not-allowed'
-                  : 'bg-primary-500'
-              }`}
-            >
-              صفحه بعد
-              <ArrowLeftIcon className="w-4 h-4 mr-1" />
-            </button>
+            <div className="flex items-center">
+              <CustomInfoIcon
+                className="w-6 h-6 text-gray-500 cursor-pointer ml-2"
+                onClick={() => setIsInfoModalOpen(true)}
+              />
+              <button
+                onClick={handleNextClick}
+                disabled={selectedTab === 'finalSubmit' || isSaving}
+                className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${
+                  selectedTab === 'finalSubmit' || isSaving
+                    ? ' bg-primary-100 cursor-not-allowed'
+                    : 'bg-primary-500'
+                }`}
+              >
+                صفحه بعد
+                <ArrowLeftIcon className="w-4 h-4 mr-1" />
+              </button>
+            </div>
           </div>
+
+          {/* Info Modal */}
+          <Dialog open={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)}>
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
+              <Dialog.Panel className="w-full max-w-md bg-white rounded-2xl p-6">
+                <Dialog.Title className="text-lg font-medium">اطلاعات بیشتر</Dialog.Title>
+                <div className="mt-4">
+                  <p>{infoContent[selectedTab]}</p>
+                </div>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={() => setIsInfoModalOpen(false)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-2xl"
+                  >
+                    بستن
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </div>
+          </Dialog>
         </>
       )}
     </div>

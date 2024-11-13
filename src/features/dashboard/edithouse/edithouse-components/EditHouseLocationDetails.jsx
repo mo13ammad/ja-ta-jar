@@ -401,7 +401,7 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
         </div>
 
         <div
-          className="mt-6 w-full lg:col-span-2 shadow-centered rounded-lg overflow-hidden border h-[400px]"
+          className="mt-6 w-full lg:col-span-2 shadow-centered rounded-lg overflow-hidden border h-[400px] z-0"
           ref={mapContainerRef}
         />
       </form>
