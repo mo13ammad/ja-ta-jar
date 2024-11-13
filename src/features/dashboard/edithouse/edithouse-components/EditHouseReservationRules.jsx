@@ -8,9 +8,9 @@ import React, {
 } from "react";
 import Spinner from "../../../../ui/Loading";
 import NumberField from "../../../../ui/NumberField";
-import FormSelect from "../../../../ui/FormSelect";
 import { toast, Toaster } from "react-hot-toast";
 import { useFetchWeekendOptions } from "../../../../services/fetchDataService";
+import WeekendTypeSelect from "./WeekendTypeSelect"; // Import the new component
 
 const EditHouseReservationRules = forwardRef((props, ref) => {
   const {
@@ -77,14 +77,14 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
     }
   }, [houseData]);
 
-  const handleInputChange = (key, value) => {
+  const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
-      [key]: value,
+      [name]: value,
     }));
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [key]: null,
+      [name]: null,
     }));
     setIsModified(true);
   };
@@ -310,7 +310,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           min="1"
         />
 
-<NumberField
+        <NumberField
           label="حداقل شب اقامت"
           name="minimum_length_stay.all"
           type="number"
@@ -330,25 +330,17 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           min="1"
         />
 
-        
-
-        <FormSelect
+        {/* Use WeekendTypeSelect instead of FormSelect */}
+        <WeekendTypeSelect
           label="تعیین روزهای آخر هفته"
           name="weekendType"
           value={formData.weekendType ?? ""}
-          onChange={(e) => handleInputChange("weekendType", e.target.value)}
-          options={[
-            { value: "", label: "انتخاب کنید" },
-            ...weekendOptions.map((option) => ({
-              value: option.key,
-              label: option.label,
-            })),
-          ]}
-          error={errors.weekendType}
+          onChange={handleInputChange}
+          options={weekendOptions}
+          errorMessages={errors.weekendType}
         />
       </div>
 
-   
       <div className="mt-8 lg:col-span-2 lg:w-1/2">
         <label className="block text-sm xl:text-lg font-medium text-gray-700 mb-2">
           حداقل شب اقامت به ازای روزهای هفته
