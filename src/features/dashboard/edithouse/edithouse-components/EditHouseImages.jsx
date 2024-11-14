@@ -22,10 +22,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
 
-  // New state to track loading states
   const [deleteModalLoading, setDeleteModalLoading] = useState(false);
   const [makeMainLoading, setMakeMainLoading] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // Loading state for refetching data
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (houseData?.medias) {
@@ -45,29 +44,18 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     }
   };
 
-  // Function to display errors based on error.response.data.message
   const displayError = (error) => {
     const errorMessage =
       error.response?.data?.message || error.message || 'خطایی رخ داده است';
     toast.error(errorMessage);
   };
 
-  // Mutation to add a new image
   const addImageMutation = useMutation(
     async (formData) => {
-      // Log the data being sent
-      console.log('Sending data to createHousePicture:');
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
       return await createHousePicture(houseId, formData);
     },
     {
       onSuccess: (data) => {
-        // Log the data received
-        console.log('Received data from createHousePicture:', data);
-
         setImages(data.medias);
         toast.success('تصویر با موفقیت اضافه شد');
         setIsOpen(false);
@@ -75,9 +63,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         setImagePreview(null);
         setTitle('');
         setIsMain(false);
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
         refetchHouseData().then(() => {
-          setIsLoading(false); // Stop loading after data is fetched
+          setIsLoading(false);
         });
       },
       onError: (error) => {
@@ -97,43 +85,31 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     formData.append('title', title);
     if (isMain) formData.append('main', 1);
 
-    // Log the formData being sent
-    console.log('FormData to be sent in handleAddImage:');
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
     addImageMutation.mutate(formData);
   };
 
-  // Mutation to delete an image
   const deleteImageMutation = useMutation(
     async () => {
-      // Log the data being sent
-      console.log('Sending request to deleteHousePicture for imageId:', imageToDelete);
       return await deleteHousePicture(houseId, imageToDelete);
     },
     {
       onMutate: () => {
-        setDeleteModalLoading(true); // Set loading state when mutation starts
+        setDeleteModalLoading(true);
       },
       onSuccess: () => {
-        // Log success
-        console.log('Image deleted successfully:', imageToDelete);
-
         setImages((prev) => prev.filter((img) => img.id !== imageToDelete));
         toast.success('تصویر با موفقیت حذف شد');
         setDeleteModalOpen(false);
-        setDeleteModalLoading(false); // Reset loading state
-        setIsLoading(true); // Start loading
+        setDeleteModalLoading(false);
+        setIsLoading(true);
         refetchHouseData().then(() => {
-          setIsLoading(false); // Stop loading after data is fetched
+          setIsLoading(false);
         });
       },
       onError: (error) => {
         console.error('Error deleting image:', error);
         displayError(error);
-        setDeleteModalLoading(false); // Reset loading state
+        setDeleteModalLoading(false);
       },
     }
   );
@@ -147,7 +123,6 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     deleteImageMutation.mutate();
   };
 
-  // Mutation to set image as main
   const makeMainImageMutation = useMutation(
     async (imageId) => {
       const imageToUpdate = images.find((img) => img.id === imageId);
@@ -155,23 +130,15 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         throw new Error('تصویر مورد نظر یافت نشد');
       }
 
-      // Include the title in the request data
       const data = {
         title: imageToUpdate.title || '',
         main: 1,
       };
 
-      // Log the data being sent
-      console.log('Sending data to changeHouseMainPicture:', data);
-
       return await changeHouseMainPicture(houseId, imageId, data);
     },
     {
       onSuccess: (data) => {
-        // Log the data received
-        console.log('Received data from changeHouseMainPicture:', data);
-
-        // Update the images state
         setImages((prevImages) =>
           prevImages.map((img) => {
             if (img.id === data.id) {
@@ -183,9 +150,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
           })
         );
         toast.success('تصویر اصلی تغییر کرد');
-        setIsLoading(true); // Start loading
+        setIsLoading(true);
         refetchHouseData().then(() => {
-          setIsLoading(false); // Stop loading after data is fetched
+          setIsLoading(false);
         });
       },
       onError: (error) => {
@@ -227,40 +194,42 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
 
       {images.length > 0 ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          {[...images].reverse().map((image) => (
-            <div key={image.id} className="relative border rounded-2xl flex items-center">
-              <img
-                src={image.media}
-                alt="House"
-                className="w-36 h-36 object-cover rounded-tl-lg"
-              />
-              <div className="p-3 w-full flex flex-col">
-                <p className="font-semibold mb-1">عنوان: {image.title || 'بدون عنوان'}</p>
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={() => handleDeleteClick(image.id)}
-                    className="text-white bg-red-500 rounded-2xl px-3 py-1"
-                  >
-                    حذف
-                  </button>
-                  {!image.main && (
+          {[...images]
+            .sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0)) // مرتب کردن تصویر اصلی به عنوان اولین تصویر
+            .map((image) => (
+              <div key={image.id} className="relative border rounded-2xl flex items-center">
+                <img
+                  src={image.media}
+                  alt="House"
+                  className="w-36 h-36 object-cover rounded-tl-lg"
+                />
+                <div className="p-3 w-full flex flex-col">
+                  <p className="font-semibold mb-1">عنوان: {image.title || 'بدون عنوان'}</p>
+                  <div className="flex gap-2 mt-2">
                     <button
-                      onClick={() => handleMakeMain(image.id)}
-                      className="text-white bg-secondary-900 rounded-2xl px-3 py-1"
-                      disabled={makeMainLoading[image.id]}
+                      onClick={() => handleDeleteClick(image.id)}
+                      className="text-white bg-red-500 rounded-2xl px-3 py-1"
                     >
-                      {makeMainLoading[image.id] ? 'در حال تبدیل...' : 'تبدیل به تصویر اصلی'}
+                      حذف
                     </button>
+                    {!image.main && (
+                      <button
+                        onClick={() => handleMakeMain(image.id)}
+                        className="text-white bg-secondary-900 rounded-2xl px-3 py-1"
+                        disabled={makeMainLoading[image.id]}
+                      >
+                        {makeMainLoading[image.id] ? 'در حال تبدیل...' : 'تبدیل به تصویر اصلی'}
+                      </button>
+                    )}
+                  </div>
+                  {image.main && (
+                    <span className="absolute top-2 left-2 bg-primary-500 text-white text-xs px-2 py-1 rounded-2xl">
+                      تصویر اصلی
+                    </span>
                   )}
                 </div>
-                {image.main && (
-                  <span className="absolute top-2 left-2 bg-primary-500 text-white text-xs px-2 py-1 rounded-2xl">
-                    تصویر اصلی
-                  </span>
-                )}
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       ) : (
         <p className="p-4 text-center">هیچ تصویری وجود ندارد.</p>
@@ -282,7 +251,6 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
               placeholder="عنوان تصویر"
               className="w-full border rounded-2xl p-2 my-2 focus:outline-none focus:ring-0"
             />
-            {/* Use ToggleSwitch for isMain */}
             <div className="flex items-center mt-2">
               <ToggleSwitch
                 checked={isMain}
