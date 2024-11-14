@@ -195,7 +195,8 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       {images.length > 0 ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {[...images]
-            .sort((a, b) => (b.main ? 1 : 0) - (a.main ? 1 : 0)) // مرتب کردن تصویر اصلی به عنوان اولین تصویر
+            .filter((img) => img.main) // ابتدا فقط تصویر اصلی
+            .concat(images.filter((img) => !img.main)) // سپس سایر تصاویر
             .map((image) => (
               <div key={image.id} className="relative border rounded-2xl flex items-center">
                 <img
