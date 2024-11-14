@@ -191,7 +191,7 @@ function CheckOTPForm({ userStatus, phone, onBack, onResendOtp }) {
         {isError && <p className="text-red-500">{error?.response?.data?.message}</p>}
 
         <p className="text-xs opacity-80 leading-normal">
-          ثبت نام یا ورود شما به منظور پذیرش قوانین و مقررات جات آجار می باشد.
+          ثبت نام یا ورود شما به معنی پذیرش قوانین جات اجار مبیاشد 
         </p>
       </form>
     </div>

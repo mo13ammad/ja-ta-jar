@@ -33,7 +33,7 @@ function SendOTPForm({ phone, onChange, onSubmit, loading, error }) {
         {error && <p className="text-red-500 mb-2">{error}</p>}
 
         <p className="text-xs opacity-80 leading-normal">
-          ثبت نام یا ورود شما به منظور پذیرش قوانین و مقررات جات آجار می باشد.
+          ثبت نام یا ورود شما به معنی پذیرش قوانین جات اجار مبیاشد 
         </p>
       </form>
     </div>
