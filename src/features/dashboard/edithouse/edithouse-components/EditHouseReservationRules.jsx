@@ -309,7 +309,15 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           errorMessages={errors.capacity}
           min="1"
         />
-
+        <NumberField
+          label="حداکثر ظرفیت"
+          name="maximum_capacity"
+          type="number"
+          value={formData.maximum_capacity ?? ""}
+          onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
+          errorMessages={errors.maximum_capacity}
+          min="1"
+        />
         <NumberField
           label="حداقل شب اقامت"
           name="minimum_length_stay.all"
@@ -320,15 +328,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           min="0"
         />
 
-        <NumberField
-          label="حداکثر ظرفیت"
-          name="maximum_capacity"
-          type="number"
-          value={formData.maximum_capacity ?? ""}
-          onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
-          errorMessages={errors.maximum_capacity}
-          min="1"
-        />
+
 
         {/* Use WeekendTypeSelect instead of FormSelect */}
         <WeekendTypeSelect
