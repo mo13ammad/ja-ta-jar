@@ -81,9 +81,12 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
   useEffect(() => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      enter_from: houseData?.reservation?.timing?.enter?.from ?? "00:00",
+      enter_from: houseData?.reservation?.timing?.enter?.from ?? "14:00",
+      enter_until: houseData?.reservation?.timing?.enter?.to ?? "23:00",
+      discharge_time: houseData?.reservation?.timing?.leave ?? "12:00",
     }));
   }, [houseData]);
+  
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
