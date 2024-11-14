@@ -78,24 +78,51 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
   }, [houseData]);
 
   // اضافه کردن useEffect برای تنظیم مقدار پیش‌فرض enter_from
+  const [formData, setFormData] = useState({
+    short_term_booking_length:
+      houseData?.reservation?.discount?.short_term?.minimum_length_stay ?? "",
+    short_term_booking_discount:
+      houseData?.reservation?.discount?.short_term?.discount ?? "",
+    long_term_booking_length:
+      houseData?.reservation?.discount?.long_term?.minimum_length_stay ?? "",
+    long_term_booking_discount:
+      houseData?.reservation?.discount?.long_term?.discount ?? "",
+    minimum_length_stay: houseData?.reservation?.minimum_length_stay ?? {
+      all: "1",
+      Saturday: "1",
+      Sunday: "1",
+      Monday: "1",
+      Tuesday: "1",
+      Wednesday: "1",
+      Thursday: "1",
+      Friday: "1",
+    },
+    enter_from: houseData?.reservation?.timing?.enter?.from ?? "14:00",
+    enter_until: houseData?.reservation?.timing?.enter?.to ?? "23:00",
+    discharge_time: houseData?.reservation?.timing?.leave ?? "12:00",
+    capacity: houseData?.reservation?.capacity?.normal ?? "",
+    maximum_capacity: houseData?.reservation?.capacity?.maximum ?? "",
+    weekendType: houseData?.weekendType?.key ?? "",
+  });
+  
   useEffect(() => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      enter_from: houseData?.reservation?.timing?.enter?.from ?? "14:00",
-      enter_until: houseData?.reservation?.timing?.enter?.to ?? "23:00",
-      discharge_time: houseData?.reservation?.timing?.leave ?? "12:00",
-      minimum_length_stay: houseData?.reservation?.minimum_length_stay ?? {
-        all: "1",
-        Saturday: "1",
-        Sunday: "1",
-        Monday: "1",
-        Tuesday: "1",
-        Wednesday: "1",
-        Thursday: "1",
-        Friday: "1",
-      },
-    }));
+    if (!houseData?.reservation?.minimum_length_stay) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        minimum_length_stay: {
+          all: "1",
+          Saturday: "1",
+          Sunday: "1",
+          Monday: "1",
+          Tuesday: "1",
+          Wednesday: "1",
+          Thursday: "1",
+          Friday: "1",
+        },
+      }));
+    }
   }, [houseData]);
+  
   
 
   const handleInputChange = (name, value) => {
