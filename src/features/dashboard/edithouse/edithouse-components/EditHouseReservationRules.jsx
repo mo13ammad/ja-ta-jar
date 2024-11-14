@@ -77,6 +77,14 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
     }
   }, [houseData]);
 
+  // اضافه کردن useEffect برای تنظیم مقدار پیش‌فرض enter_from
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      enter_from: houseData?.reservation?.timing?.enter?.from ?? "00:00",
+    }));
+  }, [houseData]);
+
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -327,8 +335,6 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           errorMessages={errors["minimum_length_stay.all"]}
           min="0"
         />
-
-
 
         {/* Use WeekendTypeSelect instead of FormSelect */}
         <WeekendTypeSelect
