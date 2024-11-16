@@ -1,7 +1,6 @@
-// Profile.jsx
-
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Dialog } from '@headlessui/react';
 import Loading from '../../ui/Loading.jsx';
 import useUser from '../dashboard/useUser.js';
 import { becomeVendor } from '../../services/userService';
@@ -14,10 +13,10 @@ const Profile = () => {
   const { data: user, isLoading } = useUser();
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // State for confirmation modal
 
   const { mutate, isLoading: isBecomingVendor } = useMutation(becomeVendor, {
     onSuccess: (newUserData) => {
-      // Update the user data in the cache with the response from becomeVendor
       queryClient.setQueryData(['get-user'], (oldData) => ({
         ...oldData,
         ...newUserData,
@@ -31,18 +30,18 @@ const Profile = () => {
 
   const handleBecomeVendorClick = () => {
     setErrorMessage(null); // Clear any previous error message
-    mutate();
+    setIsConfirmationOpen(true); // Open the confirmation modal
+  };
+
+  const confirmBecomeVendor = () => {
+    setIsConfirmationOpen(false); // Close the modal
+    mutate(); // Trigger the mutation
   };
 
   const formatPersianDate = (date) => {
     if (!date) return 'تاریخ تولد شما وارد نشده است';
-
-    // Parse the date string and convert it to Jalali calendar
     const jalaliDate = dayjs(date).calendar('jalali');
-
-    // Format the date in Persian
-    const formattedDate = jalaliDate.locale('fa').format('YYYY MMMM DD');
-    return formattedDate;
+    return jalaliDate.locale('fa').format('YYYY MMMM DD');
   };
 
   if (isLoading) return <Loading />;
@@ -71,7 +70,7 @@ const Profile = () => {
       {/* Display error message if exists */}
       {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
 
-      {/* Show Become Vendor Button or Loading Spinner */}
+      {/* Show Become Vendor Button */}
       {!isVendor && !isAdmin && (
         <button 
           onClick={handleBecomeVendorClick}
@@ -81,6 +80,33 @@ const Profile = () => {
           {isBecomingVendor ? <Loading size={20} /> : 'میزبان شوید'}
         </button>
       )}
+
+      {/* Confirmation Modal */}
+      <Dialog open={isConfirmationOpen} onClose={() => setIsConfirmationOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="max-w-lg space-y-4 border bg-white p-6 rounded-3xl w-full">
+            <Dialog.Title className="font-bold text-xl">آیا از تبدیل شدن به میزبان مطمئن هستید؟</Dialog.Title>
+            <p className="mt-4">در صورت تایید، اطلاعات شما به عنوان میزبان در سیستم ثبت خواهد شد.</p>
+            <div className="flex gap-4 mt-4">
+              <button
+                className="btn bg-gray-300 text-gray-800"
+                onClick={() => setIsConfirmationOpen(false)}
+                disabled={isBecomingVendor}
+              >
+                لغو
+              </button>
+              <button
+                className="btn bg-primary-600 text-white"
+                onClick={confirmBecomeVendor}
+                disabled={isBecomingVendor}
+              >
+                {isBecomingVendor ? 'در حال ثبت...' : 'بله'}
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 };
