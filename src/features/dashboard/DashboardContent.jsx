@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Profile from './Profile';
 import EditProfile from './EditProfile';
 import Houses from './Houses';
@@ -13,8 +13,15 @@ const DashboardContent = ({ selectedTab, initialUser }) => {
       case 'editProfile':
         return <EditProfile user={user} onUpdateUser={setUser} />;
       case 'houses':
-        // Only render Houses if user type is Vendor
         return user?.type === 'Vendor' ? <Houses user={user} /> : <Profile user={user} />;
+      case 'wallet':
+        return <div>کیف پول - Wallet Content Placeholder</div>;
+      case 'favorites':
+        return <div>علاقه مندی ها - Favorites Content Placeholder</div>;
+      case 'inviteFriends':
+        return <div>دعوت از دوستان - Invite Friends Content Placeholder</div>;
+      case 'reserves':
+        return <div>رزرو ها - Reserves Content Placeholder</div>;
       default:
         return <Profile user={user} />;
     }

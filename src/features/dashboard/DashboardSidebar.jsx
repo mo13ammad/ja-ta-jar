@@ -1,7 +1,6 @@
-// DashboardSidebar.js
 import React, { useState } from 'react';
 import { Tab } from '@headlessui/react';
-import { UserIcon, PencilSquareIcon, HomeIcon } from '@heroicons/react/24/solid';
+import { UserIcon, PencilSquareIcon, HomeIcon, CreditCardIcon, HeartIcon, UsersIcon, CalendarIcon } from '@heroicons/react/24/solid';
 import Loading from '../../ui/Loading';
 import { logOutUser } from '../../services/userService';
 import { useQueryClient } from "@tanstack/react-query";
@@ -18,9 +17,6 @@ function DashboardSidebar({ setSelectedTab, user }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const token = getAuthTokenFromCookies();
 
-  // Log the token for debugging
-
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -36,7 +32,7 @@ function DashboardSidebar({ setSelectedTab, user }) {
   };
 
   return (
-    <div className="w-full overflow-auto rounded-xl flex flex-col justify-start pt-10 items-center py-4 gap-y-5">
+    <div className="w-full overflow-auto rounded-xl flex flex-col justify-start pt-4 items-center py-4 lg:pt-1 gap-y-1.5 lg:gap-y-3">
       <img
         className="border rounded-full w-24"
         src={user?.avatar || '/path-to-default-avatar.png'}
@@ -58,9 +54,6 @@ function DashboardSidebar({ setSelectedTab, user }) {
             className="text-sm opacity-80 border rounded-xl px-6 py-2 flex justify-center flex-row-reverse items-center hover:text-blue-600 hover:bg-blue-100 transition-all"
           >
             ورود به پنل ادمین
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 ml-1">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 3.75H5.25A2.25 2.25 0 0 0 3 6v12a2.25 2.25 0 0 0 2.25 2.25h12A2.25 2.25 0 0 0 19.5 18V13.5m-9 0 3.75-3.75m0 0L10.5 6m3.75 3.75H21" />
-            </svg>
           </button>
         </form>
       )}
@@ -90,6 +83,22 @@ function DashboardSidebar({ setSelectedTab, user }) {
               <HomeIcon className={`${svgClasses}`} />
             </Tab>
           )}
+          <Tab as="div" className={({ selected }) => `tab ${selected ? 'tab-selected' : 'tab-hover'}`} onClick={() => setSelectedTab('wallet')}>
+            کیف پول
+            <CreditCardIcon className={`${svgClasses}`} />
+          </Tab>
+          <Tab as="div" className={({ selected }) => `tab ${selected ? 'tab-selected' : 'tab-hover'}`} onClick={() => setSelectedTab('favorites')}>
+            علاقه مندی ها
+            <HeartIcon className={`${svgClasses}`} />
+          </Tab>
+          <Tab as="div" className={({ selected }) => `tab ${selected ? 'tab-selected' : 'tab-hover'}`} onClick={() => setSelectedTab('inviteFriends')}>
+            دعوت از دوستان
+            <UsersIcon className={`${svgClasses}`} />
+          </Tab>
+          <Tab as="div" className={({ selected }) => `tab ${selected ? 'tab-selected' : 'tab-hover'}`} onClick={() => setSelectedTab('reserves')}>
+            رزرو ها
+            <CalendarIcon className={`${svgClasses}`} />
+          </Tab>
         </Tab.List>
       </Tab.Group>
     </div>
