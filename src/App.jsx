@@ -1,15 +1,16 @@
-import { Route, Routes } from "react-router-dom";
 import Auth from './pages/Auth';
-import Dashboard from './pages/Dashboard';
+
 import EditHouseContainer from './features/dashboard/edithouse/EditHouseContainer';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import AppLayout from "./ui/AppLayout";
 import DashboardContainer from "./features/dashboard/DashboardContainer";
+import HouseContainer from './features/house/HouseContainer';
+import { Route, Routes } from 'react-router-dom';
+
 
 const queryClient = new QueryClient();
-
 
 function App() {
   return (
@@ -19,7 +20,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<DashboardContainer />} />
-          <Route path="/dashboard/edit-house/:uuid" element={<EditHouseContainer />} /> {/* Updated Route */}
+          <Route path="/dashboard/edit-house/:uuid" element={<EditHouseContainer />} />
+          <Route path="/house/:uuid" element={<HouseContainer />} /> {/* Added Route */}
         </Route>
         <Route path="/auth" element={<Auth />} />
       </Routes>

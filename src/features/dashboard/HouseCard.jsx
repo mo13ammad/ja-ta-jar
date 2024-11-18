@@ -1,3 +1,5 @@
+// src/components/HouseCard.jsx
+
 import { useNavigate } from "react-router-dom";
 
 const HouseCard = ({ house, onDelete }) => {
@@ -18,7 +20,8 @@ const HouseCard = ({ house, onDelete }) => {
           <p className="font-semibold">وضعیت :</p>
           <p>{house.status.label}</p>
         </div>
-        <div className="action-buttons-container">
+        <div className="action-buttons-container flex flex-col">
+          <div className="flex gap-1">
           <button
             className="btn hover:opacity-100 bg-primary-500"
             onClick={() => navigate(`/dashboard/edit-house/${house.uuid}`)}
@@ -26,11 +29,26 @@ const HouseCard = ({ house, onDelete }) => {
             ویرایش
           </button>
           <button
+            className="btn hover:opacity-100 bg-primary-500"
+            onClick={() => navigate(`/house/${house.uuid}`)}
+          >
+            مشاهده
+          </button>
+          <button
             className="btn hover:opacity-100 bg-red-500"
             onClick={onDelete}
           >
             حذف
           </button>
+          </div>
+          <div>
+          <button
+            className="btn hover:opacity-100 bg-primary-500"
+            onClick={()=>{}}
+          >
+            تقویم
+          </button>
+          </div>
         </div>
       </div>
       <img src={house.image} className="house-image" alt="house" />

@@ -88,7 +88,7 @@ const Houses = () => {
     }
   };
 
-  if (isHousesLoading || isRefetchingHouses) {
+  if (isRefetchingHouses) {
     return (
       <div className="min-h-[65vh] flex items-center justify-center">
         <Loading message="در حال بارگذاری اقامتگاه‌ها..." />
@@ -150,15 +150,15 @@ const Houses = () => {
                     <RadioGroup.Option key={option.key} value={option.key} className="flex items-center">
                       {({ checked }) => (
                         <div
-                          className={`flex items-center px-4 py-2 border rounded-lg cursor-pointer w-full ${
-                            checked ? 'bg-gray-100' : ''
+                          className={`flex items-center px-3 md:px-4 py-2 border overflow-hidden rounded-2xl cursor-pointer w-full ${
+                            checked ? 'bg-primary-600' : ''
                           }`}
                         >
                           <div className="flex-shrink-0">
-                            <img src={option.icon} alt={option.label} className="w-6 h-6" />
+                            <img src={option.icon} alt={option.label} className="w-4 md:w-6  h-4 md:h-6 " />
                           </div>
                           <div className="ml-3 flex flex-col">
-                            <label className="text-lg font-medium mr-2">{option.label}</label>
+                            <label className={`lg:text-lg truncate text-sm font-medium mr-2 ${checked? 'text-secondary-200' : '' }`}>{option.label}</label>
                           </div>
                         </div>
                       )}
