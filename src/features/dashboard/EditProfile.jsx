@@ -311,7 +311,7 @@ function EditProfile({ user, onUpdateUser }) {
             disabled={false} // Set to true if needed
           >
             {({ open }) => (
-              <div className="relative bg-white rounded-xl">
+              <div className="relative bg-white rounded-xl ">
                 <Listbox.Button className={`listbox__button ${false ? 'cursor-not-allowed bg-gray-100' : ''}`}>
                   <span>
                     {selectedProvince
@@ -332,7 +332,7 @@ function EditProfile({ user, onUpdateUser }) {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <Listbox.Options className="absolute z-50 w-full mt-1 scrollbar-thin  bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {provinceOptions.map((option) => (
                       <Listbox.Option
                         key={option.value}
@@ -407,7 +407,7 @@ function EditProfile({ user, onUpdateUser }) {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <Listbox.Options className="absolute z-50 w-full mt-1 scrollbar-thin bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {cityOptions.map((option) => (
                       <Listbox.Option
                         key={option.value}
@@ -600,7 +600,7 @@ const BirthDateFields = ({ formData, setFormData }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col w-1/2 gap-2">
       <label className="block font-medium text-gray-700">تاریخ تولد</label>
       <div className="flex gap-2">
         <TextField

@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 import tailwindFormPlugin from "@tailwindcss/forms"
 
+
 function withOpacity(variableName) {
   return ({ opacityValue }) => {
     if (opacityValue !== undefined) {
@@ -65,5 +66,6 @@ module.exports = {
       strategy: 'class', // only generate classes
     }),
     require('tailwind-scrollbar')({ nocompatible: true }),
+   
   ],
 }

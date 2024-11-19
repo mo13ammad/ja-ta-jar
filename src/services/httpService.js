@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://portal1.jatajar.com/api";
+const BASE_URL = "https://test.jatajar.com/api";
 
 const setAuthTokenInCookie = (token, expiryDays = 30) => {
   const now = new Date();
