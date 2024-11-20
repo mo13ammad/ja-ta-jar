@@ -21,8 +21,9 @@ function MainPage() {
 
   return (
     <div className="container min-h-96 mx-auto p-4 max-w-5xl px-8">
-      <img src={Mizban} alt="Mizban" className="w-full min-h-40 rounded-3xl" />
-      
+      <a href="/dashboard">
+        <img src={Mizban} alt="Mizban" className="w-full min-h-40 rounded-3xl" />
+      </a>      
       <Slider {...settings} className="">
         <div>
           <img src={Beach} alt="Beach" className="w-full min-h-40 mt-10 rounded-3xl" />

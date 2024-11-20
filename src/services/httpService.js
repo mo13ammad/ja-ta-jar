@@ -1,7 +1,10 @@
+// src/http.js
+
 import axios from "axios";
 
-const BASE_URL = "https://test.jatajar.com/api";
+const BASE_URL = "https://portal1.jatajar.com/api";
 
+// Function to set auth token in cookie
 const setAuthTokenInCookie = (token, expiryDays = 30) => {
   const now = new Date();
   now.setTime(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
@@ -9,10 +12,14 @@ const setAuthTokenInCookie = (token, expiryDays = 30) => {
   document.cookie = `authToken=${token}; ${expires}; path=/; Secure; SameSite=Strict`;
 };
 
+// Function to delete auth token from cookie
+const deleteAuthTokenCookie = () => {
+  document.cookie = `authToken=; Max-Age=0; path=/; domain=${window.location.hostname};`;
+};
+
 const app = axios.create({
   baseURL: BASE_URL,
 });
-
 
 app.interceptors.request.use(
   (config) => {
@@ -49,3 +56,4 @@ const http = {
 };
 
 export default http;
+export { setAuthTokenInCookie, deleteAuthTokenCookie };

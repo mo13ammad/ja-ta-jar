@@ -19,6 +19,7 @@
     "jalaali-js": "^1.2.7",
     "jalali-moment": "^3.3.11",
     "jalaliday": "^2.3.0",
+    "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
