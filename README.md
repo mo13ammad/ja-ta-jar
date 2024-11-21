@@ -1,2 +1,4 @@
-Ja ta jar project
-Improved performance of the dashboard page
+[![Deploy On Server](https://github.com/mo13ammad/jatajar-front/actions/workflows/deploy.yml/badge.svg)](https://github.com/mo13ammad/jatajar-front/actions/workflows/deploy.yml)
+![License](https://img.shields.io/github/license/{owner}/{repo})
+[![Node.js Package](https://github.com/mo13ammad/jatajar-front/actions/workflows/npm-publish-github-packages.yml/badge.svg)](https://github.com/mo13ammad/jatajar-front/actions/workflows/npm-publish-github-packages.yml)
+[![Node.js CI](https://github.com/mo13ammad/jatajar-front/actions/workflows/node.js.yml/badge.svg)](https://github.com/mo13ammad/jatajar-front/actions/workflows/node.js.yml)
