@@ -8,7 +8,7 @@ function HouseHeader() {
    
 
       {/* City and Province */}
-      <div className="flex flex-row items-center gap-3 ">
+      <div className="flex flex-row items-center gap-3 container ">
       <div className="">
       <HouseVendorBadge />
       </div>
@@ -19,6 +19,10 @@ function HouseHeader() {
               </div> 
               <div className='text-primary-500 flex items-center justify-start rounded-2xl  w-full'>
                   <StarIcon className="h-5 w-5 text-primary-600" />
+                  <StarIcon className="h-5 w-5 text-primary-600" />
+                  <StarIcon className="h-5 w-5 text-primary-600" />
+                  <StarIcon className="h-5 w-5 text-primary-600" />
+                  <StarIcon className="h-5 w-5 text-primary-100" />
                   <p className='text-sm px-1 py-0.5'>۴,۱</p>
               </div>
       </div>

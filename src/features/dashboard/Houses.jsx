@@ -57,7 +57,7 @@ const Houses = () => {
       toast.error(errorMessage);
     },
   });
-
+   console.log(houses);
   const deleteHouseMutation = useMutation(deleteHouse, {
     onSuccess: async () => {
       toast.success('اقامتگاه با موفقیت حذف شد!');

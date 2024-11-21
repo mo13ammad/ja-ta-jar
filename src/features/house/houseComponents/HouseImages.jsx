@@ -39,7 +39,7 @@ function HouseImages() {
         pagination={{ clickable: true }}
         spaceBetween={50}
         slidesPerView={1}
-        className="rounded-xl shadow-centered"
+        className="rounded-xl shadow-centered lg:mr-4"
       >
         {images.map((image, index) => (
           <SwiperSlide key={index}>

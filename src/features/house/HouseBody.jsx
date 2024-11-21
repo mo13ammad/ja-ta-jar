@@ -8,11 +8,7 @@ import HouseReservation from './houseComponents/HouseReservation'
 function HouseBody() {
   return (
     <div>
-        <HouseReservation/>
-        <HouseFacilitties/>
-        <HouseRules/>
-        <HouseLocation/>
-        <HouseComments/>
+       
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const HouseCard = ({ house, onDelete }) => {
   const navigate = useNavigate();
-
+  const isPending = house.status.key === "Pending";
   return (
     <div className="house-card-container shadow-centered max-h-64">
       <div className="house-info-container">
@@ -23,11 +23,17 @@ const HouseCard = ({ house, onDelete }) => {
         <div className="action-buttons-container flex flex-col">
           <div className="flex gap-1">
           <button
-            className="btn hover:opacity-100 bg-primary-500"
-            onClick={() => navigate(`/dashboard/edit-house/${house.uuid}`)}
-          >
-            ویرایش
-          </button>
+  className={`btn bg-primary-500 hover:opacity-100 ${
+    isPending ? "opacity-50 cursor-not-allowed hover:opacity-50" : ""
+  }`}
+  onClick={() => navigate(`/dashboard/edit-house/${house.uuid}`)}
+  disabled={isPending}
+  title={isPending ? "در حال بررسی، امکان ویرایش در دسترس نیست" : "ویرایش اقامتگاه"}
+>
+  ویرایش
+</button>
+
+
           <button
             className="btn hover:opacity-100 bg-primary-500"
             onClick={() => navigate(`/house/${house.uuid}`)}
