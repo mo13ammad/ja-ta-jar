@@ -1,3 +1,3 @@
 Ja ta jar project
-Fixed button misalignment on mobile view
+Resolved issue with modal window closing unexpectedly
 
