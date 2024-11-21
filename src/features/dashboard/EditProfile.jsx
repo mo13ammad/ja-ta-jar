@@ -80,6 +80,9 @@ function EditProfile({ user, onUpdateUser }) {
   // State for field errors
   const [fieldErrors, setFieldErrors] = useState({});
 
+  // Determine if user is a Vendor
+  const isVendor = user?.type === "Vendor";
+
   // Initialize form data and selected options from user prop
   useEffect(() => {
     if (user) {
@@ -120,6 +123,8 @@ function EditProfile({ user, onUpdateUser }) {
   // Handler for regular input fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // Prevent changes if user is Vendor
+    if (isVendor) return;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -128,11 +133,14 @@ function EditProfile({ user, onUpdateUser }) {
 
   // Handler for avatar upload
   const handleAvatarChange = (e) => {
+    // Prevent changes if user is Vendor
+    if (isVendor) return;
     setFormData({ ...formData, avatar: e.target.files[0] });
   };
 
   // Handler for select fields (province, city, gender)
   const handleSelectChange = (name, option) => {
+    if (isVendor) return;
     if (name === 'province') {
       setSelectedProvince(option);
       setFormData((prevData) => ({
@@ -184,6 +192,9 @@ function EditProfile({ user, onUpdateUser }) {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Prevent submission if user is Vendor
+    if (isVendor) return;
 
     const birthDateGregorian = persianToGregorian(formData.birthYear, formData.birthMonth, formData.birthDay);
     const genderValue = genderMap[formData.gender] || 'Male';
@@ -253,6 +264,7 @@ function EditProfile({ user, onUpdateUser }) {
             value={formData.firstName}
             onChange={handleInputChange}
             placeholder="نام"
+            readOnly={isVendor}
           />
           {fieldErrors.first_name && fieldErrors.first_name.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -267,6 +279,7 @@ function EditProfile({ user, onUpdateUser }) {
             value={formData.lastName}
             onChange={handleInputChange}
             placeholder="نام خانوادگی"
+            readOnly={isVendor}
           />
           {fieldErrors.last_name && fieldErrors.last_name.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -281,6 +294,7 @@ function EditProfile({ user, onUpdateUser }) {
             value={formData.nationalCode}
             onChange={handleInputChange}
             placeholder="کد ملی"
+            readOnly={isVendor}
           />
           {fieldErrors.national_code && fieldErrors.national_code.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -296,6 +310,7 @@ function EditProfile({ user, onUpdateUser }) {
             onChange={handleInputChange}
             placeholder="ایمیل"
             type="email"
+            readOnly={isVendor}
           />
           {fieldErrors.email && fieldErrors.email.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -308,11 +323,11 @@ function EditProfile({ user, onUpdateUser }) {
           <Listbox
             value={selectedProvince}
             onChange={(value) => handleSelectChange('province', value)}
-            disabled={false} // Set to true if needed
+            disabled={isVendor} // Disable if user is Vendor
           >
             {({ open }) => (
-              <div className="relative bg-white rounded-xl">
-                <Listbox.Button className={`listbox__button ${false ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+              <div className="relative bg-white rounded-xl ">
+                <Listbox.Button className={`listbox__button ${isVendor ? 'cursor-not-allowed bg-gray-100' : ''}`}>
                   <span>
                     {selectedProvince
                       ? selectedProvince.label
@@ -326,45 +341,47 @@ function EditProfile({ user, onUpdateUser }) {
                   />
                 </Listbox.Button>
 
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {provinceOptions.map((option) => (
-                      <Listbox.Option
-                        key={option.value}
-                        value={option}
-                        className={({ active }) =>
-                          `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
-                            active
-                              ? 'bg-secondary-100 text-secondary-700'
-                              : 'text-gray-900'
-                          }`
-                        }
-                      >
-                        {({ selected, active }) => (
-                          <>
-                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                              {option.label}
-                            </span>
-                            {selected ? (
-                              <span
-                                className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                  active ? 'text-secondary-600' : 'text-secondary-600'
-                                }`}
-                              >
-                                {/* Optional: Add a checkmark icon here */}
+                {!isVendor && (
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute z-50 w-full mt-1 scrollbar-thin  bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {provinceOptions.map((option) => (
+                        <Listbox.Option
+                          key={option.value}
+                          value={option}
+                          className={({ active }) =>
+                            `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
+                              active
+                                ? 'bg-secondary-100 text-secondary-700'
+                                : 'text-gray-900'
+                            }`
+                          }
+                        >
+                          {({ selected, active }) => (
+                            <>
+                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                {option.label}
                               </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
+                              {selected ? (
+                                <span
+                                  className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                  }`}
+                                >
+                                  {/* Optional: Add a checkmark icon here */}
+                                </span>
+                              ) : null}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                )}
               </div>
             )}
           </Listbox>
@@ -379,11 +396,11 @@ function EditProfile({ user, onUpdateUser }) {
           <Listbox
             value={selectedCity}
             onChange={(value) => handleSelectChange('city', value)}
-            disabled={!selectedProvince || fetchCitiesLoading}
+            disabled={isVendor || !selectedProvince || fetchCitiesLoading}
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className={`listbox__button ${(!selectedProvince || fetchCitiesLoading) ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+                <Listbox.Button className={`listbox__button ${isVendor || !selectedProvince || fetchCitiesLoading ? 'cursor-not-allowed bg-gray-100' : ''}`}>
                   <span>
                     {selectedCity
                       ? selectedCity.label
@@ -401,45 +418,47 @@ function EditProfile({ user, onUpdateUser }) {
                   />
                 </Listbox.Button>
 
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {cityOptions.map((option) => (
-                      <Listbox.Option
-                        key={option.value}
-                        value={option}
-                        className={({ active }) =>
-                          `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
-                            active
-                              ? 'bg-secondary-100 text-secondary-700'
-                              : 'text-gray-900'
-                          }`
-                        }
-                      >
-                        {({ selected, active }) => (
-                          <>
-                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                              {option.label}
-                            </span>
-                            {selected ? (
-                              <span
-                                className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                  active ? 'text-secondary-600' : 'text-secondary-600'
-                                }`}
-                              >
-                                {/* Optional: Add a checkmark icon here */}
+                {!isVendor && (
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute z-50 w-full mt-1 scrollbar-thin bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {cityOptions.map((option) => (
+                        <Listbox.Option
+                          key={option.value}
+                          value={option}
+                          className={({ active }) =>
+                            `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
+                              active
+                                ? 'bg-secondary-100 text-secondary-700'
+                                : 'text-gray-900'
+                            }`
+                          }
+                        >
+                          {({ selected, active }) => (
+                            <>
+                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                {option.label}
                               </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
+                              {selected ? (
+                                <span
+                                  className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                  }`}
+                                >
+                                  {/* Optional: Add a checkmark icon here */}
+                                </span>
+                              ) : null}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                )}
               </div>
             )}
           </Listbox>
@@ -450,7 +469,7 @@ function EditProfile({ user, onUpdateUser }) {
 
         {/* Birth Date Fields */}
         <div className="col-span-2">
-          <BirthDateFields formData={formData} setFormData={setFormData} />
+          <BirthDateFields formData={formData} setFormData={setFormData} isVendor={isVendor} />
         </div>
 
         {/* Gender Select */}
@@ -459,11 +478,11 @@ function EditProfile({ user, onUpdateUser }) {
           <Listbox
             value={{ value: formData.gender, label: formData.gender }}
             onChange={(value) => handleSelectChange('gender', value)}
-            disabled={false} // Set to true if needed
+            disabled={isVendor} // Disable if user is Vendor
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className={`listbox__button ${false ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+                <Listbox.Button className={`listbox__button ${isVendor ? 'cursor-not-allowed bg-gray-100' : ''}`}>
                   <span>
                     {formData.gender
                       ? formData.gender
@@ -477,49 +496,51 @@ function EditProfile({ user, onUpdateUser }) {
                   />
                 </Listbox.Button>
 
-                <Transition
-                  as={Fragment}
-                  leave="transition ease-in duration-100"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {[
-                      { value: 'مرد', label: 'مرد' },
-                      { value: 'زن', label: 'زن' },
-                      { value: 'دیگر', label: 'دیگر' },
-                    ].map((option) => (
-                      <Listbox.Option
-                        key={option.value}
-                        value={option}
-                        className={({ active }) =>
-                          `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
-                            active
-                              ? 'bg-secondary-100 text-secondary-700'
-                              : 'text-gray-900'
-                          }`
-                        }
-                      >
-                        {({ selected, active }) => (
-                          <>
-                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                              {option.label}
-                            </span>
-                            {selected ? (
-                              <span
-                                className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                  active ? 'text-secondary-600' : 'text-secondary-600'
-                                }`}
-                              >
-                                {/* Optional: Add a checkmark icon here */}
+                {!isVendor && (
+                  <Transition
+                    as={Fragment}
+                    leave="transition ease-in duration-100"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {[
+                        { value: 'مرد', label: 'مرد' },
+                        { value: 'زن', label: 'زن' },
+                        { value: 'دیگر', label: 'دیگر' },
+                      ].map((option) => (
+                        <Listbox.Option
+                          key={option.value}
+                          value={option}
+                          className={({ active }) =>
+                            `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
+                              active
+                                ? 'bg-secondary-100 text-secondary-700'
+                                : 'text-gray-900'
+                            }`
+                          }
+                        >
+                          {({ selected, active }) => (
+                            <>
+                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                {option.label}
                               </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </Transition>
+                              {selected ? (
+                                <span
+                                  className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                  }`}
+                                >
+                                  {/* Optional: Add a checkmark icon here */}
+                                </span>
+                              ) : null}
+                            </>
+                          )}
+                        </Listbox.Option>
+                      ))}
+                    </Listbox.Options>
+                  </Transition>
+                )}
               </div>
             )}
           </Listbox>
@@ -536,6 +557,7 @@ function EditProfile({ user, onUpdateUser }) {
             value={formData.secondPhone}
             onChange={handleInputChange}
             placeholder="شماره دوم"
+            readOnly={isVendor}
           />
           {fieldErrors.second_phone && fieldErrors.second_phone.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -551,6 +573,7 @@ function EditProfile({ user, onUpdateUser }) {
             className='bg-white w-full px-2 py-1.5 border rounded-2xl shadow-centered' 
             onChange={handleAvatarChange} 
             accept="image/*"
+            disabled={isVendor}
           />
           {fieldErrors.avatar && fieldErrors.avatar.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -566,6 +589,7 @@ function EditProfile({ user, onUpdateUser }) {
             onChange={handleInputChange}
             placeholder="درباره شما"
             rows={4}
+            readOnly={isVendor}
           />
           {fieldErrors.bio && fieldErrors.bio.map((msg, idx) => (
             <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
@@ -580,27 +604,34 @@ function EditProfile({ user, onUpdateUser }) {
         )}
 
         {/* Submit Button */}
+       {
+        !isVendor && 
         <div className="col-span-2">
-          <button 
-            type="submit" 
-            className="btn block bg-primary-800 h-10 text-white "
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'در حال ارسال...' : 'ذخیره اطلاعات'}
-          </button>
-        </div>
+        <button 
+          type="submit" 
+          className="btn block bg-primary-800 h-10 text-white "
+          disabled={isSubmitting || isVendor}
+        >
+          {isSubmitting ? 'در حال ارسال...' : 'ذخیره اطلاعات'}
+        </button>
+      </div>
+       }
       </form>
+       {isVendor && 
+       <p className='px-4 lg:px-6 text-primary-800'>لطفا برای تغییر اطلاعات به بخش تیکت ها مراجعه کنید و تیکت ثبت کنید.</p>
+       }
     </div>
   );
 }
 
-const BirthDateFields = ({ formData, setFormData }) => {
+const BirthDateFields = ({ formData, setFormData, isVendor }) => {
   const handleBirthDateChange = (part, value) => {
+    if (isVendor) return;
     setFormData((prev) => ({ ...prev, [part]: value }));
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col w-1/2 gap-2">
       <label className="block font-medium text-gray-700">تاریخ تولد</label>
       <div className="flex gap-2">
         <TextField
@@ -610,6 +641,7 @@ const BirthDateFields = ({ formData, setFormData }) => {
           placeholder="روز"
           maxLength={2}
           pattern="\d*"
+          readOnly={isVendor}
         />
         <TextField
           name="birthMonth"
@@ -618,6 +650,7 @@ const BirthDateFields = ({ formData, setFormData }) => {
           placeholder="ماه"
           maxLength={2}
           pattern="\d*"
+          readOnly={isVendor}
         />
         <TextField
           name="birthYear"
@@ -626,6 +659,7 @@ const BirthDateFields = ({ formData, setFormData }) => {
           placeholder="سال"
           maxLength={4}
           pattern="\d*"
+          readOnly={isVendor}
         />
       </div>
     </div>

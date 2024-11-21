@@ -1,9 +1,11 @@
-import React from 'react'
+// src/pages/HouseContainer.jsx
+
+import React from 'react';
 
 function HouseContainer() {
   return (
-    <div>HouseContainer</div>
-  )
+   <div>house container</div>
+  );
 }
 
-export default HouseContainer
+export default HouseContainer;

@@ -1,31 +1,33 @@
+// src/features/dashboard/Profile.jsx
+
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Dialog } from '@headlessui/react';
 import Loading from '../../ui/Loading.jsx';
-import useUser from '../dashboard/useUser.js';
-import { becomeVendor } from '../../services/userService';
+import { becomeVendor, getUser } from '../../services/userService';
 import dayjs from 'dayjs';
 import jalaliday from 'jalaliday';
 
 dayjs.extend(jalaliday);
 
-const Profile = () => {
-  const { data: user, isLoading } = useUser();
-  const queryClient = useQueryClient();
+const Profile = ({ user, onUpdateUser }) => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // State for confirmation modal
 
   const { mutate, isLoading: isBecomingVendor } = useMutation(becomeVendor, {
-    onSuccess: (newUserData) => {
-      queryClient.setQueryData(['get-user'], (oldData) => ({
-        ...oldData,
-        ...newUserData,
-      }));
-      setErrorMessage(null); // Clear any previous error message
+    onSuccess: async () => {
+      try {
+        // Fetch the updated user data
+        const newUserData = await getUser();
+        onUpdateUser(newUserData);
+        setErrorMessage(null); // Clear any previous error message
+      } catch (error) {
+        setErrorMessage(error.response?.data?.message || 'خطایی رخ داده است');
+      }
     },
     onError: (error) => {
       setErrorMessage(error.response?.data?.message || 'خطایی رخ داده است');
-    }
+    },
   });
 
   const handleBecomeVendorClick = () => {
@@ -43,8 +45,6 @@ const Profile = () => {
     const jalaliDate = dayjs(date).calendar('jalali');
     return jalaliDate.locale('fa').format('YYYY MMMM DD');
   };
-
-  if (isLoading) return <Loading />;
 
   const cityName = user?.city?.name || 'شهر نامشخص';
   const sexLabel = user?.sex?.label || 'جنسیت نامشخص';
@@ -72,7 +72,7 @@ const Profile = () => {
 
       {/* Show Become Vendor Button */}
       {!isVendor && !isAdmin && (
-        <button 
+        <button
           onClick={handleBecomeVendorClick}
           className="btn bg-primary-600 max-w-36 mt-6 text-sm flex items-center justify-center"
           disabled={isBecomingVendor}

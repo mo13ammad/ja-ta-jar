@@ -1,6 +1,8 @@
+// src/ui/TextArea.jsx
+
 import React from 'react';
 
-function TextArea({ label, name, value, onChange, placeholder, rows = 4 }) {
+function TextArea({ label, name, value, onChange, placeholder, rows = 4, readOnly }) {
   return (
     <div className=''>
       <label htmlFor={name} className="mb-3 ">{label} </label>
@@ -12,6 +14,7 @@ function TextArea({ label, name, value, onChange, placeholder, rows = 4 }) {
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}  // Default is 4 rows, can be customized
+        readOnly={readOnly}
       />
     </div>
   );
