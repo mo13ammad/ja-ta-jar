@@ -2,7 +2,7 @@ import React from 'react'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
-import Mizban from '../../public/assets/Mizban.jpg';
+import Mizban from '../../public/assets/mizbanshavid.jpg';
 import Beach from '../../public/assets/1.webp';
 import Mountain from '../../public/assets/4.webp';
 import Forest from '../../public/assets/2.webp';
