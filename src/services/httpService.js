@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const BASE_URL = "https://portal1.jatajar.com/api";
+const BASE_URL = "https://test.jatajar.com/api";
 
 // Function to set auth token in cookie
 const setAuthTokenInCookie = (token, expiryDays = 30) => {

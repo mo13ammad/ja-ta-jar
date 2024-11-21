@@ -164,3 +164,20 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(160, 174, 192, 0.5) transparent;
 }
+
+
+/* Change navigation arrows color */
+.swiper-button-next,
+.swiper-button-prev {
+  color: rgb(var(--color-primary-700)); /* Use your primary-700 variable */
+  font-size: 10px; /* Adjust the size of the arrow icon */
+}
+
+/* Change pagination dots color */
+.swiper-pagination-bullet {
+  background-color: rgb(var(--color-primary-700)); /* Unselected dots */
+}
+
+.swiper-pagination-bullet-active {
+  background-color: rgb(var(--color-primary-700)); /* Active dot */
+}
