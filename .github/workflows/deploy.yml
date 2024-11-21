@@ -1,29 +1,34 @@
-name: Deploy to Server
+
+name: Deploy and Notify via Telegram
 
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
-  deploy:
+  deploy-and-notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # مرحله 1: کلون کردن کد مخزن
+      - name: Checkout Code
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # مرحله 2: نصب sshpass برای اتصال به سرور
       - name: Install sshpass
         run: sudo apt-get install -y sshpass
 
-      - name: Notify Server for Deployment
+      # مرحله 3: اطلاع‌رسانی به سرور برای استقرار
+      - name: Deploy to Server (Main Branch Only)
+        if: github.ref_name == 'main'  # شرط برای اجرا فقط روی برنچ main
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
           SERVER_USER: ${{ secrets.SERVER_USER }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # توکن دسترسی شخصی
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           # بررسی اتصال SSH با رمز عبور
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no -p 9011 $SERVER_USER@$SERVER_IP "echo 'SSH connection successful'"
@@ -44,29 +49,66 @@ jobs:
             # به عنوان مثال:
             # systemctl restart your_service
           EOF
-   #  - name: Send SMS Notification
-     #   env:
-     #     MOBILE: ${{ secrets.MOBILE }}
-      #    SMSIRAPI: ${{ secrets.SMSIRAPI }}
-        #  SMSIRLINENUMBER: ${{ secrets.SMSIRLINENUMBER }}
-       #   SMSIRUSERNAME: ${{ secrets.SMSIRUSERNAME }}
-        #  COMMIT_MESSAGE: ${{ github.event.head_commit.message }}  # پیام کامیت
-      #  run: |
-       #   MESSAGE="برنچ اصلی فرانت جات آجار به عنوان کامیت '${COMMIT_MESSAGE}' آپدیت شد"
-     #     MESSAGE_ENCODED=$(echo "$MESSAGE" | jq -sRr @uri)  # URL encode
-      #    curl -X GET "https://api.sms.ir/v1/send?username=$SMSIRUSERNAME&password=$SMSIRAPI&line=$SMSIRLINENUMBER&mobile=$MOBILE&text=$MESSAGE_ENCODED"
-          
+      # مرحله 4: تنظیم محیط Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.13.0  # نسخه پشتیبانی‌شده
+
+      # مرحله 5: نصب وابستگی‌ها
+      - name: Install Dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install python-telegram-bot==20.3
+      # مرحله 6: ارسال پیام تلگرام
       - name: Send Telegram Notification
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}  # پیام کامیت
-          AUTHOR_NAME: ${{ github.event.head_commit.author.name }}  # نام نویسنده
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
           REPO_URL: "https://github.com/${{ github.repository }}"
           COMMIT_URL: "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
-
+          BRANCH_NAME: ${{ github.ref_name }}
+          PUSH_TIMESTAMP: ${{ github.event.head_commit.timestamp }}
         run: |
-          MESSAGE="✅ <b>برنچ اصلی فرانت جات آجار به‌روز شد!</b> 📝 <b>کامیت:</b> <code>${COMMIT_MESSAGE}</code> 👤 <b>نویسنده:</b> ${AUTHOR_NAME} 🔗 <a href=\"${REPO_URL}\">لینک به مخزن</a> 🔗 <a href=\"${COMMIT_URL}\">لینک به کامیت</a>"
-
-          curl -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_CHAT_ID&text=$MESSAGE" -d "parse_mode=HTML"
+          python3 - <<'EOF'
+          import os
+          import asyncio
+          from telegram import Bot
+          from telegram.constants import ParseMode
+          
+          async def send_message():
+              # دریافت متغیرهای محیطی
+              bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+              chat_id = os.getenv("TELEGRAM_CHAT_ID")
+              commit_message = os.getenv("COMMIT_MESSAGE")
+              author_name = os.getenv("AUTHOR_NAME")
+              repo_url = os.getenv("REPO_URL")
+              commit_url = os.getenv("COMMIT_URL")
+              branch_name = os.getenv("BRANCH_NAME")
+              push_timestamp = os.getenv("PUSH_TIMESTAMP")
+              
+              # ایجاد پیام
+              message = (
+                  "📢 <b>بروزرسانی پروژه انجام شد!</b>\n\n"
+                  "🔖 <b>اطلاعات بروزرسانی:</b>\n"
+                  f"📂 <b>برنچ:</b> <code>{branch_name}</code>\n"
+                  f"📝 <b>توضیحات کامیت:</b> <code>{commit_message}</code>\n"
+                  f"👤 <b>نویسنده:</b> {author_name}\n"
+                  f"⏰ <b>زمان:</b> {push_timestamp}\n\n"
+                  "🔗 <b>لینک‌ها:</b>\n"
+                  f"📁 <a href=\"{repo_url}\">مشاهده مخزن</a>\n"
+                  f"🔗 <a href=\"{commit_url}\">مشاهده کامیت</a>\n\n"
+                  "با احترام،\n"
+                  "\n\n"
+                  "🌐 <a href=\"https://viraup.com\">ویــــــــــــراپ</a>\n"
+              )
+              
+              # ارسال پیام با استفاده از Bot
+              bot = Bot(token=bot_token)
+              await bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
+              print("پیام با موفقیت ارسال شد.")
+          
+          asyncio.run(send_message())
+          EOF
