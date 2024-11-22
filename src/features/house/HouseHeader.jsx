@@ -19,7 +19,7 @@ function HouseHeader({houseData}) {
         </div>
     
       <div className="w-full">
-         <HouseStructure/>   
+        
       </div>
     </div>
       <div className="w-full">
