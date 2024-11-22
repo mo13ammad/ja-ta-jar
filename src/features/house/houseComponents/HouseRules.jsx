@@ -2,7 +2,7 @@ import React from 'react'
 
 function HouseRules() {
   return (
-    <div>HouseRules</div>
+    <div></div>
   )
 }
 

@@ -1,12 +1,14 @@
 import React, { useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import logo from "../../public/assets/logotype.png";
+import logo from "../../public/assets/white-type.png";
 import Loading from './Loading.jsx';
 import useUser from '../features/dashboard/useUser.js';
 import { Menu } from '@headlessui/react';
 import { UserIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
 import { useQueryClient } from "@tanstack/react-query";
 import { logOutUser } from '../services/userService.js';
+import { Bars3Icon } from '@heroicons/react/24/outline';
+
 import toast from "react-hot-toast";
 
 function Header() {
@@ -62,7 +64,7 @@ function Header() {
 
   return (
     <div className="w-full rounded-b-lg absolute md:relative md:container">
-      <nav className="relative w-full px-5 py-2 flex bg-gray-50 shadow-md flex-wrap justify-between items-center rounded-b-xl">
+      <nav className="relative w-full px-5 py-2 flex bg-primary-400 shadow-md flex-wrap justify-between items-center rounded-b-xl">
         <Link to="/" className="ml-auto">
           <img className="max-w-32 max-h-8" src={logo} alt="Logo" />
         </Link>
@@ -76,7 +78,7 @@ function Header() {
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              <p>{data.name}</p>
+              <p className="text-secondary-100">{data.name}</p>
 
               <div
                 className={`absolute top-full z-50 mt-3 w-44 -left-4 rounded-lg shadow-lg transition-all bg-white ring-1 ring-black ring-opacity-5 duration-500 ease-in-out ${
@@ -142,9 +144,7 @@ function Header() {
             className="text-green-600 p-3"
             onClick={toggleMobileMenu}
           >
-            <svg className="block h-4 w-4" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"></path>
-            </svg>
+            <Bars3Icon className="block h-7 w-7 text-secondary-200" />
           </button>
           
           {showMobileMenu && (
