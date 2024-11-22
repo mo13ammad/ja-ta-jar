@@ -52,7 +52,7 @@ const data = [
         {data.map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-green-100 shadow"
+            className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-secondary-100 shadow"
            
           >
             <img
