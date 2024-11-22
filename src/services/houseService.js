@@ -19,6 +19,10 @@ export function getHouse(houseId) {
   return http.get(`/client/house/${houseId}`).then(({ data }) => data.data);
 }
 
+export function showHouse(houseId) {
+  return http.get(`/house/${houseId}`).then(({ data }) => data.data);
+}
+
 export function editHouse(houseId, houseData) {
   if (!houseId || !houseData) {
     console.error("Missing houseId or houseData:", { houseId, houseData });

@@ -87,7 +87,7 @@ const Houses = () => {
       setHouseToDelete(null);
     }
   };
-
+ console.log(houses);
   if (isRefetchingHouses) {
     return (
       <div className="min-h-[65vh] flex items-center justify-center">

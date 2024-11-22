@@ -11,7 +11,7 @@ const HouseAreas = ({houseAreas}) => {
       {areas.map((item, index) => (
         <div
           key={index}
-          className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-primary-50 shadow"
+          className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-primary-50 shadow-centered"
           
         >
           <img

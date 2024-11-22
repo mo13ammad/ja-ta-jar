@@ -8,8 +8,8 @@ import { Dialog } from "@headlessui/react";
 
 function HouseImages({ houseData }) {
   // Extract the main image and media array
-  const mainImage = houseData?.main_image;
-  const mediaImages = houseData?.medias?.map((mediaItem) => mediaItem.media) || [];
+  const mainImage = houseData?.image;
+  const mediaImages = houseData?.galleries?.map((mediaItem) => mediaItem.media) || [];
 
   // Combine main image and other media images
   const images = mainImage ? [mainImage, ...mediaImages] : mediaImages;
@@ -30,7 +30,7 @@ function HouseImages({ houseData }) {
   };
 
   return (
-    <div className="w-full lg:w-2/3 mx-auto">
+    <div className="w-full lg:w-2/3 mx-auto mb-1.5 lg:mb-0">
       {/* Swiper Component */}
       <Swiper
         modules={[Navigation, Pagination]}

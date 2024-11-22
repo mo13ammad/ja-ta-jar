@@ -9,7 +9,7 @@ const HouseCard = ({ house, onDelete }) => {
     <div className="house-card-container shadow-centered max-h-64">
       <div className="house-info-container">
         <div className="info-item">
-          <p className="font-semibold">نام :</p>
+          <p className="font-semibold w-7 md:w-9">نام :</p>
           <p>{house.name}</p>
         </div>
         <div className="info-item">

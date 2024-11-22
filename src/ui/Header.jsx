@@ -132,7 +132,7 @@ function Header() {
               </div>
             </div>
           ) : (
-            <Link to="/auth" className="text-gray-700 hover:text-primary-600">
+            <Link to="/auth" className="text-secondary-50 hover:text-secondary-300">
               ورود | ثبت نام
             </Link>
           )}

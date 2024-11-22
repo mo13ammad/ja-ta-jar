@@ -4,7 +4,7 @@ import React from 'react'
 function HouseVendorBadge({hostInfo}) {
 
   return (
-    <div className='w-full flex gap-1 h-14 rounded-3xl bg-secondary-100 p-1'>
+    <div className='w-full flex gap-1 h-14 rounded-3xl bg-secondary-100 p-1 shadow-centered'>
         
         <div className='w-12  overflow-hidden  h-full  rounded-full'>
           <img src={hostInfo.avatar} alt="" className='block'   />

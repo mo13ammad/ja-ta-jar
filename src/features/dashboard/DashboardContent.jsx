@@ -7,7 +7,7 @@ import Houses from './Houses';
 
 const DashboardContent = ({ selectedTab, initialUser, onUpdateUser }) => {
   const [user, setUser] = useState(initialUser);
-
+  console.log(user);
   // Update local user state when initialUser changes
   useEffect(() => {
     setUser(initialUser);
