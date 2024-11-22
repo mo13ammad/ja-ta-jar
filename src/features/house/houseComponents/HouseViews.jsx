@@ -45,6 +45,9 @@ const data = [
   ];
   const HouseViews = () => {
     return (
+
+    <div className='mt-1'>
+        <p>منظره اقامتگاه :</p>
       <div className="flex flex-wrap w-full gap-1 my-1">
         {data.map((item, index) => (
           <div
@@ -60,6 +63,7 @@ const data = [
             <span className=" font-medium">{item.label}</span>
           </div>
         ))}
+      </div>
       </div>
     );
   };
