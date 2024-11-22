@@ -1,5 +1,5 @@
 import React from 'react'
-import VendorImage from '../imgs/vendor-image.jpg'
+
 
 function HouseVendorBadge({hostInfo}) {
 
