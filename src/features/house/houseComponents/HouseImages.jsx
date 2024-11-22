@@ -6,14 +6,13 @@ import "swiper/css/navigation";
 import { Navigation, Pagination } from "swiper/modules";
 import { Dialog } from "@headlessui/react";
 
-// Import local images
-import img1 from '../imgs/img1.jpg';
-import img2 from '../imgs/img2.jpg';
-import img3 from '../imgs/img3.jpg';
+function HouseImages({ houseData }) {
+  // Extract the main image and media array
+  const mainImage = houseData?.main_image;
+  const mediaImages = houseData?.medias?.map((mediaItem) => mediaItem.media) || [];
 
-function HouseImages() {
-  // Local images
-  const images = [img1, img2, img3];
+  // Combine main image and other media images
+  const images = mainImage ? [mainImage, ...mediaImages] : mediaImages;
 
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +53,7 @@ function HouseImages() {
       </Swiper>
 
       {/* Modal with Swiper */}
-      <Dialog open={isOpen} onClose={closeModal} className="relative z-50 ">
+      <Dialog open={isOpen} onClose={closeModal} className="relative z-50">
         <div className="fixed inset-0 bg-black bg-opacity-75" aria-hidden="true"></div>
         <div className="fixed inset-0 flex items-center justify-center">
           <Dialog.Panel className="w-full max-w-4xl max-h-screen mx-4 lg:mx-0">
