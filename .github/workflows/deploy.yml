@@ -40,7 +40,7 @@ jobs:
             git stash
             echo stashok
             #git fetch https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
-            git pull https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git
+            git pull https://x-access-token:${{ secrets.TOKEN }}@github.com/mo13ammad/jatajar-front.git --rebase
             #git reset --hard origin/main
             echo "Git reset to main branch"
             npm install build
