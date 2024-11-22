@@ -64,7 +64,7 @@ function Header() {
 
   return (
     <div className="w-full rounded-b-lg absolute md:relative md:container">
-      <nav className="relative w-full px-5 py-2 flex bg-primary-400 shadow-md flex-wrap justify-between items-center rounded-b-xl">
+      <nav className="relative w-full px-5 py-2 flex bg-primary-300 shadow-md flex-wrap justify-between items-center rounded-b-xl">
         <Link to="/" className="ml-auto">
           <img className="max-w-32 max-h-8" src={logo} alt="Logo" />
         </Link>
