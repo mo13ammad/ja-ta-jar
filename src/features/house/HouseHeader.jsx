@@ -2,7 +2,6 @@ import React from "react";
 import HouseVendorBadge from "./houseComponents/HouseVendorBadge";
 
 import HouseInformation from "./houseComponents/HouseInformation";
-import HouseStructure from "./houseComponents/HouseStructure";
 import HouseViews from './houseComponents/HouseViews';
 import HouseAreas from "./houseComponents/HouseAreas";
 
