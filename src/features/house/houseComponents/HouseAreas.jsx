@@ -1,57 +1,8 @@
 import React from 'react';
 
-const areas = [
-  {
-    color: "#ffa800",
-    icon: "https://test.jatajar.com/storage/svg/cache/fas-cow.svg",
-    key: "Village",
-    label: "روستایی",
-  },
-  {
-    color: "#000000",
-    icon: "https://test.jatajar.com/storage/svg/cache/hugeicons-city-03.svg",
-    key: "Countryside",
-    label: "حومه شهری",
-  },
-  {
-    color: "#00f7ff",
-    icon: "https://test.jatajar.com/storage/svg/cache/maki-beach.svg",
-    key: "Beach",
-    label: "ساحلی",
-  },
-  {
-    color: "#120101",
-    icon: "https://test.jatajar.com/storage/svg/cache/maki-town.svg",
-    key: "Town",
-    label: "شهری",
-  },
-  {
-    color: "#42ff00",
-    icon: "https://test.jatajar.com/storage/svg/cache/gmdi-forest-o.svg",
-    key: "Forest",
-    label: "جنگلی",
-  },
-  {
-    color: "#080000",
-    icon: "https://test.jatajar.com/storage/svg/cache/lineawesome-mountain-solid.svg",
-    key: "Mountainou",
-    label: "کوهستانی",
-  },
-  {
-    color: "#f50e0e",
-    icon: "https://test.jatajar.com/storage/svg/cache/phosphor-mountains-thin.svg",
-    key: "Summerhouse",
-    label: "ییلاقی",
-  },
-  {
-    color: "#1a0101",
-    icon: "https://test.jatajar.com/storage/svg/cache/hugeicons-desert.svg",
-    key: "Desert",
-    label: "بیابانی",
-  },
-];
 
-const HouseAreas = () => {
+const HouseAreas = ({houseAreas}) => {
+  const areas = houseAreas || [] ;
   return (
     <div>
         <p>بافت محیط :</p>

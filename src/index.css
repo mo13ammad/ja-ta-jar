@@ -93,7 +93,7 @@
     }
   
     .tab-selected {
-      @apply bg-primary-600 text-secondary-100;
+      @apply bg-primary-400 text-secondary-100;
     }
   
     .tab-svg {
