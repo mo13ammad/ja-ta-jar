@@ -4,7 +4,7 @@ import BeatLoader from 'react-spinners/BeatLoader';
 
 const Loading = ({ size, type = "clip" }) => {
   const LoaderComponent = type === "beat" ? (
-    <BeatLoader color="#56160C" size={size || 8} margin={1} />
+    <BeatLoader color="#E1F1FF" size={size || 8} margin={1} />
   ) : (
     <ClipLoader color="#56160C" size={size} />
   );

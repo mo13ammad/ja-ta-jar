@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import ToggleSwitch from "../../../../ui/ToggleSwitch";
 import { publishHouse } from "../../../../services/houseService";
+import { useNavigate } from "react-router-dom";
 
 const EditHouseFinalSubmit = ({ houseId, refetchHouseData }) => {
   const [publishing, setPublishing] = useState(false);
   const [confirmationChecked, setConfirmationChecked] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [generalErrorMessage, setGeneralErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleFinalSubmit = async () => {
     if (!confirmationChecked) return;
@@ -19,7 +21,8 @@ const EditHouseFinalSubmit = ({ houseId, refetchHouseData }) => {
     try {
       await publishHouse(houseId);
       toast.success("اقامتگاه با موفقیت ثبت شد.");
-      refetchHouseData(); // Optionally refresh data after publishing
+      navigate("/dashboard");
+      
     } catch (error) {
       if (error.response?.data) {
         const { message, errors } = error.response.data;

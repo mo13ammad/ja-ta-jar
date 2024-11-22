@@ -10,7 +10,7 @@ function HouseVendorBadge() {
         </div>
         
         <div className='flex  flex-col p-1 justify-center items-center'>
-            <p className='text-sm font-medium'>محمد رضا قاسمی</p>     
+            <p className='text-sm font-medium truncate'>محمد رضا قاسمی</p>     
         </div>
 
 

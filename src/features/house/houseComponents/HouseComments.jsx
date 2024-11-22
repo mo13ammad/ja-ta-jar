@@ -2,7 +2,7 @@ import React from 'react'
 
 function HouseComments() {
   return (
-    <div>HouseComments</div>
+    <div></div>
   )
 }
 
