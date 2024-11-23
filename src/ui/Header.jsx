@@ -44,6 +44,10 @@ function Header() {
     }
   };
 
+  const handleBecomeHostClick = () => {
+    navigate('/dashboard');
+  };
+
   const buttonText = location.pathname.includes('/dashboard') ? 'صفحه اصلی' : 'پنل کاربری';
 
   const handleLogout = async () => {
@@ -53,7 +57,7 @@ function Header() {
       document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       queryClient.setQueryData(['get-user'], null);
       queryClient.invalidateQueries(['get-user']);
-      toast.success(" از حساب کاربری خود با موفقیت خارج شدید !")
+      toast.success(" از حساب کاربری خود با موفقیت خارج شدید !");
       navigate('/');
     } catch (error) {
       console.error("Failed to log out:", error);
@@ -89,20 +93,38 @@ function Header() {
                   <Menu.Items static>
                     <Menu.Item>
                       {({ active }) => (
-                      <div className="w-full flex justify-center items-center flex-col"> 
-                        <button
-                          onClick={handleUserPanelClick}
-                          className={`${
-                            active ? 'bg-red-100' : ''
-                          } w-full px-4 py-2  flex text-sm  items-center justify-start text-gray-700`}
-                        >
-                          <UserIcon className="w-4 h-4 text-gray-700 ml-1" />
-                          {buttonText}
-                        </button>
-                        <span className="border-b inline-block mx-auto border-secondary-100 border-opacity-90 w-11/12"></span>
-                      </div>
+                        <div className="w-full flex justify-center items-center flex-col"> 
+                          <button
+                            onClick={handleUserPanelClick}
+                            className={`${
+                              active ? 'bg-red-100' : ''
+                            } w-full px-4 py-2  flex text-sm  items-center justify-start text-gray-700`}
+                          >
+                            <UserIcon className="w-4 h-4 text-gray-700 ml-1" />
+                            {buttonText}
+                          </button>
+                          <span className="border-b inline-block mx-auto border-secondary-100 border-opacity-90 w-11/12"></span>
+                        </div>
                       )}
                     </Menu.Item>
+
+                    {/* Only show "میزبان شوید" if not on dashboard */}
+                    {!location.pathname.includes('/dashboard') && (
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={handleBecomeHostClick}
+                            className={`${
+                              active ? 'bg-red-100' : ''
+                            } w-full px-4 py-2 text-sm flex items-center justify-start text-gray-700`}
+                          >
+                            <UserIcon className="w-4 h-4 text-gray-700 ml-1" />
+                            میزبان شوید
+                          </button>
+                        )}
+                      </Menu.Item>
+                    )}
+
                     {/* Only show Logout if user data is available */}
                     {data && (
                       <Menu.Item>
@@ -156,12 +178,23 @@ function Header() {
                 <UserIcon className="w-5 h-5 text-gray-700" />
                 {buttonText}
               </button>
-           
+
+              {/* Only show "میزبان شوید" if not on dashboard */}
+              {!location.pathname.includes('/dashboard') && (
+                <button
+                  onClick={handleBecomeHostClick}
+                  className="w-full px-4 py-2 flex items-center justify-start text-gray-700 hover:bg-gray-100"
+                >
+                  <UserIcon className="w-5 h-5 text-gray-700" />
+                  میزبان شوید
+                </button>
+              )}
+
               {/* Only show Logout if user data is available */}
               {data && (
                 <button
                   onClick={handleLogout}
-                  className="w-full px-4 py-2 pb-4 flex items-center justify-start  text-gray-700 hover:bg-gray-100"
+                  className="w-full px-4 py-2 pb-4 flex items-center justify-start text-gray-700 hover:bg-gray-100"
                   disabled={isLoggingOut}
                 >
                   <ArrowLeftOnRectangleIcon className="w-5 h-5 text-gray-700" />

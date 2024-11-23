@@ -71,29 +71,25 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (houseData && provinces.length) {
-      const initialLat =
-        houseData.address?.geography?.latitude || DEFAULT_LAT;
-      const initialLng =
-        houseData.address?.geography?.longitude || DEFAULT_LNG;
+      const initialLat = houseData.address?.geography?.latitude || DEFAULT_LAT;
+      const initialLng = houseData.address?.geography?.longitude || DEFAULT_LNG;
       setLatitude(initialLat);
       setLongitude(initialLng);
-
+  
       const provinceName =
         houseData.address?.province?.name ||
         houseData.address?.city?.province?.name;
       const cityName = houseData.address?.city?.name;
-      const initialProvince = provinces.find(
-        (p) => p.name === provinceName
-      );
-
+  
+      const initialProvince = provinces.find((p) => p.name === provinceName);
       if (initialProvince) {
         setSelectedProvince({
           value: initialProvince.id,
           label: initialProvince.name,
         });
       }
-
-      if (houseData.address.city) {
+  
+      if (houseData.address?.city) {
         setCityOptions([
           { value: houseData.address.city.id, label: cityName },
         ]);
@@ -104,6 +100,7 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
       }
     }
   }, [houseData, provinces]);
+  
 
   useEffect(() => {
     if (selectedProvince && citiesData?.cities) {
@@ -189,15 +186,15 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
 
   const validateAndSubmit = async () => {
     console.log('validateAndSubmit called in EditHouseLocationDetails');
-
+  
     if (!isModified) {
       console.log('No changes detected, submission skipped.');
       return true;
     }
-
+  
     setErrors({});
     console.log('Validating and submitting data.');
-
+  
     if (!selectedCity) {
       setErrors((prev) => ({
         ...prev,
@@ -207,20 +204,19 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
       console.error('Validation error: City not selected.');
       return false;
     }
-
+  
     const dataToSend = {
       city_id: selectedCity.value,
       latitude,
       longitude,
     };
-
+  
     console.log('Data to send:', dataToSend);
-
+  
     try {
-      await handleEditHouse(dataToSend);
-      await refetchHouseData();
+      await handleEditHouse(dataToSend); // Update houseData
       toast.success('موقعیت مکانی با موفقیت به‌روزرسانی شد');
-      console.log('Data successfully sent and received.');
+      console.log('Data successfully sent and updated.');
       setIsModified(false);
       return true;
     } catch (error) {
@@ -238,6 +234,7 @@ const EditHouseLocationDetails = forwardRef((props, ref) => {
       return false;
     }
   };
+  
 
   useImperativeHandle(ref, () => ({
     validateAndSubmit,

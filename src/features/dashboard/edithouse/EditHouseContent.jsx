@@ -1,5 +1,3 @@
-// EditHouseContent.js
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import AddressDetails from './edithouse-components/EditHouseAddressDetails';
@@ -40,20 +38,24 @@ const EditHouseContent = ({
 
   const { mutateAsync: editHouseAsync } = useEditHouse();
 
-  const [houseData, setHouseData] = useState(fetchedHouseData);
-  const [isRefetching, setIsRefetching] = useState(false);
+  const [houseData, setHouseData] = useState(null); // Initially null
   const [isSaving, setIsSaving] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false); // State for info modal
 
   const childRef = useRef(null); // Reference to child component
 
+  // Log initialization
+  console.log('Initializing EditHouseContent component...');
+  console.log('Selected Tab:', selectedTab);
+  console.log('Tab Sections:', tabSections);
+
+  // Initialize houseData only once
   useEffect(() => {
-    if (fetchedHouseData) {
+    if (fetchedHouseData && houseData === null) {
       console.log('Fetched house data:', fetchedHouseData);
       setHouseData(fetchedHouseData);
-      setIsRefetching(false); // Move this here to ensure it's set after data is fetched
     }
-  }, [fetchedHouseData]);
+  }, [fetchedHouseData, houseData]);
 
   const handleEditHouse = async (updatedData) => {
     console.log('handleEditHouse called with data:', updatedData);
@@ -62,24 +64,20 @@ const EditHouseContent = ({
         houseId: uuid,
         houseData: updatedData,
       });
-      console.log('Edit response:', response);
-
-      // Update houseData with the response from edit
-      setHouseData(response);
-
-      // Set refetching to true and refetch the latest data
-      setIsRefetching(true);
-      await refetchHouseData();
-
-      // Ensure isRefetching is set back to false after refetch completes
-      setIsRefetching(false);
-      return true; // Return success status
+  
+      setHouseData((prev) => ({
+        ...prev,
+        ...response, // Merge updated fields
+      }));
+  
+      console.log('Edit response received and merged:', response);
+      return true; // Indicate success
     } catch (error) {
       console.error('Edit House Error:', error.response?.data || error.message);
-      setIsRefetching(false); // Set isRefetching to false in case of error
       throw error.response?.data || error;
     }
   };
+  
 
   const commonProps = {
     houseData,
@@ -92,6 +90,7 @@ const EditHouseContent = ({
   };
 
   const renderContent = () => {
+    console.log('Rendering content for tab:', selectedTab);
     switch (selectedTab) {
       case 'address':
         return <AddressDetails ref={childRef} {...commonProps} />;
@@ -116,7 +115,7 @@ const EditHouseContent = ({
       case 'pricing':
         return <Pricing ref={childRef} {...commonProps} />;
       case 'images':
-        return <Images  {...commonProps} />;
+        return <Images {...commonProps} />;
       case 'documents':
         return <EditHouseDocuments {...commonProps} />;
       case 'finalSubmit':
@@ -128,16 +127,18 @@ const EditHouseContent = ({
 
   const handleNextClick = async () => {
     setIsSaving(true); // Start saving
+    console.log('Next button clicked. Starting validation and submission...');
     try {
-      console.log('Next button clicked.');
-      if (childRef.current && childRef.current.validateAndSubmit) {
+      if (childRef.current?.validateAndSubmit) {
         const success = await childRef.current.validateAndSubmit();
+        console.log('Validation success:', success);
         if (success) {
-          await handleNextTab(); // Navigate to next tab after successful save
+          handleNextTab(); // Navigate to next tab
+          console.log('Moved to next tab');
         }
       } else {
-        // If childRef or validateAndSubmit is not available, proceed
-        await handleNextTab();
+        handleNextTab();
+        console.log('Moved to next tab without validation');
       }
     } catch (error) {
       console.error('Error during next click:', error);
@@ -148,16 +149,18 @@ const EditHouseContent = ({
 
   const handlePreviousClick = async () => {
     setIsSaving(true); // Start saving
+    console.log('Previous button clicked. Starting validation and submission...');
     try {
-      console.log('Previous button clicked.');
-      if (childRef.current && childRef.current.validateAndSubmit) {
+      if (childRef.current?.validateAndSubmit) {
         const success = await childRef.current.validateAndSubmit();
+        console.log('Validation success:', success);
         if (success) {
-          await handlePreviousTab(); // Navigate to previous tab after successful save
+          handlePreviousTab(); // Navigate to previous tab
+          console.log('Moved to previous tab');
         }
       } else {
-        // If childRef or validateAndSubmit is not available, proceed
-        await handlePreviousTab();
+        handlePreviousTab();
+        console.log('Moved to previous tab without validation');
       }
     } catch (error) {
       console.error('Error during previous click:', error);
@@ -166,7 +169,6 @@ const EditHouseContent = ({
     }
   };
 
-  // Content for the info modal based on selectedTab
   const infoContent = {
     address: 'اطلاعات مربوط به آدرس اقامتگاه خود را وارد کنید. آدرس اقامتگاه: استان و شهر محل اقامت را وارد کنید. روستا/محله: در صورتی که اقامتگاه در روستا یا محله خاصی است، نام آن را ذکر کنید. اقامتگاه در طبقه: شماره طبقه‌ای که اقامتگاه در آن قرار دارد را وارد کنید. شماره پلاک: شماره پلاک اقامتگاه را درج کنید. کد پستی: کد پستی دقیق اقامتگاه را وارد کنید تا مهمانان بتوانند به‌راحتی محل آن را پیدا کنند.',
     location: 'بعد از انتخاب استان و نزدیکترین شهر ، محل اقامتگاه خود را در نقشه مشخص نمایید ',
@@ -185,9 +187,11 @@ const EditHouseContent = ({
     // Add more as needed
   };
 
+  console.log('Loading house data:', loadingHouse, 'House data:', houseData);
+
   return (
     <div className="flex flex-col h-full">
-      {loadingHouse || isRefetching ? (
+      {loadingHouse || houseData === null ? (
         <div className="min-h-[60vh] flex flex-col justify-center items-center">
           <Loading />
         </div>
@@ -234,7 +238,6 @@ const EditHouseContent = ({
             </div>
           </div>
 
-          {/* Info Modal */}
           <Dialog open={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)}>
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
               <Dialog.Panel className="w-full max-w-md bg-white rounded-2xl p-6">
