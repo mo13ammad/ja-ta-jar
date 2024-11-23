@@ -63,7 +63,7 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
       };
     });
   };
-
+   console.log(houseData);
   const handleInputChange = (facilityKey, fieldTitle, value) => {
     setSelectedFacilities((prevState) => {
       setIsModified(true);

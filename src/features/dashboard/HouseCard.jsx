@@ -1,5 +1,3 @@
-// src/components/HouseCard.jsx
-
 import { useNavigate } from "react-router-dom";
 
 const HouseCard = ({ house, onDelete }) => {
@@ -22,32 +20,34 @@ const HouseCard = ({ house, onDelete }) => {
         </div>
         <div className="action-buttons-container flex flex-col">
           <div className="flex gap-1">
-          <button
-            className="btn hover:opacity-100 bg-primary-500"
-            onClick={() => navigate(`/dashboard/edit-house/${house.uuid}`)}
-          >
-            ویرایش
-          </button>
-          <button
-            className="btn hover:opacity-100 bg-primary-500"
-            onClick={() => navigate(`/house/${house.uuid}`)}
-          >
-            مشاهده
-          </button>
-          <button
-            className="btn hover:opacity-100 bg-red-500"
-            onClick={onDelete}
-          >
-            حذف
-          </button>
+            <button
+              className="btn hover:opacity-100 bg-primary-500"
+              onClick={() => navigate(`/dashboard/edit-house/${house.uuid}`)}
+            >
+              ویرایش
+            </button>
+            {house.status.key === "Publish" && (
+              <button
+                className="btn hover:opacity-100 bg-primary-500"
+                onClick={() => navigate(`/house/${house.uuid}`)}
+              >
+                مشاهده
+              </button>
+            )}
+            <button
+              className="btn hover:opacity-100 bg-red-500"
+              onClick={onDelete}
+            >
+              حذف
+            </button>
           </div>
           <div>
-          <button
-            className="btn hover:opacity-100 bg-primary-500"
-            onClick={()=>{}}
-          >
-            تقویم
-          </button>
+            <button
+              className="btn hover:opacity-100 bg-primary-500"
+              onClick={() => {}}
+            >
+              تقویم
+            </button>
           </div>
         </div>
       </div>
