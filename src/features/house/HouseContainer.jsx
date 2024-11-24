@@ -22,12 +22,12 @@ function HouseContainer() {
   } = useShowHouse(uuid);
 
   // Redirect if the house is not published
-  // useEffect(() => {
-  //   if (!loadingHouse && houseData && houseData.status.key !== "Publish") {
-  //     toast.error("اطلاعات اقامتگاه موجود نمیباشد.")
-  //     navigate("/");
-  //   }
-  // }, [loadingHouse, houseData, navigate]);
+  useEffect(() => {
+    if (!loadingHouse && houseData && houseData.status.key !== "Publish") {
+      toast.error("اطلاعات اقامتگاه موجود نمیباشد.")
+      navigate("/");
+    }
+  }, [loadingHouse, houseData, navigate]);
 
   // Show loading screen while fetching house data
   if (loadingHouse) {
