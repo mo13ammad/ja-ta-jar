@@ -4,12 +4,12 @@
     return (
 
     <div className='mt-1'>
-        <p>منظره اقامتگاه :</p>
+        <p className="font-bold">منظره اقامتگاه :</p>
       <div className="flex flex-wrap w-full gap-1 my-1">
         {views.map((item, index) => (
           <div
             key={index}
-            className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-secondary-100 shadow-centered"
+            className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-primary-50 shadow-centered"
            
           >
             <img

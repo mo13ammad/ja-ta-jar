@@ -6,7 +6,7 @@ function HouseInformation({ houseData }) {
   const province = houseData?.address?.city?.province?.name || 'نامشخص';
 
   return (
-    <div className="flex flex-col  bg-primary-50 rounded-3xl py-1 px-3">
+    <div className="flex flex-col  rounded-3xl py-1 px-3">
       <div className="flex justify-self-end items-center flex-row gap-1">
         <MapPinIcon className="w-5 h-5 lg:w-6 lg:h-6 text-primary-600" />
         <p className="text-sm truncate">
@@ -15,6 +15,10 @@ function HouseInformation({ houseData }) {
       </div>
       <div className="text-primary-500 flex items-center justify-start rounded-2xl w-full">
         <StarIcon className="h-5 w-5 text-primary-600" />
+        <StarIcon className="h-5 w-5 text-primary-600" />
+        <StarIcon className="h-5 w-5 text-primary-600" />
+        <StarIcon className="h-5 w-5 text-primary-600" />
+        <StarIcon className="h-5 w-5 text-primary-200" />
         
         <p className="text-primary-800 px-1 py-0.5">۴,۱</p>
       </div>

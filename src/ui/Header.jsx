@@ -11,7 +11,7 @@ import { Bars3Icon } from '@heroicons/react/24/outline';
 
 import toast from "react-hot-toast";
 
-function Header() {
+const Header = () => {
   const { data, isLoading } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,8 +108,8 @@ function Header() {
                       )}
                     </Menu.Item>
 
-                    {/* Only show "میزبان شوید" if not on dashboard */}
-                    {!location.pathname.includes('/dashboard') && (
+                    {/* Only show "میزبان شوید" if not on dashboard and user is not a "Vendor" */}
+                    {!location.pathname.includes('/dashboard') && data?.type !== 'Vendor' && (
                       <Menu.Item>
                         {({ active }) => (
                           <button
@@ -179,8 +179,8 @@ function Header() {
                 {buttonText}
               </button>
 
-              {/* Only show "میزبان شوید" if not on dashboard */}
-              {!location.pathname.includes('/dashboard') && (
+              {/* Only show "میزبان شوید" if not on dashboard and user is not a "Vendor" */}
+              {!location.pathname.includes('/dashboard') && data?.type !== 'Vendor' && (
                 <button
                   onClick={handleBecomeHostClick}
                   className="w-full px-4 py-2 flex items-center justify-start text-gray-700 hover:bg-gray-100"
@@ -214,6 +214,6 @@ function Header() {
       </nav>
     </div>
   );
-}
+};
 
 export default Header;

@@ -204,10 +204,10 @@ const EditHouseContent = ({
             <button
               onClick={handlePreviousClick}
               disabled={selectedTab === 'address' || isSaving}
-              className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${
+              className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center hover:bg-primary-500 ${
                 selectedTab === 'address' || isSaving
                   ? 'bg-primary-100 cursor-not-allowed'
-                  : 'bg-primary-500'
+                  : 'bg-primary-400'
               }`}
             >
               <ArrowRightIcon className="w-4 h-4 ml-1" />
@@ -226,10 +226,10 @@ const EditHouseContent = ({
               <button
                 onClick={handleNextClick}
                 disabled={selectedTab === 'finalSubmit' || isSaving}
-                className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center ${
+                className={`btn flex text-sm py-1 lg:py-1.5 lg:text-md items-center hover:bg-primary-500 ${
                   selectedTab === 'finalSubmit' || isSaving
                     ? ' bg-primary-100 cursor-not-allowed'
-                    : 'bg-primary-500'
+                    : 'bg-primary-400'
                 }`}
               >
                 صفحه بعد

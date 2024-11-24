@@ -50,7 +50,7 @@ function EditHouseSidebar({ setSelectedTab, selectedTab, tabSections }) {
                         <div
                           key={keyObj.key}
                           className={`tab my-1 cursor-pointer ${
-                            selectedTab === keyObj.key ? 'tab-selected bg-primary-500' : 'tab-hover'
+                            selectedTab === keyObj.key ? 'tab-selected bg-primary-300' : 'tab-hover'
                           }`}
                           onClick={() => handleChildClick(keyObj.key, section.label)}
                         >

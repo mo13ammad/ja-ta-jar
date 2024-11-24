@@ -3,7 +3,7 @@ import React from 'react';
 function HouseStructure({ houseStructure }) {
  
   return (
-    <div className="flex items-center mr-3 gap-0.5 py-1 px-2 lg:p-2 mb-0.5 rounded-2xl bg-secondary-100 shadow-centered">
+    <div className="flex items-center mr-3 gap-0.5 py-1 px-2 lg:p-2 mb-0.5 rounded-2xl bg-primary-50 shadow-centered">
       <img
         src={houseStructure.icon}
         alt={houseStructure.label}

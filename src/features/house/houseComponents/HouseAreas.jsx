@@ -5,7 +5,7 @@ const HouseAreas = ({houseAreas}) => {
   const areas = houseAreas || [] ;
   return (
     <div>
-        <p>بافت محیط :</p>
+        <p className='font-bold'>بافت محیط :</p>
     <div className="flex flex-wrap w-full gap-1 my-1">
         
       {areas.map((item, index) => (
