@@ -11,6 +11,7 @@ import Loading from '../../ui/Loading';
 
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
+import HouseDescribtion from './houseComponents/HouseDescribtion';
 
 function HouseContainer() {
   const { uuid } = useParams();
@@ -21,13 +22,13 @@ function HouseContainer() {
     isLoading: loadingHouse,
   } = useShowHouse(uuid);
 
-  // Redirect if the house is not published
-  useEffect(() => {
-    if (!loadingHouse && houseData && houseData.status.key !== "Publish") {
-      toast.error("اطلاعات اقامتگاه موجود نمیباشد.")
-      navigate("/");
-    }
-  }, [loadingHouse, houseData, navigate]);
+  // // Redirect if the house is not published
+  // useEffect(() => {
+  //   if (!loadingHouse && houseData && houseData.status.key !== "Publish") {
+  //     toast.error("اطلاعات اقامتگاه موجود نمیباشد.")
+  //     navigate("/");
+  //   }
+  // }, [loadingHouse, houseData, navigate]);
 
   // Show loading screen while fetching house data
   if (loadingHouse) {
@@ -48,6 +49,7 @@ function HouseContainer() {
         <HouseImages houseData={houseData} />
         <HouseHeader houseData={houseData} />
       </div>
+      <HouseDescribtion  houseData={houseData}/>
       <HouseReservation />
       <HouseFacilitties />
       <HouseRules />

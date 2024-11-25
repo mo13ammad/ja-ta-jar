@@ -31,6 +31,10 @@ function HouseHeader({houseData}) {
       </div>
     </div>
       <div className="w-full flex flex-col gap-2 md:gap-3">
+       <HouseAreas houseAreas={houseData.areas}/>  
+      <HouseViews houseViews={houseData.views.types}/>  
+      <div className="flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-6 md:items-center">
+       <HouseArrivals arrivals={houseData.arrivals} tip={houseData.tip} structure={houseData.structure}  />  
         {/* Tip Section */}
       { (
         <div  className='w-1/2 xs:w-auto lg:w-1/2 xl:w-auto'>
@@ -50,10 +54,7 @@ function HouseHeader({houseData}) {
           </div>
         </div>
       )}
-       <HouseAreas houseAreas={houseData.areas}/>  
-      <HouseViews houseViews={houseData.views.types}/>  
-       <HouseArrivals arrivals={houseData.arrivals} tip={houseData.tip} structure={houseData.structure}  />  
-      
+      </div>
       </div>
     </div>
   );
