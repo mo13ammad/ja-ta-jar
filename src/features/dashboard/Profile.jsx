@@ -7,6 +7,7 @@ import Loading from '../../ui/Loading.jsx';
 import { becomeVendor, getUser } from '../../services/userService';
 import dayjs from 'dayjs';
 import jalaliday from 'jalaliday';
+import toPersianNumber from '../../utils/toPersianNumber.js';
 
 dayjs.extend(jalaliday);
 
@@ -48,7 +49,7 @@ const Profile = ({ user, onUpdateUser }) => {
 
   const cityName = user?.city?.name || 'شهر نامشخص';
   const sexLabel = user?.sex?.label || 'جنسیت نامشخص';
-  const birthDate = formatPersianDate(user?.birth_date);
+  const birthDate =toPersianNumber( formatPersianDate(user?.birth_date));
   const isVendor = user?.type === 'Vendor';
   const isAdmin = user?.type === 'Admin';
 
@@ -58,10 +59,10 @@ const Profile = ({ user, onUpdateUser }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-6">
         <UserInfo label="نام و نام خانوادگی :" value={user?.name || 'اطلاعاتی وارد نشده'} />
         <UserInfo label="ایمیل :" value={user?.email || 'اطلاعاتی وارد نشده'} />
-        <UserInfo label="شماره تلفن همراه :" value={user?.phone || 'اطلاعاتی وارد نشده'} />
-        <UserInfo label="کدملی :" value={user?.national_code || 'اطلاعاتی وارد نشده'} />
+        <UserInfo label="شماره تلفن همراه :" value={toPersianNumber(user?.phone) || 'اطلاعاتی وارد نشده'} />
+        <UserInfo label="کدملی :" value={toPersianNumber(user?.national_code) || 'اطلاعاتی وارد نشده'} />
         <UserInfo label="شهر :" value={cityName} />
-        <UserInfo label="شماره تلفن همراه دوم :" value={user?.second_phone || 'اطلاعاتی وارد نشده'} />
+        <UserInfo label="شماره تلفن همراه دوم :" value={toPersianNumber(user?.second_phone )|| 'اطلاعاتی وارد نشده'} />
         <UserInfo label="تاریخ تولد :" value={birthDate} />
         <UserInfo label="جنسیت :" value={sexLabel} />
         <UserInfo label="درباره شما :" value={user?.bio || 'اطلاعاتی وارد نشده'} />

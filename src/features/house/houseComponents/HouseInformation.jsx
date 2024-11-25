@@ -1,5 +1,6 @@
 import { MapPinIcon, StarIcon } from '@heroicons/react/24/solid';
 import React from 'react';
+import toPersianNumber from '../../../utils/toPersianNumber';
 
 function HouseInformation({ houseData }) {
   const city = houseData?.address?.city?.name || 'نامشخص';
@@ -20,7 +21,7 @@ function HouseInformation({ houseData }) {
         <StarIcon className="h-5 w-5 text-primary-600" />
         <StarIcon className="h-5 w-5 text-primary-200" />
         
-        <p className="text-primary-800 px-1 py-0.5">۴,۱</p>
+        <p className="text-primary-800 px-1 py-0.5">{toPersianNumber(4.1)}</p>
       </div>
     </div>
   );

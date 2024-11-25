@@ -6,6 +6,7 @@ import HouseViews from './houseComponents/HouseViews';
 
 import HouseArrivals from "./houseComponents/HouseArrivals";
 import HouseStructure from "./houseComponents/HouseStructure";
+import toPersianNumber from "../../utils/toPersianNumber";
 
 
 function HouseHeader({houseData}) {
@@ -16,7 +17,7 @@ function HouseHeader({houseData}) {
         <h1 className="text-xl xs:text-2xl  font-bold mb-1.5 w-full md:w-auto">
           {houseData?.name ?? 'نام اقامتگاه مشخص نشده است'}
         </h1>      
-          <p className="text-sm bg-primary-50 px-2 flex items-center mb-1 justify-center pt-1 rounded-2xl">{houseData.uuid}</p>  
+          <p className="text-sm bg-primary-50 px-2 flex items-center mb-1 justify-center pt-1 rounded-2xl">{toPersianNumber(houseData.uuid)}</p>  
       </div>
    
       {/* City and Province */}
