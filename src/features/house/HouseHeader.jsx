@@ -3,10 +3,10 @@ import HouseVendorBadge from "./houseComponents/HouseVendorBadge";
 
 import HouseInformation from "./houseComponents/HouseInformation";
 import HouseViews from './houseComponents/HouseViews';
-import HouseAreas from "./houseComponents/HouseAreas";
+
 import HouseArrivals from "./houseComponents/HouseArrivals";
 import HouseStructure from "./houseComponents/HouseStructure";
-import HouseCode from "./houseComponents/HouseCode";
+
 
 function HouseHeader({houseData}) {
  
@@ -31,29 +31,9 @@ function HouseHeader({houseData}) {
       </div>
     </div>
       <div className="w-full flex flex-col gap-2 md:gap-3">
-       <HouseAreas houseAreas={houseData.areas}/>  
       <HouseViews houseViews={houseData.views.types}/>  
       <div className="flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-6 md:items-center">
        <HouseArrivals arrivals={houseData.arrivals} tip={houseData.tip} structure={houseData.structure}  />  
-        {/* Tip Section */}
-      { (
-        <div  className='w-1/2 xs:w-auto lg:w-1/2 xl:w-auto'>
-          <div className="flex items-center gap-1 mb-2">
-            <p className='font-bold'>نوع اقامتگاه :</p>
-          </div>
-          <div className='flex gap-1'>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-primary-50 shadow-centered">
-            <img src={houseData.structure.icon} alt={houseData.structure.label} className="w-6 h-6" />
-            <span className="font-medium">{houseData.structure.label}</span>
-          </div>
-          <div className="flex items-center gap-1 px-2 py-1 rounded-2xl bg-primary-50 shadow-centered">
-            <img src={houseData.tip.icon} alt={houseData.tip.label} className="w-6 h-6" />
-            <span className="font-medium truncate">{houseData.tip.label}</span>
-          </div>
-         
-          </div>
-        </div>
-      )}
       </div>
       </div>
     </div>

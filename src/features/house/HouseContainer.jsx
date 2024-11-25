@@ -12,6 +12,7 @@ import Loading from '../../ui/Loading';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import HouseDescribtion from './houseComponents/HouseDescribtion';
+import HouseSpace from './houseComponents/HouseSpace';
 
 function HouseContainer() {
   const { uuid } = useParams();
@@ -50,6 +51,7 @@ function HouseContainer() {
         <HouseHeader houseData={houseData} />
       </div>
       <HouseDescribtion  houseData={houseData}/>
+      <HouseSpace houseData={houseData}/>
       <HouseReservation />
       <HouseFacilitties />
       <HouseRules />
