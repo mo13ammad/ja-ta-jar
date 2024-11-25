@@ -11,9 +11,9 @@ import HouseStructure from "./houseComponents/HouseStructure";
 function HouseHeader({houseData}) {
  
   return (
-    <div className="w-full flex flex-col gap-1 lg:gap-2 justify-start items-start  lg:w-1/3 ">
+    <div className="w-full flex flex-col gap-1 lg:gap-2 justify-start items-start px-2  lg:w-1/3 ">
       <div className="flex  items-center p-1 gap-1">
-        <h1 className="text-2xl font-bold mb-1.5 w-full md:w-auto">
+        <h1 className="text-xl xs:text-2xl  font-bold mb-1.5 w-full md:w-auto">
           {houseData?.name ?? 'نام اقامتگاه مشخص نشده است'}
         </h1>      
           <p className="text-sm bg-primary-50 px-2 flex items-center mb-1 justify-center pt-1 rounded-2xl">{houseData.uuid}</p>  

@@ -13,10 +13,11 @@ import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import HouseDescribtion from './houseComponents/HouseDescribtion';
 import HouseSpace from './houseComponents/HouseSpace';
+import CalenderContainer from '../calender/CalenderContainer';
 
 function HouseContainer() {
-  const { uuid } = useParams();
   const navigate = useNavigate();
+  const { uuid } = useParams();
 
   const {
     data: houseData,
@@ -45,7 +46,7 @@ function HouseContainer() {
 
   // Render the house details
   return (
-    <div className="mt-7 lg:mt-0 flex items-start flex-col bg-gray-100 shadow-centered rounded-2xl p-1 md:p-2"> 
+    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl p-1 md:p-2"> 
       <div className="w-full flex lg:flex-row-reverse gap-1 flex-col">
         <HouseImages houseData={houseData} />
         <HouseHeader houseData={houseData} />
@@ -57,6 +58,7 @@ function HouseContainer() {
       <HouseRules />
       <HouseLocation />
       <HouseComments />
+      {/* <CalenderContainer /> */}
     </div>
   );
 }

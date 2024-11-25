@@ -4,15 +4,15 @@ function HouseSpace({ houseData }) {
   const { structure, reservation,areas } = houseData;
 
   return (
-    <div className="rounded-xl w-full">
+    <div className=" w-full px-2">
       {/* Title */}
       <h3 className="text-lg font-bold text-gray-800 mb-2">فضای اقامتگاه :</h3>
 
       {/* Content Section */}
-      <div className="flex  gap-7 px-1 ">
+      <div className="flex flex-row gap-5 xs:gap-7  px-1 ">
         {/* Standard Capacity */}
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col w-1/2 lg:w-auto   gap-2">
         <div className="flex items-center gap-3">
           <strong className="text-gray-700">ظرفیت استاندارد:</strong>
           <span>{reservation?.capacity?.normal || "نامشخص"} نفر</span>
@@ -31,7 +31,7 @@ function HouseSpace({ houseData }) {
 
         </div>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col w-1/2 lg:w-auto gap-2">
         {/* Maximum Capacity */}
         <div className="flex items-center gap-3">
           <strong className="text-gray-700">حداکثر ظرفیت:</strong>

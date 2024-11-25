@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-import tailwindFormPlugin from "@tailwindcss/forms"
+const plugin = require('tailwindcss/plugin');
+const tailwindFormPlugin = require('@tailwindcss/forms');
 
 function withOpacity(variableName) {
   return ({ opacityValue }) => {
@@ -17,6 +18,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        '3xs': '0.5rem', // Custom 3xs size (8px)
+        '2xs': '0.625rem', // Custom 2xs size (10px)
+        md: '0.9375rem', // 15px
+      },
       screens: {
         xs: '420px', // Replace 480px with your desired breakpoint value
       },
@@ -25,7 +31,6 @@ module.exports = {
       },
       colors: {
         primary: {
-          
           800: withOpacity("--color-primary-800"),
           700: withOpacity("--color-primary-700"),
           600: withOpacity("--color-primary-600"),
@@ -56,19 +61,30 @@ module.exports = {
       fontFamily: {
         sans: ["iransans", "Arial", "sans-serif"],
       },
-      container:{
-        center:true,
+      container: {
+        center: true,
         padding: "1rem",
-        
-      }
+      },
     },
   },
   plugins: [
-    require('@tailwindcss/forms')({
+    tailwindFormPlugin({
       strategy: 'class', // only generate classes
     }),
     require('tailwind-scrollbar')({ nocompatible: true }),
-   
+    plugin(function ({ addUtilities }) {
+      const persianNumberStyles = {
+        '.persian-numbers': {
+          fontVariantNumeric: 'normal', // Disable automatic numeric shaping
+          unicodeBidi: 'isolate',
+          direction: 'ltr',
+        },
+        '.persian-numbers::before': {
+          content: `'۰۱۲۳۴۵۶۷۸۹'`,
+        },
+      };
+
+      addUtilities(persianNumberStyles, ['responsive', 'hover']);
+    }),
   ],
-  
-}
+};

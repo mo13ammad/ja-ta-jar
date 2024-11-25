@@ -11,7 +11,7 @@ function AppLayout() {
     <>
       <div className="w-full relative min-h-screen">
         <Header />
-        <div className="container xl:max-w-8xl min-h-[85vh] pt-12 md:pt-8 flex flex-col">
+        <div className="md:container xl:max-w-8xl min-h-[85vh] pt-12 md:pt-8 flex flex-col">
           <Outlet />
         </div>
       </div>
