@@ -1,7 +1,7 @@
-import React from 'react';
+import React from "react";
 import logo from "../../../public/assets/jatajarlogo.webp";
-import TextField from '../../ui/TextField';
-import Loading from '../../ui/Loading';
+import TextField from "../../ui/TextField";
+import Loading from "../../ui/Loading";
 
 function SendOTPForm({ phone, onChange, onSubmit, loading, error }) {
   return (
@@ -24,7 +24,10 @@ function SendOTPForm({ phone, onChange, onSubmit, loading, error }) {
           {loading ? (
             <Loading />
           ) : (
-            <button className="btn hover:bg-primary-700 bg-primary-600 w-full" type="submit">
+            <button
+              className="btn hover:bg-primary-700 bg-primary-600 w-full"
+              type="submit"
+            >
               ارسال کد تایید
             </button>
           )}
@@ -33,7 +36,7 @@ function SendOTPForm({ phone, onChange, onSubmit, loading, error }) {
         {error && <p className="text-red-500 mb-2">{error}</p>}
 
         <p className="text-xs opacity-80 leading-normal">
-          ثبت نام یا ورود شما به معنی پذیرش قوانین جات اجار مبیاشد 
+          ثبت نام یا ورود شما به معنی پذیرش قوانین جات اجار مبیاشد
         </p>
       </form>
     </div>

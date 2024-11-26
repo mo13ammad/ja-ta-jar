@@ -1,9 +1,9 @@
 // src/features/dashboard/DashboardContent.jsx
 
-import React, { useState, useEffect } from 'react';
-import Profile from './Profile';
-import EditProfile from './EditProfile';
-import Houses from './Houses';
+import React, { useState, useEffect } from "react";
+import Profile from "./Profile";
+import EditProfile from "./EditProfile";
+import Houses from "./Houses";
 
 const DashboardContent = ({ selectedTab, initialUser, onUpdateUser }) => {
   const [user, setUser] = useState(initialUser);
@@ -15,23 +15,23 @@ const DashboardContent = ({ selectedTab, initialUser, onUpdateUser }) => {
 
   const renderContent = () => {
     switch (selectedTab) {
-      case 'profile':
+      case "profile":
         return <Profile user={user} onUpdateUser={onUpdateUser} />;
-      case 'editProfile':
+      case "editProfile":
         return <EditProfile user={user} onUpdateUser={onUpdateUser} />;
-      case 'houses':
-        return user?.type === 'Vendor' ? (
+      case "houses":
+        return user?.type === "Vendor" ? (
           <Houses user={user} />
         ) : (
           <div className="text-center text-red-500">شما میزبان نیستید</div>
         );
-      case 'wallet':
+      case "wallet":
         return <div>کیف پول - Wallet Content Placeholder</div>;
-      case 'favorites':
+      case "favorites":
         return <div>علاقه مندی ها - Favorites Content Placeholder</div>;
-      case 'inviteFriends':
+      case "inviteFriends":
         return <div>دعوت از دوستان - Invite Friends Content Placeholder</div>;
-      case 'reserves':
+      case "reserves":
         return <div>رزرو ها - Reserves Content Placeholder</div>;
       default:
         return <Profile user={user} onUpdateUser={onUpdateUser} />;

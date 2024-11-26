@@ -1,19 +1,23 @@
 // src/components/edithouse-components/EditHouseRooms.jsx
 
-import React, { useState, useEffect } from 'react';
-import { Disclosure, Dialog } from '@headlessui/react';
-import Spinner from '../../../../ui/Loading';
-import TextField from '../../../../ui/TextField';
-import TextArea from '../../../../ui/TextArea';
-import ToggleSwitch from '../../../../ui/ToggleSwitch';
-import ToggleSwitchGroup from '../../../../ui/ToggleSwitchGroup';
-import NumberField from '../../../../ui/NumberField'; // Import NumberField
+import React, { useState, useEffect } from "react";
+import { Disclosure, Dialog } from "@headlessui/react";
+import Spinner from "../../../../ui/Loading";
+import TextField from "../../../../ui/TextField";
+import TextArea from "../../../../ui/TextArea";
+import ToggleSwitch from "../../../../ui/ToggleSwitch";
+import ToggleSwitchGroup from "../../../../ui/ToggleSwitchGroup";
+import NumberField from "../../../../ui/NumberField"; // Import NumberField
 import {
   useFetchRoomFacilities,
   useFetchCoolingAndHeatingOptions,
-} from '../../../../services/fetchDataService';
-import { toast } from 'react-hot-toast';
-import { createRoom, editRoom, deleteRoom } from '../../../../services/houseService';
+} from "../../../../services/fetchDataService";
+import { toast } from "react-hot-toast";
+import {
+  createRoom,
+  editRoom,
+  deleteRoom,
+} from "../../../../services/houseService";
 
 const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const [rooms, setRooms] = useState([]);
@@ -25,24 +29,25 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [expandedRoomIndex, setExpandedRoomIndex] = useState(null);
 
-  const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchRoomFacilities();
+  const { data: facilitiesData = [], isLoading: loadingFacilities } =
+    useFetchRoomFacilities();
   const { data: airConditionData = [], isLoading: loadingAirConditions } =
     useFetchCoolingAndHeatingOptions();
 
   useEffect(() => {
     if (houseData?.room) {
       const initialRooms = houseData.room.map((room) => ({
-        roomName: room.name || '',
+        roomName: room.name || "",
         isMasterRoom: room.is_master || false,
         numberSingleBeds: room.number_single_beds ?? 0, // Default to 0
         numberDoubleBeds: room.number_double_beds ?? 0, // Default to 0
         numberSofaBeds: room.number_sofa_beds ?? 0, // Default to 0
         numberFloorService: room.number_floor_service ?? 0, // Default to 0
-        description: room.description || '',
+        description: room.description || "",
         selectedFacilities: room.facilities?.map((f) => f.key) || [],
         selectedAirConditions: room.airConditions?.map((a) => a.key) || [],
         isLivingRoom: room.is_living_room || false,
-        quantity: room.quantity ?? '', // Default to empty string
+        quantity: room.quantity ?? "", // Default to empty string
         uuid: room.uuid || null,
         hasUnsavedChanges: false,
       }));
@@ -54,17 +59,17 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const addRoom = (isLivingRoom = false) => {
     setRooms((prevRooms) => [
       {
-        roomName: '',
+        roomName: "",
         isMasterRoom: false,
         numberSingleBeds: 0, // Default to 0
         numberDoubleBeds: 0, // Default to 0
         numberSofaBeds: 0, // Default to 0
         numberFloorService: 0, // Default to 0
-        description: '',
+        description: "",
         selectedFacilities: [],
         selectedAirConditions: [],
         isLivingRoom,
-        quantity: houseData.is_rent_room ? '' : null, // Default to empty string
+        quantity: houseData.is_rent_room ? "" : null, // Default to empty string
         uuid: null,
         hasUnsavedChanges: true,
       },
@@ -77,8 +82,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   const handleInputChange = (index, key, value) => {
     setRooms((prevRooms) =>
       prevRooms.map((room, i) =>
-        i === index ? { ...room, [key]: value, hasUnsavedChanges: true } : room
-      )
+        i === index ? { ...room, [key]: value, hasUnsavedChanges: true } : room,
+      ),
     );
     setFieldErrors((prevErrors) => ({
       ...prevErrors,
@@ -87,7 +92,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
   };
 
   const toggleSelection = (index, type, key) => {
-    const keyName = type === 'facility' ? 'selectedFacilities' : 'selectedAirConditions';
+    const keyName =
+      type === "facility" ? "selectedFacilities" : "selectedAirConditions";
     setRooms((prevRooms) =>
       prevRooms.map((room, i) =>
         i === index
@@ -98,8 +104,8 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                 : [...room[keyName], key],
               hasUnsavedChanges: true,
             }
-          : room
-      )
+          : room,
+      ),
     );
   };
 
@@ -117,7 +123,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       facilities: roomData.selectedFacilities,
       airConditions: roomData.selectedAirConditions,
       quantity: houseData.is_rent_room
-        ? roomData.quantity === ''
+        ? roomData.quantity === ""
           ? null
           : parseInt(roomData.quantity, 10)
         : undefined,
@@ -133,17 +139,19 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         await createRoom(houseId, payload);
       }
       await refetchHouseData();
-      toast.success('اتاق با موفقیت ثبت شد');
+      toast.success("اتاق با موفقیت ثبت شد");
       setRooms((prevRooms) =>
-        prevRooms.map((room, i) => (i === index ? { ...room, hasUnsavedChanges: false } : room))
+        prevRooms.map((room, i) =>
+          i === index ? { ...room, hasUnsavedChanges: false } : room,
+        ),
       );
     } catch (error) {
       if (error.response?.status === 422) {
         const errors = error.response.data.errors.fields;
         setFieldErrors(errors);
-        toast.error('لطفاً خطاهای فرم را بررسی کنید');
+        toast.error("لطفاً خطاهای فرم را بررسی کنید");
       } else {
-        toast.error('خطا در ثبت اتاق');
+        toast.error("خطا در ثبت اتاق");
       }
     } finally {
       setLoadingSubmit(false);
@@ -170,10 +178,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
       await deleteRoom(houseId, roomData.uuid);
       await refetchHouseData();
       setRooms((prevRooms) => prevRooms.filter((_, i) => i !== deleteIndex));
-      toast.success('اتاق با موفقیت حذف شد');
+      toast.success("اتاق با موفقیت حذف شد");
       if (roomData.isLivingRoom) setHasLivingRoom(false);
     } catch (error) {
-      toast.error('خطا در حذف اتاق');
+      toast.error("خطا در حذف اتاق");
     } finally {
       setLoadingDelete(false);
       setIsModalOpen(false);
@@ -212,7 +220,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
           <button
             onClick={() => addRoom(true)}
             className={`bg-primary-600 text-xs md:text-sm cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered ${
-              hasLivingRoom ? 'opacity-50 cursor-not-allowed' : ''
+              hasLivingRoom ? "opacity-50 cursor-not-allowed" : ""
             }`}
             disabled={hasLivingRoom}
           >
@@ -240,12 +248,14 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                       </span>
                     )}
                     {room.hasUnsavedChanges && (
-                      <span className="mr-2 text-red-500 text-xs">* تغییرات ذخیره نشده</span>
+                      <span className="mr-2 text-red-500 text-xs">
+                        * تغییرات ذخیره نشده
+                      </span>
                     )}
                   </span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${
-                      open ? 'rotate-180' : 'rotate-0'
+                      open ? "rotate-180" : "rotate-0"
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -265,7 +275,9 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     label="نام اتاق"
                     name="roomName"
                     value={room.roomName}
-                    onChange={(e) => handleInputChange(index, 'roomName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "roomName", e.target.value)
+                    }
                     placeholder="نام اتاق"
                     error={fieldErrors.roomName}
                   />
@@ -275,7 +287,9 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                       label="تعداد موجود از این اتاق"
                       name="quantity"
                       value={room.quantity}
-                      onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(index, "quantity", e.target.value)
+                      }
                       error={fieldErrors.quantity}
                       placeholder="تعداد موجود از این اتاق"
                     />
@@ -285,7 +299,11 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     <ToggleSwitch
                       checked={room.isMasterRoom}
                       onChange={() =>
-                        handleInputChange(index, 'isMasterRoom', !room.isMasterRoom)
+                        handleInputChange(
+                          index,
+                          "isMasterRoom",
+                          !room.isMasterRoom,
+                        )
                       }
                       label="اتاق مستر می باشد"
                     />
@@ -295,7 +313,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     label="تعداد تخت‌های یک نفره"
                     name="numberSingleBeds"
                     value={room.numberSingleBeds}
-                    onChange={(e) => handleInputChange(index, 'numberSingleBeds', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "numberSingleBeds",
+                        e.target.value,
+                      )
+                    }
                     errorMessages={fieldErrors.number_single_beds}
                     min="0"
                   />
@@ -304,7 +328,13 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     label="تعداد تخت‌های دو نفره"
                     name="numberDoubleBeds"
                     value={room.numberDoubleBeds}
-                    onChange={(e) => handleInputChange(index, 'numberDoubleBeds', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "numberDoubleBeds",
+                        e.target.value,
+                      )
+                    }
                     errorMessages={fieldErrors.number_double_beds}
                     min="0"
                   />
@@ -313,7 +343,9 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     label="تعداد مبل‌های تخت خواب شو"
                     name="numberSofaBeds"
                     value={room.numberSofaBeds}
-                    onChange={(e) => handleInputChange(index, 'numberSofaBeds', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "numberSofaBeds", e.target.value)
+                    }
                     min="0"
                   />
 
@@ -322,7 +354,11 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     name="numberFloorService"
                     value={room.numberFloorService}
                     onChange={(e) =>
-                      handleInputChange(index, 'numberFloorService', e.target.value)
+                      handleInputChange(
+                        index,
+                        "numberFloorService",
+                        e.target.value,
+                      )
                     }
                     min="0"
                   />
@@ -331,21 +367,25 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                     label="امکانات"
                     options={facilitiesData}
                     selectedOptions={room.selectedFacilities}
-                    onChange={(key) => toggleSelection(index, 'facility', key)}
+                    onChange={(key) => toggleSelection(index, "facility", key)}
                   />
 
                   <ToggleSwitchGroup
                     label="امکانات سرمایشی و گرمایشی"
                     options={airConditionData}
                     selectedOptions={room.selectedAirConditions}
-                    onChange={(key) => toggleSelection(index, 'airCondition', key)}
+                    onChange={(key) =>
+                      toggleSelection(index, "airCondition", key)
+                    }
                   />
 
                   <TextArea
                     label="توضیحات"
                     name="description"
                     value={room.description}
-                    onChange={(e) => handleInputChange(index, 'description', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(index, "description", e.target.value)
+                    }
                     placeholder="توضیحات اتاق"
                     className="mt-4"
                   />
@@ -357,10 +397,10 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                       disabled={loadingSubmit}
                     >
                       {loadingSubmit
-                        ? 'در حال ارسال...'
+                        ? "در حال ارسال..."
                         : room.uuid
-                        ? 'ثبت تغییرات'
-                        : 'ثبت اتاق'}
+                          ? "ثبت تغییرات"
+                          : "ثبت اتاق"}
                     </button>
 
                     <button
@@ -368,7 +408,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                       className="bg-red-500 hover:bg-red-600 btn cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered"
                       disabled={loadingDelete}
                     >
-                      {loadingDelete ? 'در حال حذف...' : 'حذف اتاق'}
+                      {loadingDelete ? "در حال حذف..." : "حذف اتاق"}
                     </button>
                   </div>
                 </Disclosure.Panel>
@@ -378,8 +418,15 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
         ))}
       </div>
 
-      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
+      <Dialog
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        className="relative z-50"
+      >
+        <div
+          className="fixed inset-0 bg-black bg-opacity-25"
+          aria-hidden="true"
+        />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <Dialog.Title className="text-lg font-medium">
@@ -397,7 +444,7 @@ const EditHouseRooms = ({ houseData, houseId, refetchHouseData }) => {
                 className="bg-red-600 cursor-pointer text-white px-4 py-2 rounded-xl shadow-xl mr-4"
                 disabled={loadingDelete}
               >
-                {loadingDelete ? 'در حال حذف...' : 'بله حذف کن'}
+                {loadingDelete ? "در حال حذف..." : "بله حذف کن"}
               </button>
             </div>
           </Dialog.Panel>

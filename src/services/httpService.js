@@ -23,7 +23,7 @@ const app = axios.create({
 
 app.interceptors.request.use(
   (config) => {
-    const match = document.cookie.match(new RegExp('(^| )authToken=([^;]+)'));
+    const match = document.cookie.match(new RegExp("(^| )authToken=([^;]+)"));
     const token = match ? match[2] : null;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -32,7 +32,7 @@ app.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 app.interceptors.response.use(
@@ -44,7 +44,7 @@ app.interceptors.response.use(
   },
   async (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 const http = {

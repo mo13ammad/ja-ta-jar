@@ -4,11 +4,11 @@ import http from "./httpService";
 
 // General House Functions
 export function getHouses(data) {
-  return http.get('/client/house', data).then(({ data }) => data.data);
+  return http.get("/client/house", data).then(({ data }) => data.data);
 }
 
 export function createHouse(data) {
-  return http.post('/client/house', data).then(({ data }) => data.data);
+  return http.post("/client/house", data).then(({ data }) => data.data);
 }
 
 export function deleteHouse(houseId) {
@@ -43,7 +43,10 @@ export function editHouse(houseId, houseData) {
 
 export function editHouseFacilities(houseId, facilitiesData) {
   if (!houseId || !facilitiesData) {
-    console.error("Missing houseId or facilitiesData:", { houseId, facilitiesData });
+    console.error("Missing houseId or facilitiesData:", {
+      houseId,
+      facilitiesData,
+    });
     throw new Error("House ID or facilities data is missing.");
   }
   return http
@@ -55,24 +58,30 @@ export function editHouseFacilities(houseId, facilitiesData) {
     });
 }
 
-
 // House Media Functions
 export function getHouseTypes(data) {
-  return http.get('/assets/types/structure/detail', data).then(({ data }) => data.data);
+  return http
+    .get("/assets/types/structure/detail", data)
+    .then(({ data }) => data.data);
 }
 
 export function createHousePicture(houseId, data) {
-  return http.post(`/client/house/${houseId}/media`, data).then(({ data }) => data.data);
+  return http
+    .post(`/client/house/${houseId}/media`, data)
+    .then(({ data }) => data.data);
 }
 
 export function deleteHousePicture(houseId, imageToDelete) {
-  return http.delete(`/client/house/${houseId}/media/${imageToDelete}`).then(({ data }) => data.data);
+  return http
+    .delete(`/client/house/${houseId}/media/${imageToDelete}`)
+    .then(({ data }) => data.data);
 }
 
 export function changeHouseMainPicture(houseId, imageId, data) {
-  return http.put(`/client/house/${houseId}/media/${imageId}`, data).then(({ data }) => data.data);
+  return http
+    .put(`/client/house/${houseId}/media/${imageId}`, data)
+    .then(({ data }) => data.data);
 }
-
 
 // Room Functions
 export function createRoom(houseId, roomData) {
@@ -91,7 +100,11 @@ export function createRoom(houseId, roomData) {
 
 export function editRoom(houseId, roomId, roomData) {
   if (!houseId || !roomId || !roomData) {
-    console.error("Missing houseId, roomId, or roomData:", { houseId, roomId, roomData });
+    console.error("Missing houseId, roomId, or roomData:", {
+      houseId,
+      roomId,
+      roomData,
+    });
     throw new Error("House ID, room ID, or room data is missing.");
   }
   return http
@@ -117,7 +130,6 @@ export function deleteRoom(houseId, roomId) {
     });
 }
 
-
 // Function to update house-level prices
 export function updateHousePrice(houseId, prices) {
   if (!houseId || !prices) {
@@ -137,7 +149,11 @@ export function updateHousePrice(houseId, prices) {
 // Function to update room-specific prices
 export function updateRoomPrice(houseId, roomId, prices) {
   if (!houseId || !roomId || !prices) {
-    console.error("Missing houseId, roomId, or prices:", { houseId, roomId, prices });
+    console.error("Missing houseId, roomId, or prices:", {
+      houseId,
+      roomId,
+      prices,
+    });
     throw new Error("House ID, room ID, or prices data is missing.");
   }
 
@@ -150,12 +166,13 @@ export function updateRoomPrice(houseId, roomId, prices) {
     });
 }
 
-
-
 // Function to upload a document for a house
 export function uploadHouseDocument(houseId, documentData) {
   if (!houseId || !documentData) {
-    console.error("Missing houseId or documentData:", { houseId, documentData });
+    console.error("Missing houseId or documentData:", {
+      houseId,
+      documentData,
+    });
     throw new Error("House ID or document data is missing.");
   }
 
@@ -174,15 +191,13 @@ export function uploadHouseDocument(houseId, documentData) {
     });
 }
 
-
-
 // Function to publish a house
 export function publishHouse(houseId) {
   if (!houseId) {
     console.error("Missing houseId:", { houseId });
     throw new Error("House ID is missing.");
   }
-  
+
   return http
     .put(`/client/house/${houseId}/publish`)
     .then(({ data }) => data.data)

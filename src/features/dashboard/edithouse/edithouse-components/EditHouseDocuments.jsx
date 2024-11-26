@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation } from "@tanstack/react-query";
 import { uploadHouseDocument } from "../../../../services/houseService";
 
 const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
@@ -16,7 +16,7 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
   // Function to display errors based on error.response.data.message
   const displayError = (error) => {
     const errorMessage =
-      error.response?.data?.message || error.message || 'خطایی رخ داده است';
+      error.response?.data?.message || error.message || "خطایی رخ داده است";
     toast.error(errorMessage);
   };
 
@@ -53,14 +53,16 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
   const handleSubmitAll = async () => {
     setLoading(true);
 
-    const uploadPromises = Object.entries(documentFiles).map(([documentType, file]) =>
-      handleDocumentUpload(documentType, file)
+    const uploadPromises = Object.entries(documentFiles).map(
+      ([documentType, file]) => handleDocumentUpload(documentType, file),
     );
 
     try {
       const results = await Promise.allSettled(uploadPromises);
 
-      const allFulfilled = results.every(result => result.status === 'fulfilled');
+      const allFulfilled = results.every(
+        (result) => result.status === "fulfilled",
+      );
       if (allFulfilled) {
         toast.success(" مدارک با موفقیت بارگذاری شدند.");
       } else {
@@ -81,23 +83,31 @@ const EditHouseDocuments = ({ houseData, houseId, refetchHouseData }) => {
       <h2 className="font-bold mb-4">مدارک مورد نیاز</h2>
 
       {houseData?.documents?.map((doc, index) => {
-
         return (
           <div key={`${doc.type.key}-${index}`} className="mb-6">
-            <div className="flex gap-2 m-1"> 
-              <img src={doc?.type?.icon} alt={`${doc?.type?.label} icon`} className="w-6 h-6" />
-              <label className="block font-medium mb-1">{doc?.type?.label}</label>
+            <div className="flex gap-2 m-1">
+              <img
+                src={doc?.type?.icon}
+                alt={`${doc?.type?.label} icon`}
+                className="w-6 h-6"
+              />
+              <label className="block font-medium mb-1">
+                {doc?.type?.label}
+              </label>
             </div>
             <div className="flex items-center gap-3">
               <input
                 type="file"
                 disabled={!doc.can_edit}
                 onChange={(event) => handleDocumentChange(event, doc.type.key)}
-                className={`border rounded-lg p-2 w-full ${doc.can_edit ? 'bg-white' : 'bg-gray-200'}`}
+                className={`border rounded-lg p-2 w-full ${doc.can_edit ? "bg-white" : "bg-gray-200"}`}
               />
             </div>
             <div className="mt-1 text-sm text-gray-600">
-              وضعیت: <span className={`text-${doc.type.color}`}>{doc.status.label}</span>
+              وضعیت:{" "}
+              <span className={`text-${doc.type.color}`}>
+                {doc.status.label}
+              </span>
             </div>
           </div>
         );

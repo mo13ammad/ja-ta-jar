@@ -1,7 +1,7 @@
 // CustomInfoIcon.jsx
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
 const CustomInfoIcon = ({ tooltipText, className, ...props }) => (
   <div className="relative group">

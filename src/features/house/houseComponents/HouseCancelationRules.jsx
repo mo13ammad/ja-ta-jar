@@ -1,5 +1,5 @@
-import React from 'react';
-import { Disclosure } from '@headlessui/react';
+import React from "react";
+import { Disclosure } from "@headlessui/react";
 
 function HouseCancellationRules({ houseData }) {
   // Handle the case where cancellation_rule might be undefined
@@ -28,7 +28,7 @@ function HouseCancellationRules({ houseData }) {
               <Disclosure.Panel
                 static
                 className={`text-gray-700 text-sm overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-                  open ? 'max-h-[1000px]' : 'max-h-32'
+                  open ? "max-h-[1000px]" : "max-h-32"
                 }`}
                 dir="rtl"
               >
@@ -48,7 +48,7 @@ function HouseCancellationRules({ houseData }) {
                 className="px-4 text-primary-600 hover:underline focus:outline-none"
                 aria-expanded={open}
               >
-                {open ? 'بستن' : 'مشاهده بیشتر...'}
+                {open ? "بستن" : "مشاهده بیشتر..."}
               </Disclosure.Button>
             </div>
           </>

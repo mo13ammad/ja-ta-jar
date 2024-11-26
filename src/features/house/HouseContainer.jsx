@@ -1,31 +1,28 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import useShowHouse from './useShowHouse';
-import HouseHeader from './HouseHeader';
-import HouseComments from './houseComponents/HouseComments';
-import HouseFacilitties from './houseComponents/HouseFacilitties';
-import HouseImages from './houseComponents/HouseImages';
-import HouseLocation from './houseComponents/HouseLocation';
-import HouseReservation from './houseComponents/HouseReservation';
-import HouseRules from './houseComponents/HouseRules';
-import Loading from '../../ui/Loading';
+import { useNavigate, useParams } from "react-router-dom";
+import useShowHouse from "./useShowHouse";
+import HouseHeader from "./HouseHeader";
+import HouseComments from "./houseComponents/HouseComments";
+import HouseFacilitties from "./houseComponents/HouseFacilitties";
+import HouseImages from "./houseComponents/HouseImages";
+import HouseLocation from "./houseComponents/HouseLocation";
+import HouseReservation from "./houseComponents/HouseReservation";
+import HouseRules from "./houseComponents/HouseRules";
+import Loading from "../../ui/Loading";
 
-import toast from 'react-hot-toast';
-import { useEffect } from 'react';
-import HouseDescribtion from './houseComponents/HouseDescribtion';
-import HouseSpace from './houseComponents/HouseSpace';
-import CalenderContainer from '../calender/CalenderContainer';
-import HouseRooms from './houseComponents/HouseRooms';
-import Separator from './../../ui/Separator';
-import HouseCancelationRules from './houseComponents/HouseCancelationRules';
+import toast from "react-hot-toast";
+import { useEffect } from "react";
+import HouseDescribtion from "./houseComponents/HouseDescribtion";
+import HouseSpace from "./houseComponents/HouseSpace";
+import CalenderContainer from "../calender/CalenderContainer";
+import HouseRooms from "./houseComponents/HouseRooms";
+import Separator from "./../../ui/Separator";
+import HouseCancelationRules from "./houseComponents/HouseCancelationRules";
 
 function HouseContainer() {
   const navigate = useNavigate();
   const { uuid } = useParams();
 
-  const {
-    data: houseData,
-    isLoading: loadingHouse,
-  } = useShowHouse(uuid);
+  const { data: houseData, isLoading: loadingHouse } = useShowHouse(uuid);
 
   // // Redirect if the house is not published
   // useEffect(() => {
@@ -49,30 +46,33 @@ function HouseContainer() {
 
   // Render the house details
   return (
-    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl p-1 md:p-2"> 
+    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl p-1 md:p-2">
       <div className="w-full flex lg:flex-row-reverse gap-1 flex-col">
         <HouseImages houseData={houseData} />
         <HouseHeader houseData={houseData} />
       </div>
-      <HouseDescribtion  houseData={houseData}/>
-      <div className='w-full px-4 mb-2'>
-      <Separator/>
+      <HouseDescribtion houseData={houseData} />
+      <div className="w-full px-4 mb-2">
+        <Separator />
       </div>
-      <HouseSpace houseData={houseData}/>
-      <div className='w-full px-4 my-3'>
-      <Separator/>
+      <HouseSpace houseData={houseData} />
+      <div className="w-full px-4 my-3">
+        <Separator />
       </div>
       <HouseRooms houseData={houseData} />
-      <div className='w-full px-4 my-3'>
-      <Separator/>
+      <div className="w-full px-4 my-3">
+        <Separator />
       </div>
       <HouseFacilitties houseData={houseData} />
-      <div className='w-full px-4 my-3'>
-      <Separator/>
+      <div className="w-full px-4 my-3">
+        <Separator />
       </div>
-      <HouseCancelationRules houseData={houseData}/>
+      <HouseCancelationRules houseData={houseData} />
+      <div className="w-full px-4 my-3">
+        <Separator />
+      </div>
+      <HouseRules houseData={houseData} />
       <HouseReservation />
-      <HouseRules />
       <HouseLocation />
       <HouseComments />
       {/* <CalenderContainer /> */}

@@ -1,10 +1,10 @@
 // src/services/userService.js
 
-import http from './httpService';
+import http from "./httpService";
 
 export function getUser() {
   return http
-    .get('/client/profile')
+    .get("/client/profile")
     .then(({ data }) => data.data)
     .catch((error) => {
       // Handle errors if needed
@@ -14,7 +14,7 @@ export function getUser() {
 
 export function editUser(data) {
   return http
-    .post('/client/profile', data)
+    .post("/client/profile", data)
     .then(({ data }) => data.data)
     .catch((error) => {
       // Handle errors if needed
@@ -24,7 +24,7 @@ export function editUser(data) {
 
 export function logOutUser() {
   return http
-    .delete('/client/profile/logout')
+    .delete("/client/profile/logout")
     .then(({ data }) => data.data)
     .catch((error) => {
       // Handle errors if needed
@@ -34,7 +34,7 @@ export function logOutUser() {
 
 export function becomeVendor(data) {
   return http
-    .put('/client/profile/vendor', data)
+    .put("/client/profile/vendor", data)
     .then(({ data }) => data.data)
     .catch((error) => {
       // Handle errors if needed

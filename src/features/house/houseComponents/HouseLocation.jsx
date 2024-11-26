@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function HouseLocation() {
-  return (
-    <div></div>
-  )
+  return <div></div>;
 }
 
-export default HouseLocation
+export default HouseLocation;

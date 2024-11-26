@@ -13,22 +13,15 @@ import { useFetchWeekendOptions } from "../../../../services/fetchDataService";
 import WeekendTypeSelect from "./WeekendTypeSelect"; // Import the new component
 
 const EditHouseReservationRules = forwardRef((props, ref) => {
-  const {
-    houseData,
-    handleEditHouse,
-    loadingHouse,
-    refetchHouseData,
-  } = props;
+  const { houseData, handleEditHouse, loadingHouse, refetchHouseData } = props;
 
   const [isModified, setIsModified] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [isRefetching, setIsRefetching] = useState(false);
   const [errors, setErrors] = useState({});
   const [errorList, setErrorList] = useState([]);
-  const {
-    data: weekendOptions = [],
-    isLoading: loadingWeekendOptions,
-  } = useFetchWeekendOptions();
+  const { data: weekendOptions = [], isLoading: loadingWeekendOptions } =
+    useFetchWeekendOptions();
 
   const [formData, setFormData] = useState({
     short_term_booking_length:
@@ -39,20 +32,19 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
       houseData?.reservation?.discount?.long_term?.minimum_length_stay ?? "",
     long_term_booking_discount:
       houseData?.reservation?.discount?.long_term?.discount ?? "",
-    minimum_length_stay:
-      houseData?.reservation?.minimum_length_stay ?? {
-        all: "1",
-        Saturday: "1",
-        Sunday: "1",
-        Monday: "1",
-        Tuesday: "1",
-        Wednesday: "1",
-        Thursday: "1",
-        Friday: "1",
-      },
-      enter_from: houseData?.reservation?.timing?.enter?.from ?? "14:00",
-      enter_until: houseData?.reservation?.timing?.enter?.to ?? "23:00",
-      discharge_time: houseData?.reservation?.timing?.leave ?? "12:00",
+    minimum_length_stay: houseData?.reservation?.minimum_length_stay ?? {
+      all: "1",
+      Saturday: "1",
+      Sunday: "1",
+      Monday: "1",
+      Tuesday: "1",
+      Wednesday: "1",
+      Thursday: "1",
+      Friday: "1",
+    },
+    enter_from: houseData?.reservation?.timing?.enter?.from ?? "14:00",
+    enter_until: houseData?.reservation?.timing?.enter?.to ?? "23:00",
+    discharge_time: houseData?.reservation?.timing?.leave ?? "12:00",
     capacity: houseData?.reservation?.capacity?.normal ?? "",
     maximum_capacity: houseData?.reservation?.capacity?.maximum ?? "",
     weekendType: houseData?.weekendType?.key ?? "",
@@ -78,9 +70,6 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
   }, [houseData]);
 
   // اضافه کردن useEffect برای تنظیم مقدار پیش‌فرض enter_from
-  
-  
-  
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -139,7 +128,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
 
   const validateAndSubmit = async () => {
     if (!isModified) {
-      console.log('No changes detected, submission skipped.');
+      console.log("No changes detected, submission skipped.");
       return true;
     }
 
@@ -195,7 +184,7 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
   }));
 
   if (loadingHouse || loadingWeekendOptions || isRefetching) {
-    console.log('Loading data...');
+    console.log("Loading data...");
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <Spinner message="در حال بارگذاری..." />
@@ -222,7 +211,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           label="تعداد شب اقامت کوتاه‌مدت"
           name="short_term_booking_length"
           value={formData.short_term_booking_length ?? ""}
-          onChange={(e) => handleInputChange("short_term_booking_length", e.target.value)}
+          onChange={(e) =>
+            handleInputChange("short_term_booking_length", e.target.value)
+          }
           placeholder="تعداد شب رزرو کوتاه‌مدت"
           errorMessages={errors.short_term_booking_length}
           min="0"
@@ -232,7 +223,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           label="درصد تخفیف کوتاه‌مدت"
           name="short_term_booking_discount"
           value={formData.short_term_booking_discount ?? ""}
-          onChange={(e) => handleInputChange("short_term_booking_discount", e.target.value)}
+          onChange={(e) =>
+            handleInputChange("short_term_booking_discount", e.target.value)
+          }
           placeholder="درصد تخفیف"
           errorMessages={errors.short_term_booking_discount}
           min="0"
@@ -243,7 +236,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           label="تعداد شب اقامت بلندمدت"
           name="long_term_booking_length"
           value={formData.long_term_booking_length ?? ""}
-          onChange={(e) => handleInputChange("long_term_booking_length", e.target.value)}
+          onChange={(e) =>
+            handleInputChange("long_term_booking_length", e.target.value)
+          }
           placeholder="تعداد شب رزرو بلندمدت"
           errorMessages={errors.long_term_booking_length}
           min="0"
@@ -253,7 +248,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           label="درصد تخفیف بلندمدت"
           name="long_term_booking_discount"
           value={formData.long_term_booking_discount ?? ""}
-          onChange={(e) => handleInputChange("long_term_booking_discount", e.target.value)}
+          onChange={(e) =>
+            handleInputChange("long_term_booking_discount", e.target.value)
+          }
           placeholder="درصد تخفیف"
           errorMessages={errors.long_term_booking_discount}
           min="0"
@@ -261,7 +258,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
         />
 
         <div>
-          <label className="block text-sm xl:text-lg font-medium mb-2">زمان ورود از</label>
+          <label className="block text-sm xl:text-lg font-medium mb-2">
+            زمان ورود از
+          </label>
           <input
             type="time"
             value={formData.enter_from ?? ""}
@@ -276,7 +275,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
         </div>
 
         <div>
-          <label className="block text-sm xl:text-lg font-medium mb-2">زمان ورود تا</label>
+          <label className="block text-sm xl:text-lg font-medium mb-2">
+            زمان ورود تا
+          </label>
           <input
             type="time"
             value={formData.enter_until ?? ""}
@@ -291,17 +292,23 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
         </div>
 
         <div>
-          <label className="block text-sm xl:text-lg font-medium mb-2">زمان تخلیه</label>
+          <label className="block text-sm xl:text-lg font-medium mb-2">
+            زمان تخلیه
+          </label>
           <input
             type="time"
             value={formData.discharge_time ?? ""}
-            onChange={(e) => handleInputChange("discharge_time", e.target.value)}
+            onChange={(e) =>
+              handleInputChange("discharge_time", e.target.value)
+            }
             className={`px-3 py-1.5 border rounded-2xl bg-white shadow-centered w-full outline-none ${
               errors.discharge_time ? "border-red-500" : ""
             }`}
           />
           {errors.discharge_time && (
-            <p className="text-red-500 text-sm mt-1">{errors.discharge_time[0]}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.discharge_time[0]}
+            </p>
           )}
         </div>
 
@@ -319,7 +326,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
           name="maximum_capacity"
           type="number"
           value={formData.maximum_capacity ?? ""}
-          onChange={(e) => handleInputChange("maximum_capacity", e.target.value)}
+          onChange={(e) =>
+            handleInputChange("maximum_capacity", e.target.value)
+          }
           errorMessages={errors.maximum_capacity}
           min="1"
         />
@@ -371,7 +380,9 @@ const EditHouseReservationRules = forwardRef((props, ref) => {
                   <NumberField
                     name={`minimum_length_stay.${day.key}`}
                     value={formData.minimum_length_stay[day.key] ?? ""}
-                    onChange={(e) => handleMinimumStayChange(day.key, e.target.value)}
+                    onChange={(e) =>
+                      handleMinimumStayChange(day.key, e.target.value)
+                    }
                     placeholder={`تعداد شب برای ${day.label}`}
                     type="number"
                     className="p-1 border rounded-xl max-w-[4rem] outline-none"

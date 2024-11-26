@@ -5,18 +5,20 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
-} from 'react';
-import Spinner from '../../../../ui/Loading';
-import TextField from '../../../../ui/TextField';
-import TextArea from '../../../../ui/TextArea';
-import ToggleSwitch from '../../../../ui/ToggleSwitch';
-import { useFetchFacilities } from '../../../../services/fetchDataService';
-import { toast, Toaster } from 'react-hot-toast';
-import { editHouseFacilities } from '../../../../services/houseService';
+} from "react";
+import Spinner from "../../../../ui/Loading";
+import TextField from "../../../../ui/TextField";
+import TextArea from "../../../../ui/TextArea";
+import ToggleSwitch from "../../../../ui/ToggleSwitch";
+import { useFetchFacilities } from "../../../../services/fetchDataService";
+import { toast, Toaster } from "react-hot-toast";
+import { editHouseFacilities } from "../../../../services/houseService";
 
 const EditHouseMainFacilities = forwardRef((props, ref) => {
-  const { houseId, houseData, setHouseData, loadingHouse, refetchHouseData } = props;
-  const { data: facilitiesData = [], isLoading: loadingFacilities } = useFetchFacilities();
+  const { houseId, houseData, setHouseData, loadingHouse, refetchHouseData } =
+    props;
+  const { data: facilitiesData = [], isLoading: loadingFacilities } =
+    useFetchFacilities();
   const [selectedFacilities, setSelectedFacilities] = useState({});
   const [errors, setErrors] = useState({});
   const [errorList, setErrorList] = useState([]);
@@ -25,25 +27,32 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (houseData && facilitiesData.length > 0) {
-      const initialSelectedFacilities = facilitiesData.reduce((acc, facility) => {
-        const existingFacility = houseData.facilities?.find((f) => f.key === facility.key);
+      const initialSelectedFacilities = facilitiesData.reduce(
+        (acc, facility) => {
+          const existingFacility = houseData.facilities?.find(
+            (f) => f.key === facility.key,
+          );
 
-        acc[facility.key] = {
-          checked: !!existingFacility,
-          fields: facility.fields?.reduce((fieldAcc, field) => {
-            const existingField = existingFacility?.fields?.find(
-              (f) => f.title.trim() === field.title.trim()
-            );
-            fieldAcc[field.title.trim()] = existingField
-              ? existingField.value === "true" || existingField.value === true || existingField.value
-              : field.type === 'toggle'
-              ? false
-              : '';
-            return fieldAcc;
-          }, {}),
-        };
-        return acc;
-      }, {});
+          acc[facility.key] = {
+            checked: !!existingFacility,
+            fields: facility.fields?.reduce((fieldAcc, field) => {
+              const existingField = existingFacility?.fields?.find(
+                (f) => f.title.trim() === field.title.trim(),
+              );
+              fieldAcc[field.title.trim()] = existingField
+                ? existingField.value === "true" ||
+                  existingField.value === true ||
+                  existingField.value
+                : field.type === "toggle"
+                  ? false
+                  : "";
+              return fieldAcc;
+            }, {}),
+          };
+          return acc;
+        },
+        {},
+      );
 
       setSelectedFacilities(initialSelectedFacilities);
     }
@@ -63,7 +72,7 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
       };
     });
   };
-   console.log(houseData);
+  console.log(houseData);
   const handleInputChange = (facilityKey, fieldTitle, value) => {
     setSelectedFacilities((prevState) => {
       setIsModified(true);
@@ -82,13 +91,13 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
 
   const validateAndSubmit = async () => {
     if (!isModified) {
-      console.log('No changes detected, submission skipped.');
+      console.log("No changes detected, submission skipped.");
       return true;
     }
 
     setErrors({});
     setErrorList([]);
-    console.log('Validating and submitting data.');
+    console.log("Validating and submitting data.");
 
     setIsRefetching(true);
 
@@ -101,31 +110,34 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
             ([fieldKey, fieldValue]) => ({
               key: fieldKey.trim(),
               value:
-                typeof fieldValue === 'string' && !isNaN(fieldValue.trim())
+                typeof fieldValue === "string" && !isNaN(fieldValue.trim())
                   ? parseFloat(fieldValue.trim())
-                  : fieldValue === 'true' || fieldValue === true || fieldValue,
-            })
+                  : fieldValue === "true" || fieldValue === true || fieldValue,
+            }),
           ),
         }));
 
-      console.log('Data to send:', facilitiesDataToSend);
+      console.log("Data to send:", facilitiesDataToSend);
 
-      const updatedHouseData = await editHouseFacilities(houseId, facilitiesDataToSend);
+      const updatedHouseData = await editHouseFacilities(
+        houseId,
+        facilitiesDataToSend,
+      );
 
       if (updatedHouseData) {
         setHouseData(updatedHouseData);
-        toast.success('اطلاعات با موفقیت ثبت شد');
+        toast.success("اطلاعات با موفقیت ثبت شد");
         setIsRefetching(true);
         await refetchHouseData();
         setIsRefetching(false);
         setIsModified(false);
         return true;
       } else {
-        throw new Error('Failed to update facilities.');
+        throw new Error("Failed to update facilities.");
       }
     } catch (error) {
-      console.error('Submission Error:', error);
-      toast.error('خطایی در ثبت اطلاعات پیش آمد');
+      console.error("Submission Error:", error);
+      toast.error("خطایی در ثبت اطلاعات پیش آمد");
       setIsRefetching(false);
       return false;
     }
@@ -140,7 +152,7 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
   const rightFacilities = facilitiesData.slice(halfIndex);
 
   if (loadingHouse || loadingFacilities || isRefetching) {
-    console.log('Loading data...');
+    console.log("Loading data...");
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <Spinner />
@@ -190,7 +202,12 @@ const EditHouseMainFacilities = forwardRef((props, ref) => {
 });
 
 // Component to render each facility item
-const FacilityItem = ({ facility, selectedFacilities, toggleFacility, handleInputChange }) => (
+const FacilityItem = ({
+  facility,
+  selectedFacilities,
+  toggleFacility,
+  handleInputChange,
+}) => (
   <div className="p-2 md:p-4 rounded-xl flex flex-col shadow-centered bg-white">
     <ToggleSwitch
       checked={selectedFacilities[facility.key]?.checked || false}
@@ -198,46 +215,62 @@ const FacilityItem = ({ facility, selectedFacilities, toggleFacility, handleInpu
       label={facility.label}
       icon={facility.icon}
     />
-    {selectedFacilities[facility.key]?.checked && facility.fields && facility.fields.length > 0 && (
-      <div className="mt-4 bg-white p-2 rounded-xl">
-        {facility.fields.map((field, index) => (
-          <div key={index} className="mb-4">
-            {field.type === 'toggle' ? (
-              <ToggleSwitch
-                checked={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || false}
-                onChange={() =>
-                  handleInputChange(
-                    facility.key,
-                    field.title,
-                    !selectedFacilities[facility.key]?.fields?.[field.title.trim()]
-                  )
-                }
-                label={field.title}
-              />
-            ) : field.type === 'textarea' ? (
-              <TextArea
-                label={field.title}
-                placeholder={field.placeholder}
-                value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
-                onChange={(e) =>
-                  handleInputChange(facility.key, field.title, e.target.value)
-                }
-              />
-            ) : (
-              <TextField
-                label={field.title}
-                type={field.type === 'number' ? 'number' : 'text'}
-                placeholder={field.placeholder}
-                value={selectedFacilities[facility.key]?.fields?.[field.title.trim()] || ''}
-                onChange={(e) =>
-                  handleInputChange(facility.key, field.title, e.target.value)
-                }
-              />
-            )}
-          </div>
-        ))}
-      </div>
-    )}
+    {selectedFacilities[facility.key]?.checked &&
+      facility.fields &&
+      facility.fields.length > 0 && (
+        <div className="mt-4 bg-white p-2 rounded-xl">
+          {facility.fields.map((field, index) => (
+            <div key={index} className="mb-4">
+              {field.type === "toggle" ? (
+                <ToggleSwitch
+                  checked={
+                    selectedFacilities[facility.key]?.fields?.[
+                      field.title.trim()
+                    ] || false
+                  }
+                  onChange={() =>
+                    handleInputChange(
+                      facility.key,
+                      field.title,
+                      !selectedFacilities[facility.key]?.fields?.[
+                        field.title.trim()
+                      ],
+                    )
+                  }
+                  label={field.title}
+                />
+              ) : field.type === "textarea" ? (
+                <TextArea
+                  label={field.title}
+                  placeholder={field.placeholder}
+                  value={
+                    selectedFacilities[facility.key]?.fields?.[
+                      field.title.trim()
+                    ] || ""
+                  }
+                  onChange={(e) =>
+                    handleInputChange(facility.key, field.title, e.target.value)
+                  }
+                />
+              ) : (
+                <TextField
+                  label={field.title}
+                  type={field.type === "number" ? "number" : "text"}
+                  placeholder={field.placeholder}
+                  value={
+                    selectedFacilities[facility.key]?.fields?.[
+                      field.title.trim()
+                    ] || ""
+                  }
+                  onChange={(e) =>
+                    handleInputChange(facility.key, field.title, e.target.value)
+                  }
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
   </div>
 );
 

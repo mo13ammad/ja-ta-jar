@@ -1,23 +1,23 @@
 // src/components/edithouse-components/EditHouseImages.jsx
 
-import React, { useState, useEffect } from 'react';
-import { Dialog } from '@headlessui/react';
-import toast, { Toaster } from 'react-hot-toast';
-import Spinner from '../../../../ui/Loading';
+import React, { useState, useEffect } from "react";
+import { Dialog } from "@headlessui/react";
+import toast, { Toaster } from "react-hot-toast";
+import Spinner from "../../../../ui/Loading";
 import {
   createHousePicture,
   deleteHousePicture,
   changeHouseMainPicture,
-} from '../../../../services/houseService';
-import { useMutation } from '@tanstack/react-query';
-import ToggleSwitch from '../../../../ui/ToggleSwitch';
+} from "../../../../services/houseService";
+import { useMutation } from "@tanstack/react-query";
+import ToggleSwitch from "../../../../ui/ToggleSwitch";
 
 const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [images, setImages] = useState(houseData?.medias || []);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [isMain, setIsMain] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [imageToDelete, setImageToDelete] = useState(null);
@@ -46,7 +46,7 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
 
   const displayError = (error) => {
     const errorMessage =
-      error.response?.data?.message || error.message || 'خطایی رخ داده است';
+      error.response?.data?.message || error.message || "خطایی رخ داده است";
     toast.error(errorMessage);
   };
 
@@ -57,11 +57,11 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     {
       onSuccess: (data) => {
         setImages(data.medias);
-        toast.success('تصویر با موفقیت اضافه شد');
+        toast.success("تصویر با موفقیت اضافه شد");
         setIsOpen(false);
         setImageFile(null);
         setImagePreview(null);
-        setTitle('');
+        setTitle("");
         setIsMain(false);
         setIsLoading(true);
         refetchHouseData().then(() => {
@@ -69,21 +69,21 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         });
       },
       onError: (error) => {
-        console.error('Error adding image:', error);
+        console.error("Error adding image:", error);
         displayError(error);
       },
-    }
+    },
   );
 
   const handleAddImage = () => {
     if (!imageFile) {
-      toast.error('لطفا یک تصویر انتخاب کنید');
+      toast.error("لطفا یک تصویر انتخاب کنید");
       return;
     }
     const formData = new FormData();
-    formData.append('image', imageFile);
-    formData.append('title', title);
-    if (isMain) formData.append('main', 1);
+    formData.append("image", imageFile);
+    formData.append("title", title);
+    if (isMain) formData.append("main", 1);
 
     addImageMutation.mutate(formData);
   };
@@ -98,7 +98,7 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
       },
       onSuccess: () => {
         setImages((prev) => prev.filter((img) => img.id !== imageToDelete));
-        toast.success('تصویر با موفقیت حذف شد');
+        toast.success("تصویر با موفقیت حذف شد");
         setDeleteModalOpen(false);
         setDeleteModalLoading(false);
         setIsLoading(true);
@@ -107,11 +107,11 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         });
       },
       onError: (error) => {
-        console.error('Error deleting image:', error);
+        console.error("Error deleting image:", error);
         displayError(error);
         setDeleteModalLoading(false);
       },
-    }
+    },
   );
 
   const handleDeleteClick = (imageId) => {
@@ -127,11 +127,11 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
     async (imageId) => {
       const imageToUpdate = images.find((img) => img.id === imageId);
       if (!imageToUpdate) {
-        throw new Error('تصویر مورد نظر یافت نشد');
+        throw new Error("تصویر مورد نظر یافت نشد");
       }
 
       const data = {
-        title: imageToUpdate.title || '',
+        title: imageToUpdate.title || "",
         main: 1,
       };
 
@@ -147,23 +147,23 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
               return { ...img, main: false };
             }
             return img;
-          })
+          }),
         );
-        toast.success('تصویر اصلی تغییر کرد');
+        toast.success("تصویر اصلی تغییر کرد");
         setIsLoading(true);
         refetchHouseData().then(() => {
           setIsLoading(false);
         });
       },
       onError: (error) => {
-        console.error('Error setting image as main:', error);
+        console.error("Error setting image as main:", error);
         displayError(error);
       },
       onSettled: (data, error, variables) => {
         const imageId = variables;
         setMakeMainLoading((prev) => ({ ...prev, [imageId]: false }));
       },
-    }
+    },
   );
 
   const handleMakeMain = (imageId) => {
@@ -198,14 +198,19 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
             .filter((img) => img.main) // ابتدا فقط تصویر اصلی
             .concat(images.filter((img) => !img.main)) // سپس سایر تصاویر
             .map((image) => (
-              <div key={image.id} className="relative border rounded-2xl flex items-center">
+              <div
+                key={image.id}
+                className="relative border rounded-2xl flex items-center"
+              >
                 <img
                   src={image.media}
                   alt="House"
                   className="w-36 h-36 object-cover rounded-tl-lg"
                 />
                 <div className="p-3 w-full flex flex-col">
-                  <p className="font-semibold mb-1">عنوان: {image.title || 'بدون عنوان'}</p>
+                  <p className="font-semibold mb-1">
+                    عنوان: {image.title || "بدون عنوان"}
+                  </p>
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => handleDeleteClick(image.id)}
@@ -219,7 +224,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
                         className="text-white bg-secondary-900 rounded-2xl px-3 py-1"
                         disabled={makeMainLoading[image.id]}
                       >
-                        {makeMainLoading[image.id] ? 'در حال تبدیل...' : 'تبدیل به تصویر اصلی'}
+                        {makeMainLoading[image.id]
+                          ? "در حال تبدیل..."
+                          : "تبدیل به تصویر اصلی"}
                       </button>
                     )}
                   </div>
@@ -241,9 +248,18 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
           <Dialog.Panel className="w-full max-w-lg bg-white rounded-2xl p-6">
             <Dialog.Title>اضافه کردن تصویر</Dialog.Title>
-            <input type="file" accept="image/*" onChange={handleFileChange} className="w-full my-2" />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full my-2"
+            />
             {imagePreview && (
-              <img src={imagePreview} alt="Preview" className="w-full h-40 object-cover my-2" />
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-40 object-cover my-2"
+              />
             )}
             <input
               type="text"
@@ -274,7 +290,11 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
                 className="bg-primary-600 text-white px-4 py-2 rounded-2xl flex items-center justify-center"
                 disabled={addImageMutation.isLoading}
               >
-                {addImageMutation.isLoading ? <Spinner size={20} /> : 'اضافه کردن'}
+                {addImageMutation.isLoading ? (
+                  <Spinner size={20} />
+                ) : (
+                  "اضافه کردن"
+                )}
               </button>
             </div>
           </Dialog.Panel>
@@ -286,7 +306,9 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 p-4">
           <Dialog.Panel className="w-full max-w-md bg-white rounded-2xl p-6">
             <Dialog.Title>حذف تصویر</Dialog.Title>
-            <p className="my-4">آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟</p>
+            <p className="my-4">
+              آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟
+            </p>
             <div className="flex justify-end gap-4 mt-4">
               <button
                 onClick={() => setDeleteModalOpen(false)}
@@ -299,7 +321,7 @@ const EditHouseImages = ({ houseId, houseData, refetchHouseData }) => {
                 className="px-4 py-2 bg-red-600 text-white rounded-2xl flex items-center justify-center"
                 disabled={deleteModalLoading}
               >
-                {deleteModalLoading ? <Spinner size={20} /> : 'بله، حذفش کن'}
+                {deleteModalLoading ? <Spinner size={20} /> : "بله، حذفش کن"}
               </button>
             </div>
           </Dialog.Panel>

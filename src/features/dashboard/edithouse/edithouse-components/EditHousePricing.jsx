@@ -5,14 +5,24 @@ import TextField from "../../../../ui/TextField";
 import { toast, Toaster } from "react-hot-toast";
 import { Disclosure } from "@headlessui/react";
 import Spinner from "../../../../ui/Loading";
-import { updateHousePrice, updateRoomPrice } from "../../../../services/houseService";
+import {
+  updateHousePrice,
+  updateRoomPrice,
+} from "../../../../services/houseService";
 
-const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }) => {
+const EditHousePricing = ({
+  houseData,
+  loadingHouse,
+  houseId,
+  refetchHouseData,
+}) => {
   const [formData, setFormData] = useState({});
   const [errors, setErrors] = useState({});
   const [errorList, setErrorList] = useState([]);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
-  const [priceHandleBy, setPriceHandleBy] = useState(houseData?.price_handle_by?.key);
+  const [priceHandleBy, setPriceHandleBy] = useState(
+    houseData?.price_handle_by?.key,
+  );
 
   const placeholderText =
     priceHandleBy === "PerPerson"
@@ -23,7 +33,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
     if (!houseData) return;
 
     const formatNumber = (value) =>
-      value?.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      value
+        ?.toString()
+        .replace(/\D/g, "")
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
     setPriceHandleBy(houseData?.price_handle_by?.key);
 
@@ -38,25 +51,33 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
             weekend_spring: formatNumber(room.prices?.spring?.weekend || ""),
             holiday_spring: formatNumber(room.prices?.spring?.holiday || ""),
             peak_spring: formatNumber(room.prices?.spring?.peak || ""),
-            extra_people_spring: formatNumber(room.prices?.spring?.extra_people || ""),
+            extra_people_spring: formatNumber(
+              room.prices?.spring?.extra_people || "",
+            ),
             // Summer
             normal_summer: formatNumber(room.prices?.summer?.normal || ""),
             weekend_summer: formatNumber(room.prices?.summer?.weekend || ""),
             holiday_summer: formatNumber(room.prices?.summer?.holiday || ""),
             peak_summer: formatNumber(room.prices?.summer?.peak || ""),
-            extra_people_summer: formatNumber(room.prices?.summer?.extra_people || ""),
+            extra_people_summer: formatNumber(
+              room.prices?.summer?.extra_people || "",
+            ),
             // Autumn
             normal_autumn: formatNumber(room.prices?.autumn?.normal || ""),
             weekend_autumn: formatNumber(room.prices?.autumn?.weekend || ""),
             holiday_autumn: formatNumber(room.prices?.autumn?.holiday || ""),
             peak_autumn: formatNumber(room.prices?.autumn?.peak || ""),
-            extra_people_autumn: formatNumber(room.prices?.autumn?.extra_people || ""),
+            extra_people_autumn: formatNumber(
+              room.prices?.autumn?.extra_people || "",
+            ),
             // Winter
             normal_winter: formatNumber(room.prices?.winter?.normal || ""),
             weekend_winter: formatNumber(room.prices?.winter?.weekend || ""),
             holiday_winter: formatNumber(room.prices?.winter?.holiday || ""),
             peak_winter: formatNumber(room.prices?.winter?.peak || ""),
-            extra_people_winter: formatNumber(room.prices?.winter?.extra_people || ""),
+            extra_people_winter: formatNumber(
+              room.prices?.winter?.extra_people || "",
+            ),
           };
         }
       });
@@ -69,31 +90,41 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
         weekend_spring: formatNumber(houseData.prices.spring?.weekend || ""),
         holiday_spring: formatNumber(houseData.prices.spring?.holiday || ""),
         peak_spring: formatNumber(houseData.prices.spring?.peak || ""),
-        extra_people_spring: formatNumber(houseData.prices.spring?.extra_people || ""),
+        extra_people_spring: formatNumber(
+          houseData.prices.spring?.extra_people || "",
+        ),
         // Summer
         normal_summer: formatNumber(houseData.prices.summer?.normal || ""),
         weekend_summer: formatNumber(houseData.prices.summer?.weekend || ""),
         holiday_summer: formatNumber(houseData.prices.summer?.holiday || ""),
         peak_summer: formatNumber(houseData.prices.summer?.peak || ""),
-        extra_people_summer: formatNumber(houseData.prices.summer?.extra_people || ""),
+        extra_people_summer: formatNumber(
+          houseData.prices.summer?.extra_people || "",
+        ),
         // Autumn
         normal_autumn: formatNumber(houseData.prices.autumn?.normal || ""),
         weekend_autumn: formatNumber(houseData.prices.autumn?.weekend || ""),
         holiday_autumn: formatNumber(houseData.prices.autumn?.holiday || ""),
         peak_autumn: formatNumber(houseData.prices.autumn?.peak || ""),
-        extra_people_autumn: formatNumber(houseData.prices.autumn?.extra_people || ""),
+        extra_people_autumn: formatNumber(
+          houseData.prices.autumn?.extra_people || "",
+        ),
         // Winter
         normal_winter: formatNumber(houseData.prices.winter?.normal || ""),
         weekend_winter: formatNumber(houseData.prices.winter?.weekend || ""),
         holiday_winter: formatNumber(houseData.prices.winter?.holiday || ""),
         peak_winter: formatNumber(houseData.prices.winter?.peak || ""),
-        extra_people_winter: formatNumber(houseData.prices.winter?.extra_people || ""),
+        extra_people_winter: formatNumber(
+          houseData.prices.winter?.extra_people || "",
+        ),
       });
     }
   }, [houseData]);
 
   const handleInputChange = (key, value, roomUuid = null) => {
-    const formattedValue = value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    const formattedValue = value
+      .replace(/\D/g, "")
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
     if (houseData?.is_rent_room && roomUuid) {
       setFormData((prevData) => ({
@@ -122,11 +153,11 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
     const formattedData = Object.fromEntries(
       Object.entries(priceData)
         .filter(([key, value]) => value !== "")
-        .map(([key, value]) => [key, value.replace(/,/g, "")])
+        .map(([key, value]) => [key, value.replace(/,/g, "")]),
     );
 
     // Set default values for extra people fields if not provided
-    ['spring', 'summer', 'autumn', 'winter'].forEach((season) => {
+    ["spring", "summer", "autumn", "winter"].forEach((season) => {
       if (!formattedData[`extra_people_${season}`]) {
         formattedData[`extra_people_${season}`] = "10000";
       }
@@ -143,7 +174,9 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
       refetchHouseData();
     } catch (error) {
       if (error.response?.status === 422) {
-        const errorsArray = Object.values(error.response.data.errors.fields || {}).flat();
+        const errorsArray = Object.values(
+          error.response.data.errors.fields || {},
+        ).flat();
         setErrorList(errorsArray);
         const fieldErrors = error.response.data.errors.fields;
         const updatedErrors = {};
@@ -198,11 +231,17 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
         <h2 className="text-right font-bold lg:text-lg mb-4">قیمت‌گذاری :</h2>
 
         {houseData?.is_rent_room ? (
-          houseData.room && houseData.room.filter((room) => !room.is_living_room).length > 0 ? (
+          houseData.room &&
+          houseData.room.filter((room) => !room.is_living_room).length > 0 ? (
             houseData.room
               .filter((room) => !room.is_living_room)
               .map((room, index) => (
-                <Disclosure key={room.uuid} as="div" className="mb-2" defaultOpen={false}>
+                <Disclosure
+                  key={room.uuid}
+                  as="div"
+                  className="mb-2"
+                  defaultOpen={false}
+                >
                   {({ open }) => (
                     <>
                       <Disclosure.Button className="py-2 flex justify-between items-center w-full bg-white mt-2 shadow-centered rounded-xl px-4">
@@ -230,39 +269,99 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
                         {renderInputSection(
                           room.uuid,
                           "قیمت در تعطیلات نوروز",
-                          [{ key: "nowruz", label: "تعطیلات نوروز" }]
+                          [{ key: "nowruz", label: "تعطیلات نوروز" }],
                         )}
 
                         {renderInputSection(room.uuid, "قیمت در بهار", [
-                          { key: "normal_spring", label: "روز های اول هفته (بهار)" },
-                          { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
-                          { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
-                          { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
-                          { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
+                          {
+                            key: "normal_spring",
+                            label: "روز های اول هفته (بهار)",
+                          },
+                          {
+                            key: "weekend_spring",
+                            label: "روز های آخر هفته (بهار)",
+                          },
+                          {
+                            key: "holiday_spring",
+                            label: "روز های تعطیل (بهار)",
+                          },
+                          {
+                            key: "peak_spring",
+                            label: "روز های ایام پیک (بهار)",
+                          },
+                          {
+                            key: "extra_people_spring",
+                            label: "به ازای هر نفر اضافه (بهار)",
+                          },
                         ])}
 
                         {renderInputSection(room.uuid, "قیمت در تابستان", [
-                          { key: "normal_summer", label: "روز های اول هفته (تابستان)" },
-                          { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
-                          { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
-                          { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
-                          { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
+                          {
+                            key: "normal_summer",
+                            label: "روز های اول هفته (تابستان)",
+                          },
+                          {
+                            key: "weekend_summer",
+                            label: "روز های آخر هفته (تابستان)",
+                          },
+                          {
+                            key: "holiday_summer",
+                            label: "روز های تعطیل (تابستان)",
+                          },
+                          {
+                            key: "peak_summer",
+                            label: "روز های ایام پیک (تابستان)",
+                          },
+                          {
+                            key: "extra_people_summer",
+                            label: "به ازای هر نفر اضافه (تابستان)",
+                          },
                         ])}
 
                         {renderInputSection(room.uuid, "قیمت در پاییز", [
-                          { key: "normal_autumn", label: "روز های اول هفته (پاییز)" },
-                          { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
-                          { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
-                          { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
-                          { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
+                          {
+                            key: "normal_autumn",
+                            label: "روز های اول هفته (پاییز)",
+                          },
+                          {
+                            key: "weekend_autumn",
+                            label: "روز های آخر هفته (پاییز)",
+                          },
+                          {
+                            key: "holiday_autumn",
+                            label: "روز های تعطیل (پاییز)",
+                          },
+                          {
+                            key: "peak_autumn",
+                            label: "روز های ایام پیک (پاییز)",
+                          },
+                          {
+                            key: "extra_people_autumn",
+                            label: "به ازای هر نفر اضافه (پاییز)",
+                          },
                         ])}
 
                         {renderInputSection(room.uuid, "قیمت در زمستان", [
-                          { key: "normal_winter", label: "روز های اول هفته (زمستان)" },
-                          { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
-                          { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
-                          { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
-                          { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
+                          {
+                            key: "normal_winter",
+                            label: "روز های اول هفته (زمستان)",
+                          },
+                          {
+                            key: "weekend_winter",
+                            label: "روز های آخر هفته (زمستان)",
+                          },
+                          {
+                            key: "holiday_winter",
+                            label: "روز های تعطیل (زمستان)",
+                          },
+                          {
+                            key: "peak_winter",
+                            label: "روز های ایام پیک (زمستان)",
+                          },
+                          {
+                            key: "extra_people_winter",
+                            label: "به ازای هر نفر اضافه (زمستان)",
+                          },
                         ])}
 
                         <div className="mt-4 flex gap-2 justify-end">
@@ -277,7 +376,9 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
 
                         {errorList.length > 0 && (
                           <div className="mt-4 text-red-600">
-                            <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+                            <h3 className="font-semibold">
+                              خطاهای زیر را بررسی کنید:
+                            </h3>
                             <ul className="list-disc ml-5">
                               {errorList.map((error, index) => (
                                 <li key={index}>{error}</li>
@@ -306,7 +407,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
               { key: "weekend_spring", label: "روز های آخر هفته (بهار)" },
               { key: "holiday_spring", label: "روز های تعطیل (بهار)" },
               { key: "peak_spring", label: "روز های ایام پیک (بهار)" },
-              { key: "extra_people_spring", label: "به ازای هر نفر اضافه (بهار)" },
+              {
+                key: "extra_people_spring",
+                label: "به ازای هر نفر اضافه (بهار)",
+              },
             ])}
 
             {renderInputSection(null, "قیمت در تابستان", [
@@ -314,7 +418,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
               { key: "weekend_summer", label: "روز های آخر هفته (تابستان)" },
               { key: "holiday_summer", label: "روز های تعطیل (تابستان)" },
               { key: "peak_summer", label: "روز های ایام پیک (تابستان)" },
-              { key: "extra_people_summer", label: "به ازای هر نفر اضافه (تابستان)" },
+              {
+                key: "extra_people_summer",
+                label: "به ازای هر نفر اضافه (تابستان)",
+              },
             ])}
 
             {renderInputSection(null, "قیمت در پاییز", [
@@ -322,7 +429,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
               { key: "weekend_autumn", label: "روز های آخر هفته (پاییز)" },
               { key: "holiday_autumn", label: "روز های تعطیل (پاییز)" },
               { key: "peak_autumn", label: "روز های ایام پیک (پاییز)" },
-              { key: "extra_people_autumn", label: "به ازای هر نفر اضافه (پاییز)" },
+              {
+                key: "extra_people_autumn",
+                label: "به ازای هر نفر اضافه (پاییز)",
+              },
             ])}
 
             {renderInputSection(null, "قیمت در زمستان", [
@@ -330,7 +440,10 @@ const EditHousePricing = ({ houseData, loadingHouse, houseId, refetchHouseData }
               { key: "weekend_winter", label: "روز های آخر هفته (زمستان)" },
               { key: "holiday_winter", label: "روز های تعطیل (زمستان)" },
               { key: "peak_winter", label: "روز های ایام پیک (زمستان)" },
-              { key: "extra_people_winter", label: "به ازای هر نفر اضافه (زمستان)" },
+              {
+                key: "extra_people_winter",
+                label: "به ازای هر نفر اضافه (زمستان)",
+              },
             ])}
 
             <div className="mt-4">

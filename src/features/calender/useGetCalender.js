@@ -7,6 +7,6 @@ export default function useFetchHouse(uuid) {
     queryKey: ["get-house-calender", uuid],
     queryFn: () => getHouseCalender(uuid),
     retry: false,
-    enabled: !!uuid, 
+    enabled: !!uuid,
   });
 }

@@ -1,15 +1,23 @@
 // src/ui/TextField.jsx
 
-import React from 'react';
+import React from "react";
 
-function TextField({ label, name, value, onChange, placeholder, readOnly, errorMessages }) {
+function TextField({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  readOnly,
+  errorMessages,
+}) {
   return (
     <div className="my-1 lg:my-2">
       <label htmlFor={name} className="text-xs md:text-sm mb-1.5 font-medium">
         {label}
       </label>
       <input
-        className={`textField__input ${errorMessages ? 'border-red-500' : ''}`}
+        className={`textField__input ${errorMessages ? "border-red-500" : ""}`}
         type="text"
         id={name}
         name={name}
@@ -19,9 +27,13 @@ function TextField({ label, name, value, onChange, placeholder, readOnly, errorM
         autoComplete="off"
         readOnly={readOnly}
       />
-      {errorMessages && Array.isArray(errorMessages) && errorMessages.map((error, index) => (
-        <p key={index} className="text-red-500 text-xs mt-1">{error}</p>
-      ))}
+      {errorMessages &&
+        Array.isArray(errorMessages) &&
+        errorMessages.map((error, index) => (
+          <p key={index} className="text-red-500 text-xs mt-1">
+            {error}
+          </p>
+        ))}
     </div>
   );
 }

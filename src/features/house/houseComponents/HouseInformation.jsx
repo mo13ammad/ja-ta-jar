@@ -1,10 +1,10 @@
-import { MapPinIcon, StarIcon } from '@heroicons/react/24/solid';
-import React from 'react';
-import toPersianNumber from '../../../utils/toPersianNumber';
+import { MapPinIcon, StarIcon } from "@heroicons/react/24/solid";
+import React from "react";
+import toPersianNumber from "../../../utils/toPersianNumber";
 
 function HouseInformation({ houseData }) {
-  const city = houseData?.address?.city?.name || 'نامشخص';
-  const province = houseData?.address?.city?.province?.name || 'نامشخص';
+  const city = houseData?.address?.city?.name || "نامشخص";
+  const province = houseData?.address?.city?.province?.name || "نامشخص";
 
   return (
     <div className="flex flex-col  rounded-3xl py-1 px-3">
@@ -20,7 +20,7 @@ function HouseInformation({ houseData }) {
         <StarIcon className="h-5 w-5 text-primary-600" />
         <StarIcon className="h-5 w-5 text-primary-600" />
         <StarIcon className="h-5 w-5 text-primary-200" />
-        
+
         <p className="text-primary-800 px-1 py-0.5">{toPersianNumber(4.1)}</p>
       </div>
     </div>

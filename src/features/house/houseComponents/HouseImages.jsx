@@ -9,7 +9,8 @@ import { Dialog } from "@headlessui/react";
 function HouseImages({ houseData }) {
   // Extract the main image and media array
   const mainImage = houseData?.image;
-  const mediaImages = houseData?.galleries?.map((mediaItem) => mediaItem.media) || [];
+  const mediaImages =
+    houseData?.galleries?.map((mediaItem) => mediaItem.media) || [];
 
   // Combine main image and other media images
   const images = mainImage ? [mainImage, ...mediaImages] : mediaImages;
@@ -54,7 +55,10 @@ function HouseImages({ houseData }) {
 
       {/* Modal with Swiper */}
       <Dialog open={isOpen} onClose={closeModal} className="relative z-50">
-        <div className="fixed inset-0 bg-black bg-opacity-75" aria-hidden="true"></div>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75"
+          aria-hidden="true"
+        ></div>
         <div className="fixed inset-0 flex items-center justify-center">
           <Dialog.Panel className="w-full max-w-4xl max-h-screen mx-4 lg:mx-0">
             {/* Close Button */}

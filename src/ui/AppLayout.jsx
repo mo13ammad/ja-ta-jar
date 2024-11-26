@@ -1,7 +1,7 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Header from './Header';
-import useUser from '../features/dashboard/useUser';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Header from "./Header";
+import useUser from "../features/dashboard/useUser";
 
 function AppLayout() {
   // Fetch user data in the background

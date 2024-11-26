@@ -1,6 +1,6 @@
 // src/ui/NumberField.jsx
 
-import React from 'react';
+import React from "react";
 
 function NumberField({
   label,
@@ -20,7 +20,7 @@ function NumberField({
         {label}
       </label>
       <input
-        className={`textField__input ${errorMessages ? 'border-red-500' : ''}`}
+        className={`textField__input ${errorMessages ? "border-red-500" : ""}`}
         type="number"
         id={name}
         name={name}

@@ -1,59 +1,59 @@
 // EditHouseContainer.js
 
-import React, { useState } from 'react';
-import EditHouseSidebar from './EditHouseSidebar';
-import EditHouseContent from './EditHouseContent';
+import React, { useState } from "react";
+import EditHouseSidebar from "./EditHouseSidebar";
+import EditHouseContent from "./EditHouseContent";
 
 const tabSections = [
   {
-    label: 'آدرس و موقعیت مکانی',
+    label: "آدرس و موقعیت مکانی",
     keys: [
-      { key: 'address', label: 'آدرس' },
-      { key: 'location', label: 'موقعیت مکانی' },
+      { key: "address", label: "آدرس" },
+      { key: "location", label: "موقعیت مکانی" },
     ],
   },
   {
-    label: 'اطلاعات کلی',
+    label: "اطلاعات کلی",
     keys: [
-      { key: 'generalInfo', label: 'اطلاعات اقامتگاه' },
-      { key: 'environmentInfo', label: 'اطلاعات محیطی' },
+      { key: "generalInfo", label: "اطلاعات اقامتگاه" },
+      { key: "environmentInfo", label: "اطلاعات محیطی" },
     ],
   },
   {
-    label: 'مشخصات اقامتگاه',
+    label: "مشخصات اقامتگاه",
     keys: [
-      { key: 'mainFacilities', label: 'امکانات اقامتگاه' },
-      { key: 'rooms', label: 'اتاق‌ها' },
-      { key: 'sanitaries', label: 'امکانات بهداشتی' },
+      { key: "mainFacilities", label: "امکانات اقامتگاه" },
+      { key: "rooms", label: "اتاق‌ها" },
+      { key: "sanitaries", label: "امکانات بهداشتی" },
     ],
   },
   {
-    label: 'قوانین اقامتگاه',
+    label: "قوانین اقامتگاه",
     keys: [
-      { key: 'reservationRules', label: 'قوانین رزرو' },
-      { key: 'cancellationRules', label: 'قوانین کنسلی' },
-      { key: 'stayRules', label: 'قوانین اقامت' },
+      { key: "reservationRules", label: "قوانین رزرو" },
+      { key: "cancellationRules", label: "قوانین کنسلی" },
+      { key: "stayRules", label: "قوانین اقامت" },
     ],
   },
   {
-    label: 'قیمت گذاری',
-    keys: [{ key: 'pricing', label: 'قیمت گذاری' }],
+    label: "قیمت گذاری",
+    keys: [{ key: "pricing", label: "قیمت گذاری" }],
   },
   {
-    label: 'تصاویر',
+    label: "تصاویر",
     keys: [
-      { key: 'images', label: 'تصاویر اقامتگاه' },
-      { key: 'documents', label: 'مدارک مالکیت' },
+      { key: "images", label: "تصاویر اقامتگاه" },
+      { key: "documents", label: "مدارک مالکیت" },
     ],
   },
   {
-    label: 'ثبت نهایی اقامتگاه',
-    keys: [{ key: 'finalSubmit', label: 'ثبت نهایی اقامتگاه' }],
+    label: "ثبت نهایی اقامتگاه",
+    keys: [{ key: "finalSubmit", label: "ثبت نهایی اقامتگاه" }],
   },
 ];
 
 function EditHouseContainer() {
-  const [selectedTab, setSelectedTab] = useState('address');
+  const [selectedTab, setSelectedTab] = useState("address");
 
   const handleNextTab = () => {
     const flatKeys = tabSections.flatMap((section) => section.keys);
@@ -68,7 +68,9 @@ function EditHouseContainer() {
     const flatKeys = tabSections.flatMap((section) => section.keys);
     const currentIndex = flatKeys.findIndex((tab) => tab.key === selectedTab);
     if (currentIndex > 0) {
-      console.log(`Navigating to previous tab: ${flatKeys[currentIndex - 1].key}`);
+      console.log(
+        `Navigating to previous tab: ${flatKeys[currentIndex - 1].key}`,
+      );
       setSelectedTab(flatKeys[currentIndex - 1].key);
     }
   };

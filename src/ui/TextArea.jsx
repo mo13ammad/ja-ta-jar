@@ -1,11 +1,21 @@
 // src/ui/TextArea.jsx
 
-import React from 'react';
+import React from "react";
 
-function TextArea({ label, name, value, onChange, placeholder, rows = 4, readOnly }) {
+function TextArea({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  rows = 4,
+  readOnly,
+}) {
   return (
-    <div className=''>
-      <label htmlFor={name} className="mb-3 ">{label} </label>
+    <div className="">
+      <label htmlFor={name} className="mb-3 ">
+        {label}{" "}
+      </label>
       <textarea
         className="textArea__input"
         id={name}
@@ -13,7 +23,7 @@ function TextArea({ label, name, value, onChange, placeholder, rows = 4, readOnl
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        rows={rows}  // Default is 4 rows, can be customized
+        rows={rows} // Default is 4 rows, can be customized
         readOnly={readOnly}
       />
     </div>

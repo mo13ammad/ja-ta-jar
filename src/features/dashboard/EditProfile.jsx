@@ -1,72 +1,84 @@
 // src/components/EditProfile.jsx
 
-import React, { useState, useEffect, useMemo, Fragment } from 'react';
-import { toast } from 'react-hot-toast';
-import TextField from '../../ui/TextField';
-import TextArea from '../../ui/TextArea';
-import Loading from '../../ui/Loading';
-import { editUser } from '../../services/userService';
-import { useMutation } from '@tanstack/react-query';
-import useUser from './useUser';
-import jalaali from 'jalaali-js';
-import { Listbox, Transition } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/20/solid';
-import useFetchProvinces from './useFetchProvinces';
-import useFetchCities from './useFetchCities';
+import React, { useState, useEffect, useMemo, Fragment } from "react";
+import { toast } from "react-hot-toast";
+import TextField from "../../ui/TextField";
+import TextArea from "../../ui/TextArea";
+import Loading from "../../ui/Loading";
+import { editUser } from "../../services/userService";
+import { useMutation } from "@tanstack/react-query";
+import useUser from "./useUser";
+import jalaali from "jalaali-js";
+import { Listbox, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import useFetchProvinces from "./useFetchProvinces";
+import useFetchCities from "./useFetchCities";
 
 // Functions for date conversion
 const gregorianToPersian = (gregorianDate) => {
   if (!gregorianDate) return { year: "", month: "", day: "" };
-  const dateWithoutTime = gregorianDate.split('T')[0];
-  const [year, month, day] = dateWithoutTime.split('-');
-  const persianDate = jalaali.toJalaali(parseInt(year), parseInt(month), parseInt(day));
-  return { 
-    year: persianDate.jy, 
-    month: String(persianDate.jm).padStart(2, '0'), 
-    day: String(persianDate.jd).padStart(2, '0') 
+  const dateWithoutTime = gregorianDate.split("T")[0];
+  const [year, month, day] = dateWithoutTime.split("-");
+  const persianDate = jalaali.toJalaali(
+    parseInt(year),
+    parseInt(month),
+    parseInt(day),
+  );
+  return {
+    year: persianDate.jy,
+    month: String(persianDate.jm).padStart(2, "0"),
+    day: String(persianDate.jd).padStart(2, "0"),
   };
 };
 
 const persianToGregorian = (year, month, day) => {
   if (!year || !month || !day) return "";
-  const gregorianDate = jalaali.toGregorian(parseInt(year), parseInt(month), parseInt(day));
-  return `${gregorianDate.gy}-${String(gregorianDate.gm).padStart(2, '0')}-${String(gregorianDate.gd).padStart(2, '0')}`;
+  const gregorianDate = jalaali.toGregorian(
+    parseInt(year),
+    parseInt(month),
+    parseInt(day),
+  );
+  return `${gregorianDate.gy}-${String(gregorianDate.gm).padStart(2, "0")}-${String(gregorianDate.gd).padStart(2, "0")}`;
 };
 
 const genderMap = {
-  'مرد': 'Male',
-  'زن': 'Female',
-  'دیگر': 'Other',
+  مرد: "Male",
+  زن: "Female",
+  دیگر: "Other",
 };
 
 function EditProfile({ user, onUpdateUser }) {
   // Fetch provinces
-  const { data: provinces = [], isLoading: fetchProvincesLoading, error: fetchProvincesError } = useFetchProvinces();
-  
+  const {
+    data: provinces = [],
+    isLoading: fetchProvincesLoading,
+    error: fetchProvincesError,
+  } = useFetchProvinces();
+
   // Memoize initial birth date in Persian calendar
   const initialBirthDate = useMemo(() => {
     return user?.birth_date
       ? gregorianToPersian(user.birth_date)
-      : { day: '', month: '', year: '' };
+      : { day: "", month: "", year: "" };
   }, [user?.birth_date]);
-  
+
   // Refetch function from useUser
   const { refetch } = useUser();
 
   // State for form data
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    nationalCode: '',
-    email: '',
-    province: '',
-    city: '',
+    firstName: "",
+    lastName: "",
+    nationalCode: "",
+    email: "",
+    province: "",
+    city: "",
     birthDay: initialBirthDate.day,
     birthMonth: initialBirthDate.month,
     birthYear: initialBirthDate.year,
-    gender: 'مرد',
-    secondPhone: '',
-    bio: '',
+    gender: "مرد",
+    secondPhone: "",
+    bio: "",
     avatar: null,
   });
 
@@ -75,7 +87,11 @@ function EditProfile({ user, onUpdateUser }) {
   const [selectedCity, setSelectedCity] = useState(null);
 
   // Fetch cities based on selected province
-  const { data: citiesData, isLoading: fetchCitiesLoading, error: fetchCitiesError } = useFetchCities(formData.province);
+  const {
+    data: citiesData,
+    isLoading: fetchCitiesLoading,
+    error: fetchCitiesError,
+  } = useFetchCities(formData.province);
 
   // State for field errors
   const [fieldErrors, setFieldErrors] = useState({});
@@ -87,18 +103,18 @@ function EditProfile({ user, onUpdateUser }) {
   useEffect(() => {
     if (user) {
       setFormData({
-        firstName: user?.first_name || '',
-        lastName: user?.last_name || '',
-        nationalCode: user?.national_code || '',
-        email: user?.email || '',
-        province: user?.city?.province?.id || '',
-        city: user?.city?.id || '',
+        firstName: user?.first_name || "",
+        lastName: user?.last_name || "",
+        nationalCode: user?.national_code || "",
+        email: user?.email || "",
+        province: user?.city?.province?.id || "",
+        city: user?.city?.id || "",
         birthDay: initialBirthDate.day,
         birthMonth: initialBirthDate.month,
         birthYear: initialBirthDate.year,
-        gender: user?.sex?.label || 'مرد',
-        secondPhone: user?.second_phone || '',
-        bio: user?.bio || '',
+        gender: user?.sex?.label || "مرد",
+        secondPhone: user?.second_phone || "",
+        bio: user?.bio || "",
         avatar: null,
       });
 
@@ -141,21 +157,21 @@ function EditProfile({ user, onUpdateUser }) {
   // Handler for select fields (province, city, gender)
   const handleSelectChange = (name, option) => {
     if (isVendor) return;
-    if (name === 'province') {
+    if (name === "province") {
       setSelectedProvince(option);
       setFormData((prevData) => ({
         ...prevData,
         province: option.value,
-        city: '',
+        city: "",
       }));
       setSelectedCity(null);
-    } else if (name === 'city') {
+    } else if (name === "city") {
       setSelectedCity(option);
       setFormData((prevData) => ({
         ...prevData,
         city: option.value,
       }));
-    } else if (name === 'gender') {
+    } else if (name === "gender") {
       setFormData((prevData) => ({
         ...prevData,
         gender: option.value,
@@ -166,26 +182,31 @@ function EditProfile({ user, onUpdateUser }) {
     setFieldErrors((prevErrors) => ({
       ...prevErrors,
       [name]: undefined,
-      ...(name === 'province' ? { city: undefined } : {}),
+      ...(name === "province" ? { city: undefined } : {}),
     }));
   };
 
   // Mutation for editing user
-  const { mutateAsync, isLoading: isSubmitting, isError, error } = useMutation({
+  const {
+    mutateAsync,
+    isLoading: isSubmitting,
+    isError,
+    error,
+  } = useMutation({
     mutationFn: editUser,
     onError: (error) => {
-      console.error('Error updating profile:', error); 
-      
+      console.error("Error updating profile:", error);
+
       if (error.response && error.response.data && error.response.data.errors) {
         const serverErrors = error.response.data.errors.fields || {};
         setFieldErrors(serverErrors);
-        toast.error(error.response.data.message || 'خطایی رخ داده است');
+        toast.error(error.response.data.message || "خطایی رخ داده است");
       }
     },
     onSuccess: (data) => {
       onUpdateUser(data); // Update with the new user data
       refetch(); // Fetch updated user data
-      toast.success('اطلاعات با موفقیت بروزرسانی شد');
+      toast.success("اطلاعات با موفقیت بروزرسانی شد");
     },
   });
 
@@ -196,31 +217,35 @@ function EditProfile({ user, onUpdateUser }) {
     // Prevent submission if user is Vendor
     if (isVendor) return;
 
-    const birthDateGregorian = persianToGregorian(formData.birthYear, formData.birthMonth, formData.birthDay);
-    const genderValue = genderMap[formData.gender] || 'Male';
+    const birthDateGregorian = persianToGregorian(
+      formData.birthYear,
+      formData.birthMonth,
+      formData.birthDay,
+    );
+    const genderValue = genderMap[formData.gender] || "Male";
 
     const updatedData = new FormData();
-    updatedData.append('_method', 'PUT');
-    updatedData.append('first_name', formData.firstName);
-    updatedData.append('last_name', formData.lastName);
-    updatedData.append('national_code', formData.nationalCode);
-    updatedData.append('email', formData.email);
-    updatedData.append('birth_date', birthDateGregorian);
-    updatedData.append('second_phone', formData.secondPhone);
-    updatedData.append('sex', genderValue);
-    updatedData.append('province_id', formData.province);
-    updatedData.append('city_id', formData.city);
+    updatedData.append("_method", "PUT");
+    updatedData.append("first_name", formData.firstName);
+    updatedData.append("last_name", formData.lastName);
+    updatedData.append("national_code", formData.nationalCode);
+    updatedData.append("email", formData.email);
+    updatedData.append("birth_date", birthDateGregorian);
+    updatedData.append("second_phone", formData.secondPhone);
+    updatedData.append("sex", genderValue);
+    updatedData.append("province_id", formData.province);
+    updatedData.append("city_id", formData.city);
 
     if (formData.avatar) {
-      updatedData.append('avatar', formData.avatar);
+      updatedData.append("avatar", formData.avatar);
     }
 
-    updatedData.append('bio', formData.bio);
+    updatedData.append("bio", formData.bio);
 
     try {
       await mutateAsync(updatedData);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error("Error updating profile:", error);
       // Errors are handled in onError
     }
   };
@@ -236,7 +261,7 @@ function EditProfile({ user, onUpdateUser }) {
 
   // Handle fetching errors
   if (fetchProvincesError) {
-    toast.error('خطا در بارگزاری استان‌ها');
+    toast.error("خطا در بارگزاری استان‌ها");
     return null;
   }
 
@@ -248,14 +273,20 @@ function EditProfile({ user, onUpdateUser }) {
 
   // Prepare city options
   const cityOptions = fetchCitiesLoading
-    ? [{ value: '', label: 'در حال بارگزاری ...' }]
+    ? [{ value: "", label: "در حال بارگزاری ..." }]
     : formData.province
-    ? (citiesData?.cities?.map((city) => ({ value: city.id, label: city.name })) || [{ value: '', label: 'شهر موجود نیست' }])
-    : [{ value: '', label: 'لطفاً ابتدا استان را انتخاب کنید' }];
+      ? citiesData?.cities?.map((city) => ({
+          value: city.id,
+          label: city.name,
+        })) || [{ value: "", label: "شهر موجود نیست" }]
+      : [{ value: "", label: "لطفاً ابتدا استان را انتخاب کنید" }];
 
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit} className="flex flex-col md:grid grid-cols-2 gap-6 p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:grid grid-cols-2 gap-6 p-6"
+      >
         {/* First Name */}
         <div>
           <TextField
@@ -266,9 +297,12 @@ function EditProfile({ user, onUpdateUser }) {
             placeholder="نام"
             readOnly={isVendor}
           />
-          {fieldErrors.first_name && fieldErrors.first_name.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.first_name &&
+            fieldErrors.first_name.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Last Name */}
@@ -281,9 +315,12 @@ function EditProfile({ user, onUpdateUser }) {
             placeholder="نام خانوادگی"
             readOnly={isVendor}
           />
-          {fieldErrors.last_name && fieldErrors.last_name.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.last_name &&
+            fieldErrors.last_name.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* National Code */}
@@ -296,9 +333,12 @@ function EditProfile({ user, onUpdateUser }) {
             placeholder="کد ملی"
             readOnly={isVendor}
           />
-          {fieldErrors.national_code && fieldErrors.national_code.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.national_code &&
+            fieldErrors.national_code.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Email */}
@@ -312,9 +352,12 @@ function EditProfile({ user, onUpdateUser }) {
             type="email"
             readOnly={isVendor}
           />
-          {fieldErrors.email && fieldErrors.email.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.email &&
+            fieldErrors.email.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Province Select */}
@@ -322,20 +365,20 @@ function EditProfile({ user, onUpdateUser }) {
           <label className="block font-medium text-gray-700 mb-2">استان</label>
           <Listbox
             value={selectedProvince}
-            onChange={(value) => handleSelectChange('province', value)}
+            onChange={(value) => handleSelectChange("province", value)}
             disabled={isVendor} // Disable if user is Vendor
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl ">
-                <Listbox.Button className={`listbox__button ${isVendor ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+                <Listbox.Button
+                  className={`listbox__button ${isVendor ? "cursor-not-allowed bg-gray-100" : ""}`}
+                >
                   <span>
-                    {selectedProvince
-                      ? selectedProvince.label
-                      : 'انتخاب استان'}
+                    {selectedProvince ? selectedProvince.label : "انتخاب استان"}
                   </span>
                   <ChevronDownIcon
                     className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                      open ? 'rotate-180' : 'rotate-0'
+                      open ? "rotate-180" : "rotate-0"
                     }`}
                     aria-hidden="true"
                   />
@@ -356,20 +399,24 @@ function EditProfile({ user, onUpdateUser }) {
                           className={({ active }) =>
                             `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
                               active
-                                ? 'bg-secondary-100 text-secondary-700'
-                                : 'text-gray-900'
+                                ? "bg-secondary-100 text-secondary-700"
+                                : "text-gray-900"
                             }`
                           }
                         >
                           {({ selected, active }) => (
                             <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                              <span
+                                className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
+                              >
                                 {option.label}
                               </span>
                               {selected ? (
                                 <span
                                   className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                    active
+                                      ? "text-secondary-600"
+                                      : "text-secondary-600"
                                   }`}
                                 >
                                   {/* Optional: Add a checkmark icon here */}
@@ -385,9 +432,12 @@ function EditProfile({ user, onUpdateUser }) {
               </div>
             )}
           </Listbox>
-          {fieldErrors.province_id && fieldErrors.province_id.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.province_id &&
+            fieldErrors.province_id.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* City Select */}
@@ -395,24 +445,26 @@ function EditProfile({ user, onUpdateUser }) {
           <label className="block font-medium text-gray-700 mb-2">شهر</label>
           <Listbox
             value={selectedCity}
-            onChange={(value) => handleSelectChange('city', value)}
+            onChange={(value) => handleSelectChange("city", value)}
             disabled={isVendor || !selectedProvince || fetchCitiesLoading}
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className={`listbox__button ${isVendor || !selectedProvince || fetchCitiesLoading ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+                <Listbox.Button
+                  className={`listbox__button ${isVendor || !selectedProvince || fetchCitiesLoading ? "cursor-not-allowed bg-gray-100" : ""}`}
+                >
                   <span>
                     {selectedCity
                       ? selectedCity.label
                       : !selectedProvince
-                      ? 'لطفاً ابتدا استان را انتخاب کنید'
-                      : fetchCitiesLoading
-                      ? 'در حال بارگزاری ...'
-                      : 'انتخاب شهر'}
+                        ? "لطفاً ابتدا استان را انتخاب کنید"
+                        : fetchCitiesLoading
+                          ? "در حال بارگزاری ..."
+                          : "انتخاب شهر"}
                   </span>
                   <ChevronDownIcon
                     className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                      open ? 'rotate-180' : 'rotate-0'
+                      open ? "rotate-180" : "rotate-0"
                     }`}
                     aria-hidden="true"
                   />
@@ -433,20 +485,24 @@ function EditProfile({ user, onUpdateUser }) {
                           className={({ active }) =>
                             `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
                               active
-                                ? 'bg-secondary-100 text-secondary-700'
-                                : 'text-gray-900'
+                                ? "bg-secondary-100 text-secondary-700"
+                                : "text-gray-900"
                             }`
                           }
                         >
                           {({ selected, active }) => (
                             <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                              <span
+                                className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
+                              >
                                 {option.label}
                               </span>
                               {selected ? (
                                 <span
                                   className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                    active
+                                      ? "text-secondary-600"
+                                      : "text-secondary-600"
                                   }`}
                                 >
                                   {/* Optional: Add a checkmark icon here */}
@@ -462,14 +518,21 @@ function EditProfile({ user, onUpdateUser }) {
               </div>
             )}
           </Listbox>
-          {fieldErrors.city_id && fieldErrors.city_id.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.city_id &&
+            fieldErrors.city_id.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Birth Date Fields */}
         <div className="col-span-2">
-          <BirthDateFields formData={formData} setFormData={setFormData} isVendor={isVendor} />
+          <BirthDateFields
+            formData={formData}
+            setFormData={setFormData}
+            isVendor={isVendor}
+          />
         </div>
 
         {/* Gender Select */}
@@ -477,20 +540,20 @@ function EditProfile({ user, onUpdateUser }) {
           <label className="block font-medium text-gray-700 mb-2">جنسیت</label>
           <Listbox
             value={{ value: formData.gender, label: formData.gender }}
-            onChange={(value) => handleSelectChange('gender', value)}
+            onChange={(value) => handleSelectChange("gender", value)}
             disabled={isVendor} // Disable if user is Vendor
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className={`listbox__button ${isVendor ? 'cursor-not-allowed bg-gray-100' : ''}`}>
+                <Listbox.Button
+                  className={`listbox__button ${isVendor ? "cursor-not-allowed bg-gray-100" : ""}`}
+                >
                   <span>
-                    {formData.gender
-                      ? formData.gender
-                      : 'انتخاب جنسیت'}
+                    {formData.gender ? formData.gender : "انتخاب جنسیت"}
                   </span>
                   <ChevronDownIcon
                     className={`h-5 w-5 text-gray-400 transition-transform duration-200 ${
-                      open ? 'rotate-180' : 'rotate-0'
+                      open ? "rotate-180" : "rotate-0"
                     }`}
                     aria-hidden="true"
                   />
@@ -505,9 +568,9 @@ function EditProfile({ user, onUpdateUser }) {
                   >
                     <Listbox.Options className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                       {[
-                        { value: 'مرد', label: 'مرد' },
-                        { value: 'زن', label: 'زن' },
-                        { value: 'دیگر', label: 'دیگر' },
+                        { value: "مرد", label: "مرد" },
+                        { value: "زن", label: "زن" },
+                        { value: "دیگر", label: "دیگر" },
                       ].map((option) => (
                         <Listbox.Option
                           key={option.value}
@@ -515,20 +578,24 @@ function EditProfile({ user, onUpdateUser }) {
                           className={({ active }) =>
                             `cursor-pointer select-none relative py-2 pl-10 pr-4 ${
                               active
-                                ? 'bg-secondary-100 text-secondary-700'
-                                : 'text-gray-900'
+                                ? "bg-secondary-100 text-secondary-700"
+                                : "text-gray-900"
                             }`
                           }
                         >
                           {({ selected, active }) => (
                             <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                              <span
+                                className={`block truncate ${selected ? "font-medium" : "font-normal"}`}
+                              >
                                 {option.label}
                               </span>
                               {selected ? (
                                 <span
                                   className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                                    active ? 'text-secondary-600' : 'text-secondary-600'
+                                    active
+                                      ? "text-secondary-600"
+                                      : "text-secondary-600"
                                   }`}
                                 >
                                   {/* Optional: Add a checkmark icon here */}
@@ -544,9 +611,12 @@ function EditProfile({ user, onUpdateUser }) {
               </div>
             )}
           </Listbox>
-          {fieldErrors.sex && fieldErrors.sex.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.sex &&
+            fieldErrors.sex.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Second Phone */}
@@ -559,25 +629,33 @@ function EditProfile({ user, onUpdateUser }) {
             placeholder="شماره دوم"
             readOnly={isVendor}
           />
-          {fieldErrors.second_phone && fieldErrors.second_phone.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.second_phone &&
+            fieldErrors.second_phone.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Avatar Upload */}
         <div className="col-span-2">
-          <label htmlFor="avatar" className='mb-2 font-medium block'>عکس پروفایل</label>
-          <input 
-            type="file" 
-            name="avatar" 
-            className='bg-white w-full px-2 py-1.5 border rounded-2xl shadow-centered' 
-            onChange={handleAvatarChange} 
+          <label htmlFor="avatar" className="mb-2 font-medium block">
+            عکس پروفایل
+          </label>
+          <input
+            type="file"
+            name="avatar"
+            className="bg-white w-full px-2 py-1.5 border rounded-2xl shadow-centered"
+            onChange={handleAvatarChange}
             accept="image/*"
             disabled={isVendor}
           />
-          {fieldErrors.avatar && fieldErrors.avatar.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.avatar &&
+            fieldErrors.avatar.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* Bio TextArea */}
@@ -591,35 +669,40 @@ function EditProfile({ user, onUpdateUser }) {
             rows={4}
             readOnly={isVendor}
           />
-          {fieldErrors.bio && fieldErrors.bio.map((msg, idx) => (
-            <div key={idx} className="text-red-500 text-sm pt-2">{msg}</div>
-          ))}
+          {fieldErrors.bio &&
+            fieldErrors.bio.map((msg, idx) => (
+              <div key={idx} className="text-red-500 text-sm pt-2">
+                {msg}
+              </div>
+            ))}
         </div>
 
         {/* General Errors */}
         {isError && (
           <div className="text-red-500 mb-4 col-span-2">
-            {error?.response?.data?.message || 'مشکلی در ثبت اطلاعات وجود دارد.'}
+            {error?.response?.data?.message ||
+              "مشکلی در ثبت اطلاعات وجود دارد."}
           </div>
         )}
 
         {/* Submit Button */}
-       {
-        !isVendor && 
-        <div className="col-span-2">
-        <button 
-          type="submit" 
-          className="btn block bg-primary-800 h-10 text-white "
-          disabled={isSubmitting || isVendor}
-        >
-          {isSubmitting ? 'در حال ارسال...' : 'ذخیره اطلاعات'}
-        </button>
-      </div>
-       }
+        {!isVendor && (
+          <div className="col-span-2">
+            <button
+              type="submit"
+              className="btn block bg-primary-800 h-10 text-white "
+              disabled={isSubmitting || isVendor}
+            >
+              {isSubmitting ? "در حال ارسال..." : "ذخیره اطلاعات"}
+            </button>
+          </div>
+        )}
       </form>
-       {isVendor && 
-       <p className='px-4 lg:px-6 text-primary-800'>لطفا برای تغییر اطلاعات به بخش تیکت ها مراجعه کنید و تیکت ثبت کنید.</p>
-       }
+      {isVendor && (
+        <p className="px-4 lg:px-6 text-primary-800">
+          لطفا برای تغییر اطلاعات به بخش تیکت ها مراجعه کنید و تیکت ثبت کنید.
+        </p>
+      )}
     </div>
   );
 }
@@ -637,7 +720,7 @@ const BirthDateFields = ({ formData, setFormData, isVendor }) => {
         <TextField
           name="birthDay"
           value={formData.birthDay}
-          onChange={(e) => handleBirthDateChange('birthDay', e.target.value)}
+          onChange={(e) => handleBirthDateChange("birthDay", e.target.value)}
           placeholder="روز"
           maxLength={2}
           pattern="\d*"
@@ -646,7 +729,7 @@ const BirthDateFields = ({ formData, setFormData, isVendor }) => {
         <TextField
           name="birthMonth"
           value={formData.birthMonth}
-          onChange={(e) => handleBirthDateChange('birthMonth', e.target.value)}
+          onChange={(e) => handleBirthDateChange("birthMonth", e.target.value)}
           placeholder="ماه"
           maxLength={2}
           pattern="\d*"
@@ -655,7 +738,7 @@ const BirthDateFields = ({ formData, setFormData, isVendor }) => {
         <TextField
           name="birthYear"
           value={formData.birthYear}
-          onChange={(e) => handleBirthDateChange('birthYear', e.target.value)}
+          onChange={(e) => handleBirthDateChange("birthYear", e.target.value)}
           placeholder="سال"
           maxLength={4}
           pattern="\d*"

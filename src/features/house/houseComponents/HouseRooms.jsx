@@ -1,7 +1,7 @@
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import { FaBed, FaCouch } from 'react-icons/fa';
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { FaBed, FaCouch } from "react-icons/fa";
 
 function HouseRooms({ houseData }) {
   const rooms = houseData.room;
@@ -37,17 +37,17 @@ function HouseRooms({ houseData }) {
       bedInfo.push(`${room.number_sofa_beds} مبل تخت‌خواب‌شو`);
     }
 
-    return bedInfo.join('، ');
+    return bedInfo.join("، ");
   };
 
   // Function to convert numbers to Persian digits
   const toPersianNumber = (num) => {
-    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+    const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
     return num.toString().replace(/\d/g, (digit) => persianDigits[digit]);
   };
 
   return (
-    <div className=' px-3'>
+    <div className=" px-3">
       {/* Header */}
       <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center">
         فضای خواب
@@ -57,22 +57,18 @@ function HouseRooms({ houseData }) {
       </h3>
 
       {/* Rooms Carousel */}
-      <Swiper
-        spaceBetween={10}
-        slidesPerView={'auto'}
-        className="my-4"
-      >
+      <Swiper spaceBetween={10} slidesPerView={"auto"} className="my-4">
         {rooms.map((room, index) => (
           <SwiperSlide
             key={room.uuid || index}
-            style={{ width: 'auto' }}
+            style={{ width: "auto" }}
             className="flex-shrink-0"
           >
             <div className="border rounded-lg p-4 flex flex-col items-center">
               {/* Icon */}
               <div className="mb-2 flex items-center gap-2">
                 {getBedIcon(room)}
-              <p className="font-semibold">{room.name}</p>
+                <p className="font-semibold">{room.name}</p>
               </div>
               {/* Room Name */}
               {/* Bed Information */}

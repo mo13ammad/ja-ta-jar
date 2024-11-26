@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SendOTPForm from './SendOTPForm';
-import CheckOTPForm from './CheckOTPForm';
-import { useMutation } from '@tanstack/react-query';
-import { getOtp } from '../../services/authService';
-import toast from 'react-hot-toast';
-import useUser from '../dashboard/useUser';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import SendOTPForm from "./SendOTPForm";
+import CheckOTPForm from "./CheckOTPForm";
+import { useMutation } from "@tanstack/react-query";
+import { getOtp } from "../../services/authService";
+import toast from "react-hot-toast";
+import useUser from "../dashboard/useUser";
 
 function AuthContainer() {
   const [step, setStep] = useState(1);
@@ -19,7 +19,7 @@ function AuthContainer() {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard', { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [user, navigate]);
 
@@ -34,8 +34,13 @@ function AuthContainer() {
     },
     onError: (error) => {
       setLoading(false); // Reset loading on error
-      setError(error?.response?.data?.message || 'خطایی در ارسال کد تایید پیش آمده!');
-      toast.error(error?.response?.data?.message || 'خطایی در ارسال کد تایید پیش آمده! لطفا دوباره امتحان کنید');
+      setError(
+        error?.response?.data?.message || "خطایی در ارسال کد تایید پیش آمده!",
+      );
+      toast.error(
+        error?.response?.data?.message ||
+          "خطایی در ارسال کد تایید پیش آمده! لطفا دوباره امتحان کنید",
+      );
     },
   });
 

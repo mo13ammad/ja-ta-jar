@@ -1,16 +1,16 @@
-import React from 'react';
-import CustomInfoIcon from '../../../ui/CustomInfoIcon';
+import React from "react";
+import CustomInfoIcon from "../../../ui/CustomInfoIcon";
 
-const HouseArrivals = ({ arrivals, tip ,structure}) => {
+const HouseArrivals = ({ arrivals, tip, structure }) => {
   const arrivalTypes = arrivals?.types || [];
   const description = arrivals?.description || "";
 
   return (
     <div className="mt-1 flex gap-4 items-center ">
       {/* Arrivals Section */}
-      <div >
+      <div>
         <div className="flex items-center gap-1 mb-2">
-          <p className='font-bold'>شیوه دسترسی به اقامتگاه :</p>
+          <p className="font-bold">شیوه دسترسی به اقامتگاه :</p>
           {description && (
             <CustomInfoIcon
               className="w-5 h-5 text-gray-500 cursor-pointer"
@@ -30,8 +30,6 @@ const HouseArrivals = ({ arrivals, tip ,structure}) => {
           ))}
         </div>
       </div>
-
-      
     </div>
   );
 };

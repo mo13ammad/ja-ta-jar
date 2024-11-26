@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-const plugin = require('tailwindcss/plugin');
-const tailwindFormPlugin = require('@tailwindcss/forms');
+const plugin = require("tailwindcss/plugin");
+const tailwindFormPlugin = require("@tailwindcss/forms");
 
 function withOpacity(variableName) {
   return ({ opacityValue }) => {
@@ -12,22 +12,19 @@ function withOpacity(variableName) {
 }
 
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontSize: {
-        '3xs': '0.5rem', // Custom 3xs size (8px)
-        '2xs': '0.625rem', // Custom 2xs size (10px)
-        md: '0.9375rem', // 15px
+        "3xs": "0.5rem", // Custom 3xs size (8px)
+        "2xs": "0.625rem", // Custom 2xs size (10px)
+        md: "0.9375rem", // 15px
       },
       screens: {
-        xs: '420px', // Replace 480px with your desired breakpoint value
+        xs: "420px", // Replace 480px with your desired breakpoint value
       },
       boxShadow: {
-        'centered': '0 0 15px rgba(0, 0, 0, 0.1)',
+        centered: "0 0 15px rgba(0, 0, 0, 0.1)",
       },
       colors: {
         primary: {
@@ -69,22 +66,22 @@ module.exports = {
   },
   plugins: [
     tailwindFormPlugin({
-      strategy: 'class', // only generate classes
+      strategy: "class", // only generate classes
     }),
-    require('tailwind-scrollbar')({ nocompatible: true }),
+    require("tailwind-scrollbar")({ nocompatible: true }),
     plugin(function ({ addUtilities }) {
       const persianNumberStyles = {
-        '.persian-numbers': {
-          fontVariantNumeric: 'normal', // Disable automatic numeric shaping
-          unicodeBidi: 'isolate',
-          direction: 'ltr',
+        ".persian-numbers": {
+          fontVariantNumeric: "normal", // Disable automatic numeric shaping
+          unicodeBidi: "isolate",
+          direction: "ltr",
         },
-        '.persian-numbers::before': {
+        ".persian-numbers::before": {
           content: `'۰۱۲۳۴۵۶۷۸۹'`,
         },
       };
 
-      addUtilities(persianNumberStyles, ['responsive', 'hover']);
+      addUtilities(persianNumberStyles, ["responsive", "hover"]);
     }),
   ],
 };

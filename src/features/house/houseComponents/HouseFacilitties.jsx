@@ -1,7 +1,7 @@
-import React from 'react';
-import { Disclosure } from '@headlessui/react';
-import { useFetchFacilities } from '../../../services/fetchDataService';
-import CustomInfoIcon from '../../../ui/CustomInfoIcon';
+import React from "react";
+import { Disclosure } from "@headlessui/react";
+import { useFetchFacilities } from "../../../services/fetchDataService";
+import CustomInfoIcon from "../../../ui/CustomInfoIcon";
 
 function HouseFacilities({ houseData }) {
   if (!houseData) {
@@ -21,9 +21,7 @@ function HouseFacilities({ houseData }) {
 
   if (isError) {
     return (
-      <div className="text-red-500">
-        خطایی در بارگذاری امکانات رخ داده است.
-      </div>
+      <div className="text-red-500">خطایی در بارگذاری امکانات رخ داده است.</div>
     );
   }
 
@@ -32,7 +30,7 @@ function HouseFacilities({ houseData }) {
   }
 
   const availableFacilitiesSet = new Set(
-    houseData.facilities?.map((facility) => facility.key)
+    houseData.facilities?.map((facility) => facility.key),
   );
 
   let facilitiesWithStatus = allFacilities.map((facility) => ({
@@ -64,7 +62,7 @@ function HouseFacilities({ houseData }) {
               <Disclosure.Panel
                 static
                 className={`flex flex-wrap overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-                  open ? 'max-h-[1000px]' : 'max-h-32'
+                  open ? "max-h-[1000px]" : "max-h-32"
                 }`}
                 dir="rtl"
               >
@@ -86,7 +84,7 @@ function HouseFacilities({ houseData }) {
                   className="text-primary-600  hover:underline focus:outline-none"
                   aria-expanded={open}
                 >
-                  {open ? 'بستن' : 'مشاهده بیشتر...'}
+                  {open ? "بستن" : "مشاهده بیشتر..."}
                 </Disclosure.Button>
               </div>
             )}
@@ -107,7 +105,7 @@ function FacilityItem({ facility }) {
   return (
     <li
       className={`flex items-center m-2 transition-opacity duration-300 ${
-        isAvailable ? '' : 'opacity-50 line-through'
+        isAvailable ? "" : "opacity-50 line-through"
       }`}
     >
       <div className="w-8 h-8 flex-shrink-0">
@@ -136,23 +134,23 @@ function getAdditionalInfo(fields) {
   const countFields = fields.filter(
     (field) =>
       (field.value === true ||
-        field.value === 'true' ||
-        typeof field.value === 'number') &&
-      field.title.match(/عدد$/)
+        field.value === "true" ||
+        typeof field.value === "number") &&
+      field.title.match(/عدد$/),
   );
   if (countFields.length > 0) {
     const counts = countFields.map((field) => field.title);
-    infoParts.push(counts.join(', '));
+    infoParts.push(counts.join(", "));
   }
 
   const descriptionField = fields.find(
-    (field) => field.title.trim() === 'توضیحات' && field.value
+    (field) => field.title.trim() === "توضیحات" && field.value,
   );
   if (descriptionField) {
     infoParts.push(descriptionField.value);
   }
 
-  return infoParts.length > 0 ? infoParts.join(' - ') : null;
+  return infoParts.length > 0 ? infoParts.join(" - ") : null;
 }
 
 export default HouseFacilities;

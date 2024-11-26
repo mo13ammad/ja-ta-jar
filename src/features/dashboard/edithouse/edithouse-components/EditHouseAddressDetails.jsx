@@ -5,10 +5,10 @@ import React, {
   useEffect,
   useImperativeHandle,
   forwardRef,
-} from 'react';
-import { toast, Toaster } from 'react-hot-toast';
-import TextField from '../../../../ui/TextField';
-import Loading from '../../../../ui/Loading';
+} from "react";
+import { toast, Toaster } from "react-hot-toast";
+import TextField from "../../../../ui/TextField";
+import Loading from "../../../../ui/Loading";
 
 const EditHouseAddressDetails = forwardRef((props, ref) => {
   const {
@@ -20,11 +20,11 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
   } = props;
 
   const [formData, setFormData] = useState({
-    address: '',
-    neighborhood: '',
-    floor: '',
-    plaqueNumber: '',
-    postalCode: '',
+    address: "",
+    neighborhood: "",
+    floor: "",
+    plaqueNumber: "",
+    postalCode: "",
   });
   const [errors, setErrors] = useState({});
   const [errorList, setErrorList] = useState([]);
@@ -33,11 +33,11 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
   useEffect(() => {
     if (houseData?.address) {
       setFormData({
-        address: houseData.address.address || '',
-        neighborhood: houseData.address.village || '',
-        floor: houseData.address.floor || '',
-        plaqueNumber: houseData.address.house_number || '',
-        postalCode: houseData.address.postal_code || '',
+        address: houseData.address.address || "",
+        neighborhood: houseData.address.village || "",
+        floor: houseData.address.floor || "",
+        plaqueNumber: houseData.address.house_number || "",
+        postalCode: houseData.address.postal_code || "",
       });
     }
   }, [houseData]);
@@ -55,22 +55,22 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
 
   const validateAndSubmit = async () => {
     if (!isModified) {
-      console.log('No changes detected, submission skipped.');
+      console.log("No changes detected, submission skipped.");
       return true; // Proceed to next tab since there's nothing to submit
     }
 
     setErrors({});
     setErrorList([]);
 
-    console.log('Validating and submitting data:', formData);
+    console.log("Validating and submitting data:", formData);
 
     // Client-side validation for postal code
     if (formData.postalCode && !/^\d{10}$/.test(formData.postalCode)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        postal_code: ['کد پستی باید یک عدد ۱۰ رقمی باشد.'],
+        postal_code: ["کد پستی باید یک عدد ۱۰ رقمی باشد."],
       }));
-      toast.error('کد پستی معتبر نمی باشد.');
+      toast.error("کد پستی معتبر نمی باشد.");
       return false;
     }
 
@@ -83,10 +83,10 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
     };
 
     try {
-      console.log('Sending data to server:', dataToSend);
+      console.log("Sending data to server:", dataToSend);
       await handleEditHouse(dataToSend);
-      console.log('Data successfully sent and received.');
-      toast.success('آدرس با موفقیت به‌روزرسانی شد');
+      console.log("Data successfully sent and received.");
+      toast.success("آدرس با موفقیت به‌روزرسانی شد");
 
       // Update the houseData state with the new address
       setHouseData((prevData) => ({
@@ -103,7 +103,7 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
       setIsModified(false); // Reset isModified after successful submission
       return true;
     } catch (errorData) {
-      console.error('Edit House Error:', errorData);
+      console.error("Edit House Error:", errorData);
 
       if (errorData.errors || errorData.message) {
         if (errorData.errors?.fields) {
@@ -122,7 +122,7 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
           toast.error(errorData.message);
         }
       } else {
-        toast.error('متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید');
+        toast.error("متاسفانه مشکلی پیش آمده لطفا دوباره امتحان کنید");
       }
       return false;
     }
@@ -133,15 +133,14 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
   }));
 
   if (loadingHouse) {
-    console.log('Loading house data...');
+    console.log("Loading house data...");
     return <Loading message="در حال بارگذاری اطلاعات آدرس..." />;
   }
 
   return (
     <div className="relative">
       <Toaster />
-    
-     
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -193,8 +192,6 @@ const EditHouseAddressDetails = forwardRef((props, ref) => {
           placeholder="کد پستی"
           errorMessages={errors.postal_code}
         />
-
-        
       </form>
     </div>
   );
