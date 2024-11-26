@@ -47,7 +47,7 @@ function HouseContainer() {
 
   // Render the house details
   return (
-    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl md:p-2">
+    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl md:p-2 mb-24">
       <div className="w-full flex lg:flex-row-reverse gap-1 flex-col">
         <HouseImages houseData={houseData} />
         <HouseHeader houseData={houseData} />
@@ -77,7 +77,9 @@ function HouseContainer() {
       <HouseLocation />
       <HouseComments />
       {/* <CalenderContainer /> */}
+      <div className="bg-red-500 w-full">
       <HouseReserveMenu houseData={houseData} />
+      </div>
     </div>
   );
 }
