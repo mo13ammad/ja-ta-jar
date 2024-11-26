@@ -78,7 +78,7 @@ function HouseReserveMenu({ houseData }) {
         ) : (
           // Collapsed content
           <div
-            className="flex w-full justify-between items-center cursor-pointer"
+            className="flex w-full justify-between items-center cursor-pointer pr-10"
             onClick={handleToggle}
           >
             <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 rounded-3xl">
@@ -86,7 +86,7 @@ function HouseReserveMenu({ houseData }) {
               <p>{toPersianNumber("3,500,000")}</p>
             </div>
 
-            <button className="btn bg-primary-600 px-4 py-1.5">
+            <button className="btn bg-primary-600 px-4 pr-5 py-1.5">
               رزرو اقامتگاه
             </button>
           </div>

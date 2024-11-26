@@ -28,8 +28,8 @@ function HouseRules({ houseData }) {
 
       {/* Rule description */}
       <p className="text-gray-700 text-sm">
-        {rule.label}: {rule.status.label}
-        {rule.description && ` - ${rule.description}`}
+        {rule.label} {rule.status.label}
+        {rule.description && ` (${rule.description})`}.
       </p>
     </div>
   );
@@ -104,7 +104,7 @@ function HouseRules({ houseData }) {
                     <div className="mt-4">
                       <div className="flex items-start">
                         <i className="icon_edit-paper w-6 h-6 text-gray-500 ml-2"></i>
-                        <p className="text-gray-700 text-sm">سایر مقررات :</p>
+                        <p className="text-gray-700 text-sm">سایر مقررات </p>
                       </div>
                       <ul className="list-disc list-inside mt-2">
                         {additionalRules.split("\n").map((item, idx) => (
