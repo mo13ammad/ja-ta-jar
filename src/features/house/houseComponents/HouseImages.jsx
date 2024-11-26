@@ -39,14 +39,14 @@ function HouseImages({ houseData }) {
         pagination={{ clickable: true }}
         spaceBetween={50}
         slidesPerView={1}
-        className="rounded-xl shadow-centered"
+        className="shadow-centered"
       >
         {images.map((image, index) => (
           <SwiperSlide key={index}>
             <img
               src={image}
               alt={`Slide ${index + 1}`}
-              className="w-full max-h-48 sm:max-h-72 lg:max-h-96 h-auto object-cover rounded-lg cursor-pointer"
+              className="w-full max-h-60 sm:max-h-72 lg:max-h-96 h-auto object-cover  cursor-pointer"
               onClick={() => openModal(index)} // Open modal on click
             />
           </SwiperSlide>

@@ -71,7 +71,7 @@ function HouseReserveMenu({ houseData }) {
             {/* Add the content you want to display when expanded */}
             <p className="text-gray-700 text-sm mt-4">
               {/* Example expanded content */}
-              اینجا محتوای اضافی را نمایش دهید.
+           
             </p>
             {/* You can add more components or content here */}
           </div>
