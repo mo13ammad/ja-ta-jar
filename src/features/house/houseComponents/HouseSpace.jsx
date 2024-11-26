@@ -46,7 +46,7 @@ function HouseSpace({ houseData }) {
 
 
         {/* Region */}
-        <div className="flex items-center gap-3">
+        <div className="flex  flex-wrap items-center gap-3">
           <strong className="text-gray-700">منطقه:</strong>
           {areas.map((item, index) => (
         <div

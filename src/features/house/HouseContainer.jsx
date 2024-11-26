@@ -63,7 +63,7 @@ function HouseContainer() {
       </div>
       <HouseRooms houseData={houseData} />
       <HouseReservation />
-      <HouseFacilitties />
+      <HouseFacilitties houseData={houseData} />
       <HouseRules />
       <HouseLocation />
       <HouseComments />
