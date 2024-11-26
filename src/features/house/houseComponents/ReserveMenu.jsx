@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import toPersianNumber from "./../../../utils/toPersianNumber";
-import { MinusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { MinusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 function HouseReserveMenu({ houseData }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -46,16 +46,19 @@ function HouseReserveMenu({ houseData }) {
 
       <div
         ref={reserveMenuRef}
-        className={`z-50 px-4 pt-1 shadow-centered w-full flex flex-col bg-primary-50 rounded-t-3xl md:hidden fixed bottom-0  right-0 transition-all duration-300 ${
-          isExpanded ? "h-[50vh]" : "h-24"
+        className={`z-50 px-4 pt-1 shadow-centered flex flex-col bg-primary-50 w-full rounded-t-3xl md:hidden fixed bottom-0 transition-all duration-300 ${
+          isExpanded ? 'h-[70vh]' : 'h-24'
         }`}
       >
         {/* Top Bar with Close Icon */}
-        <div className="flex w-full justify-center items-center">
+        <div className="flex w-full justify-center items-center px-4">
+         
+          
+
           {/* Minus Icon */}
           <div
-            className="flex justify-center w-full cursor-pointer"
-            onClick={() => setIsExpanded((v) => !v)}
+            className="flex justify-center cursor-pointer"
+            onClick={() => setIsExpanded(v => !v)}
           >
             <MinusIcon className="w-7 h-7 text-primary-800 mb-1" />
           </div>
@@ -67,26 +70,26 @@ function HouseReserveMenu({ houseData }) {
         {/* Content */}
         {isExpanded ? (
           // Expanded content
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto px-4">
             {/* Add the content you want to display when expanded */}
-            <p className="text-gray-700 text-sm mt-2">
+            <p className="text-gray-700 text-sm mt-4">
               {/* Example expanded content */}
-           
+            
             </p>
             {/* You can add more components or content here */}
           </div>
         ) : (
           // Collapsed content
           <div
-            className="flex  xs:justify-between  items-center cursor-pointer "
+            className="flex w-full justify-between items-center cursor-pointer"
             onClick={handleToggle}
           >
-            <div className="flex gap-1 xs:gap-2 text-white bg-primary-500 px-3 py-1.5 rounded-3xl">
-              <p className="font-bold text-sm xs:text-md">قیمت هر شب :</p>
-              <p className="text-sm xs:text-md">{toPersianNumber("3,500,000")}</p>
+            <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 xs:mr-10 rounded-3xl">
+              <p className="font-bold">قیمت هر شب :</p>
+              <p>{toPersianNumber("3,500,000")}</p>
             </div>
 
-            <button className="btn mr-8 xs:mr-0 bg-primary-600 py-1.5">
+            <button className="btn bg-primary-600 px-4 py-1.5">
               رزرو اقامتگاه
             </button>
           </div>

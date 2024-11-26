@@ -17,6 +17,7 @@ module.exports = {
     extend: {
       screens: {
         xs: "420px", // Replace 480px with your desired breakpoint value
+        sm: '640px',
       },
       boxShadow: {
         centered: "0 0 15px rgba(0, 0, 0, 0.1)",
