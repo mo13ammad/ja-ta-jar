@@ -1,6 +1,5 @@
-// HouseFacilities.jsx
-
-import React, { useState } from 'react';
+import React from 'react';
+import { Disclosure } from '@headlessui/react';
 import { useFetchFacilities } from '../../../services/fetchDataService';
 import CustomInfoIcon from '../../../ui/CustomInfoIcon';
 
@@ -10,7 +9,6 @@ function HouseFacilities({ houseData }) {
   }
 
   const { data: allFacilities = [], isLoading, isError } = useFetchFacilities();
-  const [showAll, setShowAll] = useState(false);
 
   if (isLoading) {
     return (
@@ -50,31 +48,51 @@ function HouseFacilities({ houseData }) {
     return a.isAvailable ? -1 : 1;
   });
 
+  // Determine the number of facilities to show initially
   const initialFacilitiesCount = 10;
-  const facilitiesToShow = showAll
-    ? facilitiesWithStatus
-    : facilitiesWithStatus.slice(0, initialFacilitiesCount);
 
   return (
-    <div className="my-3 px-2">
+    <div className="my-3 px-3">
       <h3 className="text-lg font-bold text-gray-800 mb-2">امکانات</h3>
 
-      <ul className="flex flex-wrap">
-        {facilitiesToShow.map((facility) => (
-          <FacilityItem key={facility.key} facility={facility} />
-        ))}
-      </ul>
+      {/* Use Disclosure for expand/collapse functionality */}
+      <Disclosure>
+        {({ open }) => (
+          <>
+            {/* Facilities List */}
+            <div className="relative">
+              <Disclosure.Panel
+                static
+                className={`flex flex-wrap overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+                  open ? 'max-h-[1000px]' : 'max-h-32'
+                }`}
+                dir="rtl"
+              >
+                {facilitiesWithStatus.map((facility) => (
+                  <FacilityItem key={facility.key} facility={facility} />
+                ))}
+              </Disclosure.Panel>
 
-      {facilitiesWithStatus.length > initialFacilitiesCount && (
-        <div className="mt-4">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="text-primary-600 hover:underline focus:outline-none"
-          >
-            {showAll ? 'بستن' : 'مشاهده بیشتر...'}
-          </button>
-        </div>
-      )}
+              {/* Fade-out effect when content is collapsed */}
+              {!open && (
+                <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-gray-100 to-transparent"></div>
+              )}
+            </div>
+
+            {/* Show More / Show Less Button */}
+            {facilitiesWithStatus.length > initialFacilitiesCount && (
+              <div className="mt-2">
+                <Disclosure.Button
+                  className="text-primary-600  hover:underline focus:outline-none"
+                  aria-expanded={open}
+                >
+                  {open ? 'بستن' : 'مشاهده بیشتر...'}
+                </Disclosure.Button>
+              </div>
+            )}
+          </>
+        )}
+      </Disclosure>
     </div>
   );
 }
@@ -88,7 +106,7 @@ function FacilityItem({ facility }) {
 
   return (
     <li
-      className={`flex items-center m-2 ${
+      className={`flex items-center m-2 transition-opacity duration-300 ${
         isAvailable ? '' : 'opacity-50 line-through'
       }`}
     >

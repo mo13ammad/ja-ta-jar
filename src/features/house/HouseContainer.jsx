@@ -16,6 +16,7 @@ import HouseSpace from './houseComponents/HouseSpace';
 import CalenderContainer from '../calender/CalenderContainer';
 import HouseRooms from './houseComponents/HouseRooms';
 import Separator from './../../ui/Separator';
+import HouseCancelationRules from './houseComponents/HouseCancelationRules';
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -62,8 +63,15 @@ function HouseContainer() {
       <Separator/>
       </div>
       <HouseRooms houseData={houseData} />
-      <HouseReservation />
+      <div className='w-full px-4 my-3'>
+      <Separator/>
+      </div>
       <HouseFacilitties houseData={houseData} />
+      <div className='w-full px-4 my-3'>
+      <Separator/>
+      </div>
+      <HouseCancelationRules houseData={houseData}/>
+      <HouseReservation />
       <HouseRules />
       <HouseLocation />
       <HouseComments />
