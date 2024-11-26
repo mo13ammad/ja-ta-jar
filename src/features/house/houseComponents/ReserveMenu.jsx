@@ -84,7 +84,7 @@ function HouseReserveMenu({ houseData }) {
             className="flex w-full justify-between items-center cursor-pointer"
             onClick={handleToggle}
           >
-            <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 xs:mr-10 rounded-3xl">
+            <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 mr-10 rounded-3xl">
               <p className="font-bold">قیمت هر شب :</p>
               <p>{toPersianNumber("3,500,000")}</p>
             </div>
