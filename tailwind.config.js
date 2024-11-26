@@ -15,11 +15,6 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      fontSize: {
-        "3xs": "0.5rem", // Custom 3xs size (8px)
-        "2xs": "0.625rem", // Custom 2xs size (10px)
-        md: "0.9375rem", // 15px
-      },
       screens: {
         xs: "420px", // Replace 480px with your desired breakpoint value
       },
@@ -69,19 +64,5 @@ module.exports = {
       strategy: "class", // only generate classes
     }),
     require("tailwind-scrollbar")({ nocompatible: true }),
-    plugin(function ({ addUtilities }) {
-      const persianNumberStyles = {
-        ".persian-numbers": {
-          fontVariantNumeric: "normal", // Disable automatic numeric shaping
-          unicodeBidi: "isolate",
-          direction: "ltr",
-        },
-        ".persian-numbers::before": {
-          content: `'۰۱۲۳۴۵۶۷۸۹'`,
-        },
-      };
-
-      addUtilities(persianNumberStyles, ["responsive", "hover"]);
-    }),
   ],
 };

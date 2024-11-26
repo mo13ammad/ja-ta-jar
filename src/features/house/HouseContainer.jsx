@@ -17,6 +17,7 @@ import CalenderContainer from "../calender/CalenderContainer";
 import HouseRooms from "./houseComponents/HouseRooms";
 import Separator from "./../../ui/Separator";
 import HouseCancelationRules from "./houseComponents/HouseCancelationRules";
+import HouseReserveMenu from "./houseComponents/ReserveMenu";
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ function HouseContainer() {
 
   // Render the house details
   return (
-    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl p-1 md:p-2">
+    <div className="mt-7 lg:mt-0 flex items-start flex-col w-full bg-gray-100 shadow-centered rounded-2xl md:p-2">
       <div className="w-full flex lg:flex-row-reverse gap-1 flex-col">
         <HouseImages houseData={houseData} />
         <HouseHeader houseData={houseData} />
@@ -76,6 +77,7 @@ function HouseContainer() {
       <HouseLocation />
       <HouseComments />
       {/* <CalenderContainer /> */}
+      <HouseReserveMenu houseData={houseData} />
     </div>
   );
 }

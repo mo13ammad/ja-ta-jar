@@ -12,9 +12,14 @@ function HouseFacilities({ houseData }) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        {/* You can use a spinner component here */}
-        <div>در حال بارگذاری...</div>
+      <div className="my-3 px-3">
+        <h3 className="text-lg font-bold text-gray-800 mb-2">امکانات</h3>
+        {/* Skeleton Loader */}
+        <div className="space-y-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonFacilityItem key={index} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -121,6 +126,15 @@ function FacilityItem({ facility }) {
         />
       )}
     </li>
+  );
+}
+
+function SkeletonFacilityItem() {
+  return (
+    <div className="flex w-full ">
+      <div className="animate-pulse flex  h-2 bg-gray-300 rounded w-full"></div>
+      <div className="animate-pulse flex  h-2 bg-gray-300 rounded w-full"></div>
+    </div>
   );
 }
 
