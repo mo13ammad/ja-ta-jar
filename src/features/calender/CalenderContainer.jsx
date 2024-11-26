@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import toPersianNumber from "./../../utils/toPersianNumber";
 
 function CalendarContainer() {
   // Initial calendar data (replace with your actual data)
@@ -620,7 +620,7 @@ function CalendarContainer() {
 
   // Helper function to format prices
   const formatPrice = (price) => {
-    return price.toLocaleString();
+    return toPersianNumber(price.toLocaleString());
   };
 
   // Determine if we should show two months side by side
@@ -673,7 +673,7 @@ function CalendarContainer() {
           &#8594;
         </button>
         <div className="text-xl font-bold">
-          {calendarData[0].month_name} {calendarData[0].year}
+          {calendarData[0].month_name} {toPersianNumber(calendarData[0].year)}
         </div>
         <button
           className={`text-2xl p-2 ${
@@ -739,7 +739,7 @@ function CalendarContainer() {
                     <div key={index} className={`${classNames} aspect-square`}>
                       {/* Day Number */}
                       <div className="font-bold text-xs sm:text-lg">
-                        {day.day}
+                        {toPersianNumber(day.day)}
                       </div>
 
                       {/* Prices */}
@@ -781,3 +781,100 @@ function CalendarContainer() {
 }
 
 export default CalendarContainer;
+       <div className="text-2xs xs:text-xs  sm:text-md">{formatPrice(day.effective_price)}</div>
+                            )}
+                          </div>
+                        )}
+  
+                        {/* Lock Icon for Disabled Days */}
+                        {day.isDisable && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {/* You can add a lock icon here if needed */}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  export default CalendarContainer;
+         <div className="text-2xs xs:text-xs  sm:text-md">{formatPrice(day.effective_price)}</div>
+                            )}
+                          </div>
+                        )}
+  
+                        {/* Lock Icon for Disabled Days */}
+                        {day.isDisable && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {/* You can add a lock icon here if needed */}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  export default CalendarContainer;
+         <div className="text-2xs xs:text-xs  sm:text-md">{formatPrice(day.effective_price)}</div>
+                            )}
+                          </div>
+                        )}
+  
+                        {/* Lock Icon for Disabled Days */}
+                        {day.isDisable && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {/* You can add a lock icon here if needed */}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  export default CalendarContainer;
+         <div className="text-2xs xs:text-xs  sm:text-md">{formatPrice(day.effective_price)}</div>
+                            )}
+                          </div>
+                        )}
+  
+                        {/* Lock Icon for Disabled Days */}
+                        {day.isDisable && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            {/* You can add a lock icon here if needed */}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  export default CalendarContainer;
+  

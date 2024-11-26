@@ -1,8 +1,8 @@
 // HouseReserveMenu.jsx
 
 import React, { useState, useEffect, useRef } from "react";
-
-import { MinusIcon } from '@heroicons/react/24/outline';
+import toPersianNumber from "./../../../utils/toPersianNumber";
+import { MinusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 function HouseReserveMenu({ houseData }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -86,7 +86,7 @@ function HouseReserveMenu({ houseData }) {
           >
             <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 mr-10 rounded-3xl">
               <p className="font-bold">قیمت هر شب :</p>
-              <p>3,500,000</p>
+              <p>{toPersianNumber("3,500,000")}</p>
             </div>
 
             <button className="btn bg-primary-600 px-4 py-1.5">

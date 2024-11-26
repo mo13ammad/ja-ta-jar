@@ -40,7 +40,11 @@ function HouseRooms({ houseData }) {
     return bedInfo.join('، ');
   };
 
-
+  // Function to convert numbers to Persian digits
+  const toPersianNumber = (num) => {
+    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+    return num.toString().replace(/\d/g, (digit) => persianDigits[digit]);
+  };
 
   return (
     <div className="my-3 px-2">
@@ -48,7 +52,7 @@ function HouseRooms({ houseData }) {
       <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center">
         فضای خواب
         <div className="mr-2 bg-gray-200 text-gray-800 rounded-full px-2 py-1 text-sm">
-          {rooms.length} اتاق خواب
+          {toPersianNumber(rooms.length)} اتاق خواب
         </div>
       </h3>
 
@@ -68,7 +72,7 @@ function HouseRooms({ houseData }) {
               </div>
               {/* Bed Information */}
               <p className="text-sm text-gray-600">
-                {getBedInfo(room)}
+                {toPersianNumber(getBedInfo(room))}
               </p>
             </div>
           </SwiperSlide>

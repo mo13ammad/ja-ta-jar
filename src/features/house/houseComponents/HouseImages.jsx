@@ -46,7 +46,7 @@ function HouseImages({ houseData }) {
             <img
               src={image}
               alt={`Slide ${index + 1}`}
-              className="w-full max-h-60 sm:max-h-72 lg:max-h-96 h-auto object-cover  cursor-pointer"
+              className="w-full max-h-60 sm:max-h-72 lg:max-h-96 h-auto object-cover lg:rounded-xl  cursor-pointer"
               onClick={() => openModal(index)} // Open modal on click
             />
           </SwiperSlide>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Disclosure } from "@headlessui/react";
-
+import toPersianNumber from "../../../utils/toPersianNumber";
 
 function HouseRules({ houseData }) {
   // Handle the case where houseData or houseData.rules might be undefined
@@ -54,7 +54,7 @@ function HouseRules({ houseData }) {
             <p className="text-gray-700 text-sm font-bold">
               ساعت ورود از:
               <span className="font-medium mr-2">
-                {checkInTimeFrom}
+                {toPersianNumber(checkInTimeFrom)}
               </span>
             </p>
           </div>
@@ -64,7 +64,7 @@ function HouseRules({ houseData }) {
             <p className="text-gray-700 text-sm font-bold">
               ساعت ورود تا:
               <span className="font-medium mr-2">
-                {checkInTimeto}
+                {toPersianNumber(checkInTimeto)}
               </span>
             </p>
           </div>
@@ -76,7 +76,7 @@ function HouseRules({ houseData }) {
             <p className="text-gray-700 text-sm font-bold">
               ساعت خروج :
               <span className="font-medium mr-2">
-                {checkInTimeto}
+                {toPersianNumber(checkInTimeto)}
               </span>
             </p>
           </div>
