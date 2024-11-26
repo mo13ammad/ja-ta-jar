@@ -14,6 +14,8 @@ import { useEffect } from 'react';
 import HouseDescribtion from './houseComponents/HouseDescribtion';
 import HouseSpace from './houseComponents/HouseSpace';
 import CalenderContainer from '../calender/CalenderContainer';
+import HouseRooms from './houseComponents/HouseRooms';
+import Separator from './../../ui/Separator';
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -52,7 +54,14 @@ function HouseContainer() {
         <HouseHeader houseData={houseData} />
       </div>
       <HouseDescribtion  houseData={houseData}/>
+      <div className='w-full px-4 mb-2'>
+      <Separator/>
+      </div>
       <HouseSpace houseData={houseData}/>
+      <div className='w-full px-4 my-3'>
+      <Separator/>
+      </div>
+      <HouseRooms houseData={houseData} />
       <HouseReservation />
       <HouseFacilitties />
       <HouseRules />

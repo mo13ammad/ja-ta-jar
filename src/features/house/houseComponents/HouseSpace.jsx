@@ -5,7 +5,7 @@ function HouseSpace({ houseData }) {
   const { structure, reservation,areas } = houseData;
 
   return (
-    <div className=" w-full px-2">
+    <div className=" w-full px-3">
       {/* Title */}
       <h3 className="text-lg font-bold text-gray-800 mb-2">فضای اقامتگاه :</h3>
 
