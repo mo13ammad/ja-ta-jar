@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import { useEffect } from "react";
 import HouseDescribtion from "./houseComponents/HouseDescribtion";
 import HouseSpace from "./houseComponents/HouseSpace";
-import CalenderContainer from "../calender/CalenderContainer";
+
 import HouseRooms from "./houseComponents/HouseRooms";
 import Separator from "./../../ui/Separator";
 import HouseCancelationRules from "./houseComponents/HouseCancelationRules";
@@ -76,7 +76,7 @@ function HouseContainer() {
       <HouseReservation />
       <HouseLocation />
       <HouseComments />
-      {/* <CalenderContainer /> */}
+
       <div className=" bg-red-700">
       </div>
       <HouseReserveMenu houseData={houseData} />
