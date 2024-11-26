@@ -1,5 +1,5 @@
 import React from "react";
-import toPersianNumber from "../../../utils/toPersianNumber";
+
 
 function HouseSpace({ houseData }) {
   const { structure, reservation, areas } = houseData;
@@ -17,14 +17,14 @@ function HouseSpace({ houseData }) {
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">ظرفیت استاندارد:</strong>
             <span>
-              {toPersianNumber(reservation?.capacity?.normal) || "نامشخص"} نفر
+              {reservation?.capacity?.normal || "نامشخص"} نفر
             </span>
           </div>
 
           {/* Building Size */}
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">متراژ زیربنا:</strong>
-            <span>{toPersianNumber(structure?.size) || "نامشخص"} متر</span>
+            <span>{structure?.size || "نامشخص"} متر</span>
           </div>
           {/* Type of Accommodation */}
           <div className="flex items-center gap-3">
@@ -37,13 +37,13 @@ function HouseSpace({ houseData }) {
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">حداکثر ظرفیت:</strong>
             <span>
-              {toPersianNumber(reservation?.capacity?.maximum) || "نامشخص"} نفر
+              {reservation?.capacity?.maximum || "نامشخص"} نفر
             </span>
           </div>
           {/* Land Size */}
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">متراژ محوطه:</strong>
-            <span>{toPersianNumber(structure?.land_size) || "نامشخص"} متر</span>
+            <span>{structure?.land_size || "نامشخص"} متر</span>
           </div>
 
           {/* Region */}

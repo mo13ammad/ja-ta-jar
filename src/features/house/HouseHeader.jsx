@@ -5,7 +5,7 @@ import HouseViews from "./houseComponents/HouseViews";
 
 import HouseArrivals from "./houseComponents/HouseArrivals";
 import HouseStructure from "./houseComponents/HouseStructure";
-import toPersianNumber from "../../utils/toPersianNumber";
+
 
 function HouseHeader({ houseData }) {
   return (
@@ -15,7 +15,7 @@ function HouseHeader({ houseData }) {
           {houseData?.name ?? "نام اقامتگاه مشخص نشده است"}
         </h1>
         <p className="text-sm bg-primary-50 px-2 flex items-center mb-1 justify-center pt-1 rounded-2xl">
-          {toPersianNumber(houseData.uuid)}
+          {houseData.uuid}
         </p>
       </div>
 

@@ -60,10 +60,10 @@ function HouseContainer() {
       <div className="w-full px-4 my-3">
         <Separator />
       </div>
-      <HouseRooms houseData={houseData} />
-      <div className="w-full px-4 my-3">
+      {/* <HouseRooms houseData={houseData} /> */}
+      {/* <div className="w-full px-4 my-3">
         <Separator />
-      </div>
+      </div> */}
       <HouseFacilitties houseData={houseData} />
       <div className="w-full px-4 my-3">
         <Separator />
