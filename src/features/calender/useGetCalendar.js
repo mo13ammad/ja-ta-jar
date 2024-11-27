@@ -1,11 +1,11 @@
 // src/hooks/useFetchHouse.js
 import { useQuery } from "@tanstack/react-query";
-import { getHouseCalender } from "../../services/houseService";
+import { getHouseCalendar } from "../../services/houseService";
 
-export default function useFetchHouse(uuid) {
+export default function useGetCalendar(uuid) {
   return useQuery({
     queryKey: ["get-house-calender", uuid],
-    queryFn: () => getHouseCalender(uuid),
+    queryFn: () => getHouseCalendar(uuid),
     retry: false,
     enabled: !!uuid,
   });

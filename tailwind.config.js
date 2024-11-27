@@ -19,6 +19,10 @@ module.exports = {
         xs: "420px", // Replace 480px with your desired breakpoint value
         sm: '640px',
       },
+      fontSize: {
+        '3xs': '0.5rem',  // 8px
+        '2xs': '0.625rem', // 10px
+      },
       boxShadow: {
         centered: "0 0 15px rgba(0, 0, 0, 0.1)",
       },

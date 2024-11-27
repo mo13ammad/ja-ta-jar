@@ -23,8 +23,12 @@ export function showHouse(houseId) {
   return http.get(`/house/${houseId}`).then(({ data }) => data.data);
 }
 
-export function getHouseCalender(houseId) {
-  return http.get(`/house/${houseId}/calender`).then(({ data }) => data.data);
+export function getHouseCalendar(houseId) {
+  return http.get(`/house/${houseId}/calendar`).then(({ data }) => data.data);
+}
+
+export function getHouseCalendarByMonth(houseId,year,month) {
+  return http.get(`/house/${houseId}/calendar?year=${year}&month=${month}`).then(({ data }) => data.data);
 }
 
 export function editHouse(houseId, houseData) {

@@ -18,6 +18,7 @@ import HouseRooms from "./houseComponents/HouseRooms";
 import Separator from "./../../ui/Separator";
 import HouseCancelationRules from "./houseComponents/HouseCancelationRules";
 import HouseReserveMenu from "./houseComponents/ReserveMenu";
+import CalendarContainer from "../calender/CalendarContainer";
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -80,6 +81,7 @@ function HouseContainer() {
       <div className=" bg-red-700">
       </div>
       <HouseReserveMenu houseData={houseData} />
+      {/* <CalendarContainer/> */}
     </div>
   );
 }
