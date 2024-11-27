@@ -22,6 +22,7 @@ module.exports = {
       fontSize: {
         '3xs': '0.5rem',  // 8px
         '2xs': '0.625rem', // 10px
+        "md": '0.9375rem',
       },
       boxShadow: {
         centered: "0 0 15px rgba(0, 0, 0, 0.1)",
