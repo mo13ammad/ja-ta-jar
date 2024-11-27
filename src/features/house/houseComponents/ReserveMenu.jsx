@@ -49,7 +49,7 @@ function HouseReserveMenu({ houseData }) {
 
       <div
         ref={reserveMenuRef}
-        className={`z-50 px-4 pt-1 shadow-centered flex flex-col bg-primary-50 w-full rounded-t-3xl md:hidden fixed bottom-0 transition-all duration-300 ${
+        className={`z-50 px-4 pt-1 w-full shadow-centered flex flex-col bg-primary-50  rounded-t-3xl md:hidden fixed bottom-0 transition-all duration-300 ${
           isExpanded ? 'h-[35vh]' : 'h-24'
         }`}
       >

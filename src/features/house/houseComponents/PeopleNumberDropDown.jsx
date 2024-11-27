@@ -12,8 +12,8 @@ const PeopleDropdown = () => {
   };
 
   return (
-    <div className="text-sm my-2 mt-3">
-      <p className="mb-1">تعداد نفرات :</p>
+    <div className="text-sm my-2 mt-3 z-50">
+      
       <Menu as="div" className="relative inline-block w-full">
         {/* Dropdown Button */}
         <Menu.Button
@@ -37,7 +37,7 @@ const PeopleDropdown = () => {
               {({ active }) => (
                 <div
                   onClick={() => handleSelect(number)}
-                  className={`cursor-pointer px-4 py-2 ${
+                  className={`cursor-pointer px-4 z-50 py-2 ${
                     active ? "bg-gray-100 text-primary-600" : "text-gray-700"
                   }`}
                 >
