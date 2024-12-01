@@ -8,5 +8,7 @@ export default function useFetchHouse(uuid) {
     queryFn: () => getHouse(uuid),
     retry: false,
     enabled: !!uuid, // Only fetch when uuid is provided
+    staleTime: 10 * 60 * 1000, // Data remains fresh for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Cache remains for 10 minutes
   });
 }

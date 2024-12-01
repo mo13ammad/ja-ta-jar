@@ -181,3 +181,13 @@
 .swiper-pagination-bullet-active {
   background-color: rgb(var(--color-primary-700)); /* Active dot */
 }
+
+.diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(200, 200, 200, 0.2) 0px,
+    rgba(200, 200, 200, 0.2) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
