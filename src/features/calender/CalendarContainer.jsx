@@ -7,13 +7,13 @@ function CalendarContainer({
   reserveDateTo,
   setReserveDateTo,
   closeModal,
-  // instantBooking,
+  instantBooking,
   calendarData, // Receive calendar data as prop
 }) {
   console.log(calendarData);
   const [hoverDate, setHoverDate] = useState(null);
   const [validRangeEnd, setValidRangeEnd] = useState(null);
-  const instantBooking = true ;
+ 
   const formatPrice = (price) => {
     const formattedPrice = toPersianNumber(price.toLocaleString());
     return formattedPrice;
