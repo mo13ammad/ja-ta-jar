@@ -124,12 +124,12 @@ function HouseContainer() {
         </div>
 
         {/* Right Column (Desktop Reservation Menu) */}
-        <div className="hidden top-0 lg:flex items-start justify-center w-2/5 xl:w-1/4 h-full">
-          <div className="w-full rounded-3xl relative bg-white px-2 py-1 shadow-lg">
+        <div className="hidden top-0 md:flex items-start justify-center w-2/5 xl:w-1/4 h-full">
+          <div className="w-full rounded-3xl relative bg-white lg:px-2 py-1 shadow-lg">
             {/* Price Header */}
-            <div className="w-full rounded-b rounded-3xl px-8 flex justify-between absolute right-0 top-0 py-3 mb-4 bg-primary-500">
-              <p className="text-white text-lg">قیمت هر شب از</p>
-              <p className="text-white text-lg">{`${toPersianNumber(
+            <div className="w-full rounded-b rounded-3xl px-1 lg:px-8 flex justify-between absolute right-0 top-0 py-3 mb-4 bg-primary-500">
+              <p className="text-white lg:text-lg">قیمت هر شب از</p>
+              <p className="text-white lg:text-lg">{`${toPersianNumber(
                 "800,000"
               )} تومان`}</p>
             </div>

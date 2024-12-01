@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import toPersianNumber from "../../utils/toPersianNumber";
+import "../../index.css"; // Ensure this imports your CSS where .diagonal-stripes is defined
 
 function CalendarContainer({
   reserveDateFrom,
@@ -8,12 +9,12 @@ function CalendarContainer({
   setReserveDateTo,
   closeModal,
   instantBooking,
-  calendarData, // Receive calendar data as prop
+  calendarData,
 }) {
   console.log(calendarData);
   const [hoverDate, setHoverDate] = useState(null);
   const [validRangeEnd, setValidRangeEnd] = useState(null);
- 
+
   const formatPrice = (price) => {
     const formattedPrice = toPersianNumber(price.toLocaleString());
     return formattedPrice;
@@ -108,8 +109,12 @@ function CalendarContainer({
     let styles = [];
 
     if (day.isBlank) styles.push("invisible");
-    if (day.isDisable || day.isLock)
+    if (day.isDisable || day.isLock) {
       styles.push("bg-gray-200 text-gray-400 cursor-not-allowed");
+      if (day.isDisable) {
+        styles.push("diagonal-stripes");
+      }
+    }
     if (day.isToDay) styles.push("border-2 border-primary-600");
     if (day.isHoliday) styles.push("text-red-600 border-red-600");
 

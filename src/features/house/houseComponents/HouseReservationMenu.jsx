@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import toPersianNumber from "../../../utils/toPersianNumber";
-import { MinusIcon } from "@heroicons/react/24/outline";
+import { MinusIcon, TrashIcon } from "@heroicons/react/24/outline"; // Import TrashIcon
 import PeopleDropdown from "./PeopleNumberDropDown";
 import CalendarContainer from "../../calender/CalendarContainer";
 import { Transition } from "@headlessui/react";
@@ -59,7 +59,7 @@ function HouseReservationMenu({
       {/* Overlay when expanded */}
       {(isExpanded || showCalendarModal) && (
         <div
-          className="fixed inset-0   opacity-50 z-40"
+          className="fixed inset-0 opacity-50 z-40"
           onClick={() => {
             setIsExpanded(false);
             setShowCalendarModal(false);
@@ -76,17 +76,29 @@ function HouseReservationMenu({
         leave="transition ease-in duration-200"
         leaveFrom="opacity-100 translate-y-0"
         leaveTo="opacity-0 translate-y-full"
-        className="fixed w-full bottom-0 z-50 flex "
+        className="fixed w-full bottom-0 z-50 flex"
         style={{ zIndex: 1000 }}
       >
         <div
           ref={reserveMenuRef}
           className="w-full h-[80vh] md:hidden flex flex-col bg-gray-50 rounded-t-3xl overflow-auto"
         >
-          {/* Close button */}
-          <div className="">
-            <button className="w-full flex justify-end pl-2 " onClick={() => setShowCalendarModal(false)}>
+          {/* Header with Close and Clear buttons */}
+          <div className="flex justify-between items-center p-4">
+            {/* Close Button */}
+            <button onClick={() => setShowCalendarModal(false)}>
               <MinusIcon className="w-7 h-7 text-gray-700 mb-1" />
+            </button>
+            {/* Clear Button */}
+            <button
+              onClick={() => {
+                setReserveDateFrom(null);
+                setReserveDateTo(null);
+              }}
+              className="py-1.5 px-3 border rounded-2xl border-gray-400 flex items-center"
+            >
+              پاک کردن
+              <TrashIcon className="w-5 h-5 mr-2" />
             </button>
           </div>
           {/* CalendarContainer */}
@@ -176,7 +188,7 @@ function HouseReservationMenu({
             </div>
 
             {/* People Dropdown */}
-            <div className="text-sm  flex justify-center w-full my-2 mt-4">
+            <div className="text-sm flex justify-center w-full my-2 mt-4">
               <PeopleDropdown />
             </div>
 
