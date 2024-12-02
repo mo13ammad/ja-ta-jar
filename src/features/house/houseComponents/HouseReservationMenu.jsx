@@ -20,6 +20,7 @@ function HouseReservationMenu({
   const [showCalendarModal, setShowCalendarModal] = useState(false);
 
   const reserveMenuRef = useRef(null);
+  const calendarModalRef = useRef(null); // New ref for calendar modal
 
   // Function to toggle the expanded state
   const handleToggle = () => {
@@ -30,11 +31,17 @@ function HouseReservationMenu({
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        (showCalendarModal || isExpanded) &&
+        showCalendarModal &&
+        calendarModalRef.current &&
+        !calendarModalRef.current.contains(event.target)
+      ) {
+        setShowCalendarModal(false);
+      } else if (
+        !showCalendarModal && // Only close the reservation menu if the calendar modal is not open
+        isExpanded &&
         reserveMenuRef.current &&
         !reserveMenuRef.current.contains(event.target)
       ) {
-        setShowCalendarModal(false);
         setIsExpanded(false);
       }
     };
@@ -47,22 +54,33 @@ function HouseReservationMenu({
     };
   }, [showCalendarModal, isExpanded]);
 
-  // Close modal with smooth transition when both dates are selected
+  // Close modal when both dates are selected
   useEffect(() => {
     if (reserveDateFrom && reserveDateTo) {
       setShowCalendarModal(false);
+      // Ensure the reservation menu remains expanded
+      setIsExpanded(true);
     }
   }, [reserveDateFrom, reserveDateTo]);
 
   return (
     <>
-      {/* Overlay when expanded */}
-      {(isExpanded || showCalendarModal) && (
+      {/* Overlay for calendar modal */}
+      {showCalendarModal && (
         <div
-          className="fixed inset-0 opacity-50 z-40"
+          className="fixed inset-0  opacity-50 z-40"
+          onClick={() => {
+            setShowCalendarModal(false);
+          }}
+        ></div>
+      )}
+
+      {/* Overlay for expanded menu */}
+      {isExpanded && !showCalendarModal && (
+        <div
+          className="fixed inset-0  opacity-50 z-30"
           onClick={() => {
             setIsExpanded(false);
-            setShowCalendarModal(false);
           }}
         ></div>
       )}
@@ -80,7 +98,7 @@ function HouseReservationMenu({
         style={{ zIndex: 1000 }}
       >
         <div
-          ref={reserveMenuRef}
+          ref={calendarModalRef}
           className="w-full h-[80vh] md:hidden flex flex-col bg-gray-50 rounded-t-3xl overflow-auto"
         >
           {/* Header with Close and Clear buttons */}
@@ -114,12 +132,14 @@ function HouseReservationMenu({
         </div>
       </Transition>
 
+      {/* Reservation Menu */}
       <div
         ref={reserveMenuRef}
-        className={`z-50 px-4 pt-1 w-full shadow-centered flex flex-col bg-primary-50 rounded-t-3xl md:hidden fixed bottom-0 transition-all duration-300 ${
-          isExpanded ? "h-auto" : "h-24"
-        }`}
-        style={{ zIndex: 500 }}
+        className={`z-50 px-4 pt-1 w-full shadow-centered flex flex-col bg-primary-50 rounded-t-3xl md:hidden fixed bottom-0 transition-all duration-300`}
+        style={{
+          zIndex: 500,
+          maxHeight: isExpanded ? "80vh" : "6rem", // Adjusted for smooth transition
+        }}
       >
         {/* Top Bar with Close Icon */}
         <div className="flex w-full justify-center items-center px-4">
@@ -135,88 +155,90 @@ function HouseReservationMenu({
         </div>
 
         {/* Content */}
-        {isExpanded ? (
-          // Expanded content
-          <div className="flex-1 overflow-y-auto px-4">
-            {/* Reservation Dates */}
-            <p className="text-sm ">تاریخ رزرو</p>
-            <div className="h-12 my-1.5 w-full flex items-center justify-between rounded-xl shadow-sm bg-white px-4 border">
-              {/* Date From */}
-              <div
-                className="flex-1 flex items-center justify-center w-full h-full text-gray-700 text-sm cursor-pointer"
-                onClick={() => setShowCalendarModal(true)} // Open calendar modal
-              >
-                {reserveDateFrom ? (
-                  <div className="h-full flex flex-col items-center justify-center w-full ">
-                    <p>ورود</p>
-                    <p>{`${toPersianNumber(
-                      reserveDateFrom.year
-                    )}/${toPersianNumber(
-                      reserveDateFrom.month
-                    )}/${toPersianNumber(reserveDateFrom.day)}`}</p>
-                  </div>
-                ) : (
-                  <div className="h-full flex items-center justify-center w-full">
-                    <p>تاریخ ورود</p>
-                  </div>
-                )}
+        <div className="overflow-hidden transition-all duration-300">
+          {isExpanded ? (
+            // Expanded content
+            <div className="flex-1 overflow-y-auto px-4">
+              {/* Reservation Dates */}
+              <p className="text-sm ">تاریخ رزرو</p>
+              <div className="h-12 my-1.5 w-full flex items-center justify-between rounded-xl shadow-sm bg-white px-4 border">
+                {/* Date From */}
+                <div
+                  className="flex-1 flex items-center justify-center w-full h-full text-gray-700 text-sm cursor-pointer"
+                  onClick={() => setShowCalendarModal(true)} // Open calendar modal
+                >
+                  {reserveDateFrom ? (
+                    <div className="h-full flex flex-col items-center justify-center w-full ">
+                      <p>ورود</p>
+                      <p>{`${toPersianNumber(
+                        reserveDateFrom.year
+                      )}/${toPersianNumber(
+                        reserveDateFrom.month
+                      )}/${toPersianNumber(reserveDateFrom.day)}`}</p>
+                    </div>
+                  ) : (
+                    <div className="h-full flex items-center justify-center w-full">
+                      <p>تاریخ ورود</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Separator */}
+                <div className="w-px h-6 bg-gray-400 mx-2"></div>
+
+                {/* Date To */}
+                <div
+                  className="flex-1 flex items-center justify-center w-full h-full text-gray-700 text-sm cursor-pointer"
+                  onClick={() => setShowCalendarModal(true)} // Open calendar modal
+                >
+                  {reserveDateTo ? (
+                    <div className="h-full flex flex-col items-center justify-center w-full ">
+                      <p>خروج</p>
+                      <p>{`${toPersianNumber(
+                        reserveDateTo.year
+                      )}/${toPersianNumber(
+                        reserveDateTo.month
+                      )}/${toPersianNumber(reserveDateTo.day)}`}</p>
+                    </div>
+                  ) : (
+                    <div className="h-full flex items-center justify-center w-full">
+                      <p>تاریخ خروج</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Separator */}
-              <div className="w-px h-6 bg-gray-400 mx-2"></div>
+              {/* People Dropdown */}
+              <div className="text-sm flex justify-center w-full my-2 mt-4">
+                <PeopleDropdown />
+              </div>
 
-              {/* Date To */}
-              <div
-                className="flex-1 flex items-center justify-center w-full h-full text-gray-700 text-sm cursor-pointer"
-                onClick={() => setShowCalendarModal(true)} // Open calendar modal
-              >
-                {reserveDateTo ? (
-                  <div className="h-full flex flex-col items-center justify-center w-full ">
-                    <p>خروج</p>
-                    <p>{`${toPersianNumber(
-                      reserveDateTo.year
-                    )}/${toPersianNumber(
-                      reserveDateTo.month
-                    )}/${toPersianNumber(reserveDateTo.day)}`}</p>
-                  </div>
-                ) : (
-                  <div className="h-full flex items-center justify-center w-full">
-                    <p>تاریخ خروج</p>
-                  </div>
-                )}
+              {/* Reserve Button */}
+              <div className="w-full my-3 mt-6">
+                <button className="w-full btn rounded-3xl bg-primary-500 hover:bg-primary-600 transition-all duration-300 px-3 py-1.5">
+                  رزرو
+                </button>
               </div>
             </div>
+          ) : (
+            // Collapsed content
+            <div
+              className="flex w-full justify-between items-center pb-4 cursor-pointer"
+              onClick={handleToggle}
+            >
+              <div className="flex gap-2 text-primary-800  px-3 py-1.5 xs:mr-10 rounded-3xl">
+                <p className="font-bold text-lg">قیمت هر شب از :</p>
+                <p className="font-bold text-lg">
+                  {toPersianNumber("3,500,000")}
+                </p>
+              </div>
 
-            {/* People Dropdown */}
-            <div className="text-sm flex justify-center w-full my-2 mt-4">
-              <PeopleDropdown />
-            </div>
-
-            {/* Reserve Button */}
-            <div className="w-full my-3 mt-6">
-              <button className="w-full btn rounded-3xl bg-primary-500 hover:bg-primary-600 transition-all duration-300 px-3 py-1.5">
-                رزرو
+              <button className="btn text-sm xs:text-md bg-primary-600 px-4 py-2">
+                رزرو اقامتگاه
               </button>
             </div>
-          </div>
-        ) : (
-          // Collapsed content
-          <div
-            className="flex w-full justify-between items-center cursor-pointer"
-            onClick={handleToggle}
-          >
-            <div className="flex gap-2 text-white bg-primary-500 px-3 py-1.5 xs:mr-10 rounded-3xl">
-              <p className="font-bold text-sm xs:text-md">قیمت هر شب :</p>
-              <p className="text-sm xs:text-md">
-                {toPersianNumber("3,500,000")}
-              </p>
-            </div>
-
-            <button className="btn text-sm xs:text-md bg-primary-600 px-4 py-1.5">
-              رزرو اقامتگاه
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

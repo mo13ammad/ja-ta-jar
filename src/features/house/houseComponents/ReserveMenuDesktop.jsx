@@ -1,10 +1,8 @@
-// ReserveMenuDesktop.jsx
-
 import React, { useEffect, useRef, useState } from "react";
 import PeopleDropdown from "./PeopleNumberDropDown";
 import toPersianNumber from "../../../utils/toPersianNumber";
 import { Transition } from "@headlessui/react";
-import { TrashIcon } from "@heroicons/react/24/outline"; // Import the Trash Icon
+import { TrashIcon } from "@heroicons/react/24/outline";
 import CalendarContainer from "../../calender/CalendarContainer";
 
 function ReserveMenuDesktop({
@@ -14,7 +12,7 @@ function ReserveMenuDesktop({
   setReserveDateTo,
   houseData,
   uuid,
-  calendarData, // Receive calendar data
+  calendarData,
 }) {
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const modalRef = useRef(null);
@@ -38,63 +36,54 @@ function ReserveMenuDesktop({
     };
   }, [showCalendarModal]);
 
-  // Close modal when both dates are selected
-  useEffect(() => {
-    if (reserveDateFrom && reserveDateTo) {
-      setShowCalendarModal(false);
-    }
-  }, [reserveDateFrom, reserveDateTo]);
+ 
 
   return (
     <div>
-      {/* Backdrop and Modal Transition */}
-      <Transition show={showCalendarModal}>
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
-          {/* Modal Transition */}
-          <Transition.Child
-            enter="transition ease-out duration-300"
-            enterFrom="opacity-0 translate-x-full"
-            enterTo="opacity-100 translate-x-0"
-            leave="transition ease-in duration-200"
-            leaveFrom="opacity-100 translate-x-0"
-            leaveTo="opacity-0 translate-x-full"
-            className="fixed inset-y-0 right-0 z-50 flex"
-            style={{ zIndex: 1001 }}
-          >
-            <div
-              ref={modalRef}
-              className="bg-gray-50 rounded-l-3xl flex flex-col overflow-auto max-h-full scrollbar-thin w-3/5 lg:w-1/2 xl:w-1/3 shadow-lg"
+      {/* Modal Transition */}
+      <Transition
+        show={showCalendarModal}
+        as={React.Fragment}
+        unmount={true}
+        enter="transition ease-out duration-300 transform"
+        enterFrom="opacity-0 translate-x-full"
+        enterTo="opacity-100 translate-x-0"
+        leave="transition ease-in duration-200 transform"
+        leaveFrom="opacity-100  translate-x-0"
+        leaveTo="opacity-0  translate-x-full"
+      >
+        <div
+          ref={modalRef}
+          className="fixed inset-y-0 right-0 z-50 flex   rounded-l-3xl flex-col overflow-auto max-h-full scrollbar-thin w-3/5 lg:w-1/2 xl:w-1/3 shadow-lg"
+        >
+          {/* Header with Close and Clear buttons */}
+          <div className="flex justify-between p-4">
+            {/* Clear Button */}
+            <button
+              onClick={() => {
+                setReserveDateFrom(null);
+                setReserveDateTo(null);
+              }}
+              className="mr-4 py-1.5 px-3 border rounded-2xl border-gray-400 flex items-center"
             >
-              {/* Header with Close and Clear buttons */}
-              <div className="flex justify-between p-4">
-                {/* Clear Button */}
-                <button
-                  onClick={() => {
-                    setReserveDateFrom(null);
-                    setReserveDateTo(null);
-                  }}
-                  className="mr-4 py-1.5 px-3 border rounded-2xl border-gray-400 flex items-center"
-                >
-                  <TrashIcon className="w-5 h-5 ml-2" />
-                  پاک کردن
-                </button>
-                {/* Close Button */}
-                <button onClick={() => setShowCalendarModal(false)}>
-                  <span className="text-gray-700 text-xl">&times;</span>
-                </button>
-              </div>
-              {/* CalendarContainer */}
-              <CalendarContainer
-                reserveDateFrom={reserveDateFrom}
-                setReserveDateFrom={setReserveDateFrom}
-                reserveDateTo={reserveDateTo}
-                setReserveDateTo={setReserveDateTo}
-                closeModal={() => setShowCalendarModal(false)}
-                instantBooking={houseData.instant_booking}
-                calendarData={calendarData} // Pass calendar data
-              />
-            </div>
-          </Transition.Child>
+              <TrashIcon className="w-5 h-5 ml-2" />
+              پاک کردن
+            </button>
+            {/* Close Button */}
+            <button onClick={() => setShowCalendarModal(false)}>
+              <span className="text-gray-700 text-xl">&times;</span>
+            </button>
+          </div>
+          {/* CalendarContainer */}
+          <CalendarContainer
+            reserveDateFrom={reserveDateFrom}
+            setReserveDateFrom={setReserveDateFrom}
+            reserveDateTo={reserveDateTo}
+            setReserveDateTo={setReserveDateTo}
+            closeModal={() => setShowCalendarModal(false)}
+            instantBooking={houseData.instant_booking}
+            calendarData={calendarData}
+          />
         </div>
       </Transition>
 
@@ -108,7 +97,7 @@ function ReserveMenuDesktop({
             onClick={() => setShowCalendarModal(true)}
           >
             {reserveDateFrom ? (
-              <div className="h-full flex flex-col items-center justify-center w-full ">
+              <div className="h-full flex flex-col items-center justify-center w-full">
                 <p className="text-md">ورود</p>
                 <p>{`${toPersianNumber(
                   reserveDateFrom.year
@@ -132,7 +121,7 @@ function ReserveMenuDesktop({
             onClick={() => setShowCalendarModal(true)}
           >
             {reserveDateTo ? (
-              <div className="h-full flex flex-col items-center justify-center w-full ">
+              <div className="h-full flex flex-col items-center justify-center w-full">
                 <p className="text-md">خروج</p>
                 <p>{`${toPersianNumber(
                   reserveDateTo.year

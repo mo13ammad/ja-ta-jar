@@ -77,7 +77,7 @@ function HouseContainer() {
     .filter(Boolean);
 
   // Show loading screen while fetching house data or calendar data
-  if (loadingHouse || loadingInitialCalendar || isLoadingCalendar) {
+  if (loadingHouse) {
     return (
       <div className="flex justify-center items-center h-[50vh]">
         <Loading />
@@ -93,9 +93,9 @@ function HouseContainer() {
         <HouseImages houseData={houseData} />
       </div>
 
-      <div className="w-full flex relative px-2 py-1 lg:pt-6 flex-row">
+      <div className="w-full flex relative px-2 py-1 lg:pt-3 xl:pt-6 flex-row">
         {/* Left Column */}
-        <div className="flex flex-col lg:w-3/5 xl:w-3/4">
+        <div className="flex flex-col md:w-3/5 xl:w-3/4">
           <HouseHeader houseData={houseData} />
           <HouseDescription houseData={houseData} />
           <div className="w-full px-4 mb-2">
@@ -127,9 +127,9 @@ function HouseContainer() {
         <div className="hidden top-0 md:flex items-start justify-center w-2/5 xl:w-1/4 h-full">
           <div className="w-full rounded-3xl relative bg-white lg:px-2 py-1 shadow-lg">
             {/* Price Header */}
-            <div className="w-full rounded-b rounded-3xl px-1 lg:px-8 flex justify-between absolute right-0 top-0 py-3 mb-4 bg-primary-500">
-              <p className="text-white lg:text-lg">قیمت هر شب از</p>
-              <p className="text-white lg:text-lg">{`${toPersianNumber(
+            <div className="w-full rounded-b rounded-3xl px-1 md:px-3 lg:px-8 flex justify-between absolute right-0 top-0 py-3 mb-4 bg-primary-500">
+              <p className="text-white text-sm lg:text-lg">قیمت هر شب از</p>
+              <p className="text-white text-sm lg:text-lg">{`${toPersianNumber(
                 "800,000"
               )} تومان`}</p>
             </div>
