@@ -49,13 +49,13 @@ const EditHouseContent = ({
   console.log("Selected Tab:", selectedTab);
   console.log("Tab Sections:", tabSections);
 
-  // Initialize houseData only once
   useEffect(() => {
-    if (fetchedHouseData && houseData === null) {
+    if (fetchedHouseData) {
       console.log("Fetched house data:", fetchedHouseData);
       setHouseData(fetchedHouseData);
     }
-  }, [fetchedHouseData, houseData]);
+  }, [fetchedHouseData]);
+  
 
   const handleEditHouse = async (updatedData) => {
     console.log("handleEditHouse called with data:", updatedData);

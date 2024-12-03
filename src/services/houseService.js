@@ -143,7 +143,7 @@ export function updateHousePrice(houseId, prices) {
 
   return http
     .put(`/client/house/${houseId}/prices`, prices)
-    .then(({ data }) => data.data)
+    .then(({ data }) => data.data) // Ensure it returns the data
     .catch((error) => {
       console.error("updateHousePrice - Error:", error);
       throw error;
@@ -163,7 +163,7 @@ export function updateRoomPrice(houseId, roomId, prices) {
 
   return http
     .put(`/client/house/${houseId}/room/${roomId}/prices`, prices)
-    .then(({ data }) => data.data)
+    .then(({ data }) => data.data) // Ensure it returns the data
     .catch((error) => {
       console.error("updateRoomPrice - Error:", error);
       throw error;

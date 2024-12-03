@@ -15,9 +15,16 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      spacing: {
+        '128': '32rem',  // Add custom size (128 = 32rem)
+        '144': '36rem',  // Add custom size (144 = 36rem)
+        '160': '40rem',  // Add custom size (160 = 40rem)
+        '192': '48rem',  // Add custom size (192 = 48rem)
+      },
       screens: {
         xs: "420px", // Replace 480px with your desired breakpoint value
         sm: '640px',
+        '3xl': '1620px'
       },
       fontSize: {
         '3xs': '0.5rem',  // 8px

@@ -159,19 +159,22 @@ const EditHousePricing = ({
     // Set default values for extra people fields if not provided
     ["spring", "summer", "autumn", "winter"].forEach((season) => {
       if (!formattedData[`extra_people_${season}`]) {
-        formattedData[`extra_people_${season}`] = "10000";
+        formattedData[`extra_people_${season}`] = "0";
       }
     });
 
     try {
       if (houseData?.is_rent_room && roomUuid) {
         await updateRoomPrice(houseId, roomUuid, formattedData);
+        toast.success("قیمت‌های اتاق با موفقیت به روز شد");
+        refetchHouseData();
       } else {
         await updateHousePrice(houseId, formattedData);
+        toast.success("قیمت‌های اقامتگاه با موفقیت به روز شد");
+        refetchHouseData(); // Moved here
       }
-      toast.success("قیمت‌ها با موفقیت به روز شد");
       setErrorList([]);
-      refetchHouseData();
+      // Refetch the house data to get updated prices
     } catch (error) {
       if (error.response?.status === 422) {
         const errorsArray = Object.values(
@@ -370,7 +373,9 @@ const EditHousePricing = ({
                             className="btn bg-green-500 cursor-pointer text-white px-4 py-2 rounded-2xl shadow-centered hover:bg-green-600"
                             disabled={loadingSubmit}
                           >
-                            {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت اتاق"}
+                            {loadingSubmit
+                              ? "در حال ثبت ..."
+                              : "ثبت قیمت اتاق"}
                           </button>
                         </div>
 
@@ -446,15 +451,26 @@ const EditHousePricing = ({
               },
             ])}
 
-            <div className="mt-4">
+            <div className="mt-4 w-full flex justify-end">
               <button
                 onClick={() => handleSubmit()}
-                className="bg-green-600 text-white px-4 py-2 rounded-xl shadow-xl"
+                className="bg-green-600 text-white px-4 py-2 rounded-2xl shadow-xl"
                 disabled={loadingSubmit}
               >
                 {loadingSubmit ? "در حال ثبت ..." : "ثبت قیمت‌ها"}
               </button>
             </div>
+
+            {errorList.length > 0 && (
+              <div className="mt-4 text-red-600">
+                <h3 className="font-semibold">خطاهای زیر را بررسی کنید:</h3>
+                <ul className="list-disc ml-5">
+                  {errorList.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </>
         )}
       </div>

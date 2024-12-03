@@ -17,11 +17,11 @@ function HouseImages({ houseData }) {
 
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0); // Track the current slide index
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // Open modal
   const openModal = (index) => {
-    setCurrentSlide(index);
+    setSelectedImageIndex(index);
     setIsOpen(true);
   };
 
@@ -31,63 +31,112 @@ function HouseImages({ houseData }) {
   };
 
   return (
-    <div className="w-full lg:w-2/3 mx-auto mb-1.5 lg:mb-0">
-      {/* Swiper Component */}
-      <Swiper
-        modules={[Navigation, Pagination]}
-        navigation
-        pagination={{ clickable: true }}
-        spaceBetween={50}
-        slidesPerView={1}
-        className="shadow-centered"
-      >
-        {images.map((image, index) => (
-          <SwiperSlide key={index}>
-            <img
-              src={image}
-              alt={`Slide ${index + 1}`}
-              className="w-full max-h-60 sm:max-h-72 lg:max-h-96 h-auto object-cover lg:rounded-xl  cursor-pointer"
-              onClick={() => openModal(index)} // Open modal on click
-            />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+    <div className="w-full  mx-auto  mb-1.5 lg:mb-0">
+      {/* Swiper Component for small screens */}
+      <div className="block lg:hidden">
+        <Swiper
+          modules={[Navigation, Pagination]}
+          navigation
+          pagination={{ clickable: true }}
+          spaceBetween={20}
+          slidesPerView={1}
+          className="shadow-centered"
+        >
+          {images.map((image, index) => (
+            <SwiperSlide key={index}>
+              <img
+                src={image}
+                alt={`Slide ${index + 1}`}
+                className="w-full h-auto max-h-60 sm:max-h-72 object-cover rounded-xl cursor-pointer"
+                onClick={() => openModal(index)}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
-      {/* Modal with Swiper */}
+      {/* Custom layout for large screens */}
+      <div className="hidden  w-full  lg:block">
+        <div className="flex flex-row items-center  h-full  w-full justify-center gap-4">
+          {/* Left Column */}
+          <div className="flex flex-col    w-1/4 space-y-8">
+            {images.map((image, index) =>
+              index % 2 === 1 ? (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Image ${index + 1}`}
+                  className="w-full h-auto max-h-60 object-cover rounded-xl cursor-pointer"
+                  onClick={() => openModal(index)}
+                />
+              ) : null
+            )}
+          </div>
+          {/* Center Column (Big Image) */}
+          <div className="w-2/4">
+            <img
+              src={images[0]}
+              alt="Main Image"
+              className="w-full h-full object-cover rounded-xl cursor-pointer"
+              onClick={() => openModal(0)}
+            />
+          </div>
+          {/* Right Column */}
+          <div className="flex flex-col w-1/4 justify-between space-y-8 h-full">
+            {images.map((image, index) =>
+              index !== 0 && index % 2 === 0 ? (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Image ${index + 1}`}
+                  className="w-full h-auto max-h-60  object-cover rounded-xl cursor-pointer"
+                  onClick={() => openModal(index)}
+                />
+              ) : null
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal with Main Image and Thumbnails */}
       <Dialog open={isOpen} onClose={closeModal} className="relative z-50">
         <div
           className="fixed inset-0 bg-black bg-opacity-75"
           aria-hidden="true"
         ></div>
-        <div className="fixed inset-0 flex items-center justify-center">
-          <Dialog.Panel className="w-full max-w-4xl max-h-screen mx-4 lg:mx-0">
+        <div className="fixed inset-0 flex   items-center justify-center">
+          <Dialog.Panel className="w-full max-w-3xl z-50 xl:max-w-5xl mx-2  sm:px-6 flex flex-col  relative">
             {/* Close Button */}
             <button
               onClick={closeModal}
-              className="absolute top-2 right-2 text-white text-2xl bg-black bg-opacity-50 rounded-full p-2"
+              className=" text-white w-6 mb-1  h-6 bg-black  bg-opacity-50 rounded-full"
             >
               &times;
             </button>
-            {/* Swiper in Modal */}
-            <Swiper
-              modules={[Navigation, Pagination]}
-              navigation
-              pagination={{ clickable: true }}
-              spaceBetween={50}
-              slidesPerView={1}
-              initialSlide={currentSlide} // Set the initial slide
-              className="rounded-xl"
-            >
+            {/* Main Image */}
+            <div className="flex w-full justify-center  h-full  ">
+              <img
+                src={images[selectedImageIndex]}
+                alt={`Image ${selectedImageIndex + 1}`}
+                className="min-h-24 h-auto max-h-72 xs:max-h-96 xl:max-h-144 3xl:max-h-192 object-cover rounded-2xl"
+              />
+            </div>
+            {/* Thumbnails Below */}
+            <div className="flex overflow-x-auto mt-4">
               {images.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={image}
-                    alt={`Slide ${index + 1}`}
-                    className="w-full max-h-screen object-contain rounded-lg"
-                  />
-                </SwiperSlide>
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  className={`w-20 h-20 object-cover rounded-lg cursor-pointer m-1 ${
+                    selectedImageIndex === index
+                      ? "border-2 border-blue-500"
+                      : ""
+                  }`}
+                  onClick={() => setSelectedImageIndex(index)}
+                />
               ))}
-            </Swiper>
+            </div>
           </Dialog.Panel>
         </div>
       </Dialog>

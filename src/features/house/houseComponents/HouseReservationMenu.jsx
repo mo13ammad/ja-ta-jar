@@ -227,13 +227,13 @@ function HouseReservationMenu({
               onClick={handleToggle}
             >
               <div className="flex gap-2 text-primary-800  px-3 py-1.5 xs:mr-10 rounded-3xl">
-                <p className="font-bold text-lg">قیمت هر شب از :</p>
-                <p className="font-bold text-lg">
+                <p className="font-bold xs:text-lg">قیمت هر شب از :</p>
+                <p className="font-bold xs:text-lg">
                   {toPersianNumber("3,500,000")}
                 </p>
               </div>
 
-              <button className="btn text-sm xs:text-md bg-primary-600 px-4 py-2">
+              <button className="btn text-xs xs:text-md bg-primary-600 px-4 py-2">
                 رزرو اقامتگاه
               </button>
             </div>
