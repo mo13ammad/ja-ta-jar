@@ -21,6 +21,12 @@ module.exports = {
         '160': '40rem',  // Add custom size (160 = 40rem)
         '192': '48rem',  // Add custom size (192 = 48rem)
       },
+      colors: {
+        gray: {
+          150: '#e5e5e5', // Example value; replace with your desired shade
+        },
+      },
+     
       screens: {
         xs: "420px", // Replace 480px with your desired breakpoint value
         sm: '640px',

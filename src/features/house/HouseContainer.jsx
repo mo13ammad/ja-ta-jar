@@ -123,11 +123,12 @@ function HouseContainer() {
           <div className="w-full px-4 my-3">
             <Separator />
           </div>
-          <HouseCancellationRules houseData={houseData} />
+          <HouseRules houseData={houseData} />
+          
           <div className="w-full px-4 my-3">
             <Separator />
           </div>
-          <HouseRules houseData={houseData} />
+          <HouseCancellationRules houseData={houseData} />
           <div className="w-full px-4 my-3">
             <Separator />
           </div>
@@ -138,7 +139,7 @@ function HouseContainer() {
 
         {/* Right Column (Desktop Reservation Menu) */}
         <div className="hidden top-0 md:flex items-start justify-center w-2/5 xl:w-1/4 h-full">
-          <div className="w-full rounded-3xl relative bg-white lg:px-2 py-1 shadow-lg">
+          <div className="w-full rounded-3xl relative bg-white lg:px-2 py-1 shadow-centered">
             {/* Price Header */}
             <div className="w-full rounded-b rounded-3xl px-1 md:px-3 lg:px-8 flex justify-between absolute right-0 top-0 py-3 mb-4 bg-primary-500">
               <p className="text-white text-sm lg:text-lg">قیمت هر شب از</p>

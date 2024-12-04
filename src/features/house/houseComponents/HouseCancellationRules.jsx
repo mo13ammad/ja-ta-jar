@@ -7,7 +7,7 @@ function HouseCancellationRules({ houseData }) {
     return null;
   }
 
-  const { title, host_description } = houseData.cancellation_rule;
+  const { title, guest_description } = houseData.cancellation_rule;
 
   return (
     <div className="px-3">
@@ -33,7 +33,7 @@ function HouseCancellationRules({ houseData }) {
                 dir="rtl"
               >
                 <strong>سیاست {title}: </strong>
-                <span dangerouslySetInnerHTML={{ __html: host_description }} />
+                <span dangerouslySetInnerHTML={{ __html: guest_description }} />
               </Disclosure.Panel>
 
               {/* Fade-out effect when content is collapsed */}
