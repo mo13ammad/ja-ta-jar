@@ -35,14 +35,15 @@ function HouseRules({ houseData }) {
   );
 
   return (
-    <div className="my-4 w-full px-5">
-      {/* Title */}
+    <div className="px-2">
       <h3
         className="text-lg font-bold text-gray-800 mb-2"
         title="مقررات اقامتگاه"
       >
         مقررات اقامتگاه
       </h3>
+    <div className="my-4 w-full px-5 bg-gray-50 rounded-2xl">
+      {/* Title */}
 
       {/* Timing Information */}
       <div className="flex flex-row p-4 rounded mb-4">
@@ -120,7 +121,7 @@ function HouseRules({ houseData }) {
 
               {/* Fade-out effect when content is collapsed */}
               {!open && (
-                <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-gray-100 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 w-full rounded-b-xl h-8 bg-gradient-to-t from-gray-50 to-transparent"></div>
               )}
             </div>
 
@@ -138,6 +139,7 @@ function HouseRules({ houseData }) {
           </>
         )}
       </Disclosure>
+    </div>
     </div>
   );
 }

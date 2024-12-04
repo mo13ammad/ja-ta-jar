@@ -33,7 +33,7 @@ function HouseImages({ houseData }) {
   return (
     <div className="w-full  mx-auto  mb-1.5 lg:mb-0">
       {/* Swiper Component for small screens */}
-      <div className="block lg:hidden">
+      <div className="block bg-gray-100 lg:hidden">
         <Swiper
           modules={[Navigation, Pagination]}
           navigation

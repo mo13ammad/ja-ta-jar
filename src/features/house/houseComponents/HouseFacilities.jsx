@@ -55,8 +55,9 @@ function HouseFacilities({ houseData }) {
   const initialFacilitiesCount = 10;
 
   return (
-    <div className="my-3 px-3">
+    <div className="px-2">
       <h3 className="text-lg font-bold text-gray-800 mb-2">امکانات</h3>
+    <div className="my-3 px-3 bg-gray-50 rounded-2xl  p-1 lg:pt-2">
 
       {/* Use Disclosure for expand/collapse functionality */}
       <Disclosure>
@@ -78,7 +79,7 @@ function HouseFacilities({ houseData }) {
 
               {/* Fade-out effect when content is collapsed */}
               {!open && (
-                <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-gray-100 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t rounded-b-xl from-gray-50 to-transparent"></div>
               )}
             </div>
 
@@ -96,6 +97,7 @@ function HouseFacilities({ houseData }) {
           </>
         )}
       </Disclosure>
+    </div>
     </div>
   );
 }

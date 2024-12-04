@@ -24,7 +24,7 @@ function HouseCancellationRules({ houseData }) {
         {({ open }) => (
           <>
             {/* Cancellation Rules Content */}
-            <div className="relative bg-gray-100 p-4 rounded">
+            <div className="relative bg-gray-50 p-4 rounded-2xl">
               <Disclosure.Panel
                 static
                 className={`text-gray-700 text-sm overflow-hidden transition-[max-height] duration-300 ease-in-out ${
@@ -38,7 +38,7 @@ function HouseCancellationRules({ houseData }) {
 
               {/* Fade-out effect when content is collapsed */}
               {!open && (
-                <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-gray-100 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 w-full rounded-b-xl h-16 bg-gradient-to-t from-gray-50 to-transparent"></div>
               )}
             </div>
 

@@ -1,10 +1,12 @@
 import { MapPinIcon, StarIcon } from '@heroicons/react/24/solid';
 import React from 'react';
 import toPersianNumber from '../../../utils/toPersianNumber';
+import Vote from '../../../ui/Vote';
 
 function HouseInformation({ houseData }) {
   const city = houseData?.address?.city?.name || 'نامشخص';
   const province = houseData?.address?.city?.province?.name || 'نامشخص';
+  const vote = houseData?.vote|| '';
 
   return (
     <div className="flex flex-col  rounded-3xl py-1 px-3">
@@ -14,15 +16,7 @@ function HouseInformation({ houseData }) {
           {province}, <span>{city}</span>
         </p>
       </div>
-      <div className="text-primary-500 flex items-center justify-start rounded-2xl w-full">
-        <StarIcon className="h-5 w-5 text-primary-600" />
-        <StarIcon className="h-5 w-5 text-primary-600" />
-        <StarIcon className="h-5 w-5 text-primary-600" />
-        <StarIcon className="h-5 w-5 text-primary-600" />
-        <StarIcon className="h-5 w-5 text-primary-200" />
-        
-        <p className="text-primary-800 px-1 py-0.5">{toPersianNumber(4.1)}</p>
-      </div>
+      <Vote size='lg' vote={vote.total_vote}/>
     </div>
   );
 }

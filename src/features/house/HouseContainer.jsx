@@ -58,7 +58,7 @@ function HouseContainer() {
       }
     }
   }
-
+  console.log(houseData)
   // Use useQueries to fetch data for each month
   const calendarQueries = useQueries({
     queries: monthsToFetch.map(({ year, month }) => ({
@@ -118,9 +118,12 @@ function HouseContainer() {
             <Separator />
           </div>
           <HouseRules houseData={houseData} />
+          <div className="w-full px-4 my-3">
+            <Separator />
+          </div>
+          <HouseComments houseData={houseData} />
           <HouseReservation />
           <HouseLocation />
-          <HouseComments />
         </div>
 
         {/* Right Column (Desktop Reservation Menu) */}

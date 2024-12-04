@@ -57,7 +57,7 @@ function ReserveMenuDesktop({
           className="fixed inset-y-0 right-0 z-50 flex   rounded-l-3xl flex-col overflow-auto max-h-full scrollbar-thin w-3/5 lg:w-1/2 xl:w-1/3 shadow-lg"
         >
           {/* Header with Close and Clear buttons */}
-          <div className="flex justify-between p-4">
+          <div className="flex justify-between bg-gray-50 p-4">
             {/* Clear Button */}
             <button
               onClick={() => {
