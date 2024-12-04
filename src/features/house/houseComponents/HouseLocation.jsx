@@ -3,6 +3,7 @@
 import React from 'react';
 import { MapContainer, TileLayer, Circle, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
+import CustomZoomControl from '../../../ui/CustomZoomControl';
 
 function HouseLocation({ cords }) {
   if (!cords) {
@@ -12,16 +13,16 @@ function HouseLocation({ cords }) {
   const position = [cords.latitude, cords.longitude]; // [lat, lng]
 
   return (
-    <div style={{ width: '100%', height: '250px', borderRadius: '24px' }}>
+    <div  style={{ width: '100%', height: '250px', borderRadius: '24px' }}>
       <MapContainer
         center={position}
         zoom={13}
-        style={{ width: '100%', height: '100%', borderRadius: '24px' }}
+        style={{ width: '100%', height: '100%', borderRadius: '24px' ,zIndex:0,}}
         zoomControl={false} // Disable default zoom control
         scrollWheelZoom={false} // Disable scroll wheel zoom if desired
       >
         {/* Custom Zoom Control */}
-        <ZoomControl position="bottomright" />
+        <CustomZoomControl />
 
         {/* Map Tiles */}
         <TileLayer

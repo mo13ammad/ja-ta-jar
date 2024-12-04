@@ -191,3 +191,36 @@
     transparent 20px
   );
 }
+
+
+
+.leaflet-bar.custom-control {
+  background-color: transparent;
+  border: none;
+  z-index: 0;
+}
+
+/* Style the zoom buttons */
+.custom-control a {
+  background-color: #801D14;
+  color: #ffffff;
+  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  display: flex; /* Use flexbox */
+  align-items: center; /* Center content vertically */
+  justify-content: center; /* Center content horizontally */
+  text-decoration: none;
+  border-radius: 50%; /* Make it circular */
+  margin-bottom: 5px;
+  padding: 0; /* Remove padding */
+  border: none; /* Remove border */
+}
+
+.custom-control a:last-child {
+  margin-bottom: 0;
+}
+
+.custom-control a:hover {
+  background-color: #a1221a;
+}
