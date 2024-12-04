@@ -49,7 +49,7 @@ function HouseComments({ houseData }) {
               <Vote vote={comment.vote} size="sm" />
               </div>
               {comment.replay && 
-                <div className="p-2 pr-4 flex flex-col  rounded-2xl bg-gray-200 bg-opacity-40">
+                <div className="p-2 pr-4 flex flex-col  rounded-2xl bg-gray-200 bg-opacity-50">
                 <div className="w-full flex gap-1 h-14   p-1 ">
                    <div className="w-12  overflow-hidden  h-full  rounded-full">
                     <img src={vendor.avatar} alt="" className="block" />

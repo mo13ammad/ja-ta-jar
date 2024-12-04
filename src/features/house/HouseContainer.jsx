@@ -22,6 +22,7 @@ import { useQueries } from "@tanstack/react-query";
 import { getHouseCalendarByMonth } from "../../services/houseService";
 import HouseCancellationRules from "./houseComponents/HouseCancellationRules";
 import useGetCalendar from './../calender/useGetCalendar';
+import HouseTopLocation from "./houseComponents/HouseTopLocation";
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -99,6 +100,7 @@ function HouseContainer() {
         <div className="flex flex-col xl:flex-row  w-full ">
            <div className="flex flex-col lg:w-1/2 ">
           <HouseHeader houseData={houseData} />
+          <HouseTopLocation topLocations={houseData?.top_locations}/>
           <HouseDescription houseData={houseData} />
           </div>
           <div className=" flex flex-col   xl:mt-4 justify-center p-4  xl:h-full xl:w-1/2 ">

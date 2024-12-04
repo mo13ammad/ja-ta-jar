@@ -9,7 +9,7 @@ import toPersianNumber from "../../utils/toPersianNumber";
 
 function HouseHeader({ houseData }) {
   return (
-    <div className="  flex flex-col gap-1 lg:gap-2 justify-start items-start px-3  ">
+    <div className="  flex flex-col gap-1 lg:gap-2 mb-2 justify-start items-start px-3  ">
       <div className="flex  items-center p-1 gap-1">
         <h1 className="text-xl xs:text-2xl  font-bold mb-1.5 w-full md:w-auto">
           {houseData?.name ?? "نام اقامتگاه مشخص نشده است"}
