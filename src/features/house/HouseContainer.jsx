@@ -95,9 +95,19 @@ function HouseContainer() {
 
       <div className="w-full flex relative px-2 py-1 lg:pt-3 xl:pt-6 flex-row">
         {/* Left Column */}
-        <div className="flex flex-col md:w-3/5 xl:w-3/4">
+        <div className="flex flex-col w-full md:w-3/5 xl:w-3/4">
+        <div className="flex flex-col xl:flex-row  w-full ">
+           <div className="flex flex-col lg:w-1/2 ">
           <HouseHeader houseData={houseData} />
           <HouseDescription houseData={houseData} />
+          </div>
+          <div className=" flex flex-col   xl:mt-4 justify-center p-4  xl:h-full xl:w-1/2 ">
+          <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center">موقعیت اقامتگاه :</h3>
+            <div className="w-full h-full  flex  relative">
+            <HouseLocation cords={houseData?.address?.geography}/>
+            </div>
+          </div>
+        </div>
           <div className="w-full px-4 mb-2">
             <Separator />
           </div>
@@ -123,7 +133,7 @@ function HouseContainer() {
           </div>
           <HouseComments houseData={houseData} />
           <HouseReservation />
-          <HouseLocation />
+          
         </div>
 
         {/* Right Column (Desktop Reservation Menu) */}
