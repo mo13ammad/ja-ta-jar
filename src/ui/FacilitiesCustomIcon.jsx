@@ -4,7 +4,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 const CustomInfoIcon = ({ tooltipText, className, ...props }) => (
-  <div className="relative  flex group">
+  <div className="relative w-1/2 flex group">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
@@ -21,7 +21,7 @@ const CustomInfoIcon = ({ tooltipText, className, ...props }) => (
       />
     </svg>
     {tooltipText && (
-      <div className="absolute z-50  transform right-5 min-w-20 hidden group-hover:block bg-primary-500 text-white text-xs rounded-2xl px-2 py-1 max-w-[10rem] break-words whitespace-normal">
+      <div className="absolute z-50  transform right-5  hidden group-hover:block bg-primary-500 text-white text-xs rounded-2xl px-2 py-1 max-w-[10rem] break-words whitespace-normal">
         {tooltipText}
       </div>
     )}
