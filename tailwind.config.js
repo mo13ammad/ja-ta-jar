@@ -50,6 +50,7 @@ module.exports = {
           300: withOpacity("--color-primary-300"),
           200: withOpacity("--color-primary-200"),
           100: withOpacity("--color-primary-100"),
+          75: withOpacity("--color-primary-75"),
           50: withOpacity("--color-primary-50"),
         },
         secondary: {

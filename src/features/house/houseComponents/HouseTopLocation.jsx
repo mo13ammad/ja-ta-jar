@@ -16,7 +16,7 @@ function HouseTopLocation({ topLocations }) {
         {topLocations.map((location, index) => (
           <div
             key={index}
-            className="flex items-center space-x-2 bg-primary-50 px-1.5 py-1 rounded-3xl cursor-pointer hover:bg-primary-100"
+            className="flex items-center space-x-2 bg-primary-50 px-1.5 py-1 rounded-3xl cursor-pointer hover:bg-primary-75"
             onClick={() => window.open(location.link, '_blank')}
           >
             {/* Badge with Image */}
