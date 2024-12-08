@@ -89,17 +89,17 @@ function HouseContainer() {
 
   // Render the house details
   return (
-    <div className="mt-7 lg:mt-0 flex overflow-hidden items-start flex-col w-full bg-white shadow-centered rounded-2xl md:p-2 mb-24">
+    <div className="mt-7 lg:mt-0 flex   overflow-hidden items-start  flex-col w-full   shadow-centered rounded-2xl md:p-2 ">
       {/* House Images */}
-      <div className="w-full">
+      <div className="w-full md:mb-3">
         <HouseImages houseData={houseData} />
       </div>
 
-      <div className="w-full flex relative px-2 py-1 lg:pt-3 xl:pt-6 flex-row">
+      <div className="w-full bg-white rounded-t-2xl pt-2 xs:pt-3  -top-2 z-10 flex relative px-1 xs:px-2 py-1 lg:pt-3 xl:pt-6 flex-row">
         {/* Left Column */}
-        <div className="flex flex-col w-full md:w-3/5 xl:w-3/4">
+        <div className="flex flex-col w-full md:w-3/5 xl:w-3/4 ">
         <div className="flex flex-col xl:flex-row  w-full ">
-           <div className="flex flex-col lg:w-1/2 ">
+           <div className="flex flex-col xl:w-1/2  ">
           <HouseHeader houseData={houseData} />
           <HouseTopLocation topLocations={houseData?.top_locations}/>
           <HouseDescription houseData={houseData} />

@@ -42,7 +42,7 @@ function HouseRooms({ houseData }) {
     <div className="my-3 px-2">
       {/* Header */}
       <h3 className="text-lg font-bold text-gray-800 mb-2 flex items-center">
-        فضای خواب
+        اتاق ها
         <div className="mr-2 bg-gray-200 text-gray-800 rounded-full px-2 py-1 text-sm">
           {toPersianNumber(rooms.length)} اتاق خواب
         </div>
@@ -84,12 +84,12 @@ function HouseRooms({ houseData }) {
           {/* Bed and Floor Service Info */}
           {showBedSection && (
             <div className="mb-4">
-              <h5 className="text-sm font-semibold text-gray-700 mb-1">خواب</h5>
+              <h5 className="text-sm font-semibold text-gray-700 mb-1">فضای خواب</h5>
               <p className="text-sm text-gray-700">
                 {bedInfoStr && toPersianNumber(bedInfoStr)}
                 {activeRoom.number_floor_service > 0 && (
                   <>
-                    {bedInfoStr ? ' - ' : ''}
+                    {bedInfoStr ? ' , ' : ''}
                     {toPersianNumber(activeRoom.number_floor_service)} سرویس کف خواب
                   </>
                 )}

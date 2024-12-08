@@ -38,7 +38,7 @@ function HouseImages({ houseData }) {
   };
 
   return (
-    <div className="w-full mx-auto mb-1.5 lg:mb-0">
+    <div className="w-full mx-auto  lg:mb-0">
       {/* Mobile View */}
       <div className="block bg-gray-100 lg:hidden">
         <Swiper
@@ -55,7 +55,7 @@ function HouseImages({ houseData }) {
                 src={image.media}
                 alt={image.title}
                 title={image.title}
-                className="w-full h-auto max-h-60 sm:max-h-72 object-cover rounded-xl cursor-pointer"
+                className="w-full h-auto max-h-64 sm:max-h-80 object-cover rounded-t-xl md:rounded-xl cursor-pointer"
                 onClick={() => openModal(index)}
               />
             </SwiperSlide>
@@ -111,11 +111,11 @@ function HouseImages({ houseData }) {
                     src={image.media}
                     alt={image.title}
                     title={image.title}
-                    className="w-full h-auto max-h-60 object-cover rounded-xl"
+                    className="w-full h-auto max-h-44 xl:max-h-52 2xl:max-h-60 object-cover rounded-xl"
                   />
                   {index === 1 && images.length > 4 && (
                     <div
-                      className="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 rounded-2xl cursor-pointer"
+                      className="absolute inset-0 flex items-center max-h-60  justify-center bg-gray-500 bg-opacity-50 rounded-2xl cursor-pointer"
                       onClick={() => openModal(globalIndex)}
                     >
                       <span className="text-white text-sm">مشاهده بیشتر</span>
