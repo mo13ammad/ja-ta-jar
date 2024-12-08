@@ -23,6 +23,7 @@ import { getHouseCalendarByMonth } from "../../services/houseService";
 import HouseCancellationRules from "./houseComponents/HouseCancellationRules";
 import useGetCalendar from './../calender/useGetCalendar';
 import HouseTopLocation from "./houseComponents/HouseTopLocation";
+import HouseSanitaries from "./houseComponents/HouseSanitaries";
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -135,6 +136,10 @@ function HouseContainer() {
             <Separator />
           </div>
           <HouseComments houseData={houseData} />
+          <div className="w-full px-4 my-3">
+            <Separator />
+          </div>
+          <HouseSanitaries houseData={houseData}/>
           <HouseReservation />
           
         </div>
