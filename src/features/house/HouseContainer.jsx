@@ -24,6 +24,7 @@ import HouseCancellationRules from "./houseComponents/HouseCancellationRules";
 import useGetCalendar from './../calender/useGetCalendar';
 import HouseTopLocation from "./houseComponents/HouseTopLocation";
 import HouseSanitaries from "./houseComponents/HouseSanitaries";
+import HouseCalender from "./houseComponents/HouseCalender";
 
 function HouseContainer() {
   const navigate = useNavigate();
@@ -140,7 +141,13 @@ function HouseContainer() {
             <Separator />
           </div>
           <HouseSanitaries houseData={houseData}/>
-          <HouseReservation />
+          <div className="w-full px-4 my-3">
+            <Separator />
+          </div>
+          <HouseCalender calendarData={calendarData}/>
+          <div className="w-full px-4 my-3 mt-40">
+            <Separator />
+          </div>
           
         </div>
 

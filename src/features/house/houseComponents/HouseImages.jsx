@@ -78,7 +78,7 @@ function HouseImages({ houseData }) {
                   src={image.media}
                   alt={image.title}
                   title={image.title}
-                  className="w-full h-auto max-h-60 object-cover rounded-xl"
+                  className="w-full h-auto max-h-44 xl:max-h-52 2xl:max-h-60 object-cover rounded-xl"
                 />
               </div>
             ))}

@@ -3,9 +3,9 @@ import HouseVendorBadge from "./houseComponents/HouseVendorBadge";
 import HouseInformation from "./houseComponents/HouseInformation";
 import HouseViews from "./houseComponents/HouseViews";
 
-import HouseArrivals from "./houseComponents/HouseArrivals";
 import HouseStructure from "./houseComponents/HouseStructure";
 import toPersianNumber from "../../utils/toPersianNumber";
+import HouseAreas from "./houseComponents/HouseAreas";
 
 function HouseHeader({ houseData }) {
   return (
@@ -31,8 +31,8 @@ function HouseHeader({ houseData }) {
       <div className="w-full flex flex-col gap-2 md:gap-3">
         <HouseViews houseViews={houseData.views.types} />
         <div className="flex flex-col gap-2 md:flex-row md:gap-4 lg:gap-6 md:items-center">
-          <HouseArrivals
-            arrivals={houseData.arrivals}
+          <HouseAreas
+            areas={houseData.areas}
             tip={houseData.tip}
             structure={houseData.structure}
           />

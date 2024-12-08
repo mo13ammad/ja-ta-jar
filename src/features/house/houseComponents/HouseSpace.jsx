@@ -1,8 +1,9 @@
 import React from "react";
 import toPersianNumber from "../../../utils/toPersianNumber";
+import CustomInfoIcon from "../../../ui/CustomInfoIcon";
 
 function HouseSpace({ houseData }) {
-  const { structure, reservation, areas } = houseData;
+  const { structure, reservation, arrivals, areas } = houseData;
 
   return (
     <div className="w-full px-3">
@@ -24,15 +25,23 @@ function HouseSpace({ houseData }) {
           {/* Building Size */}
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">متراژ زیربنا:</strong>
-            <span>
-              {toPersianNumber(structure?.size) || "نامشخص"} متر
-            </span>
+            <span>{toPersianNumber(structure?.size) || "نامشخص"} متر</span>
           </div>
 
           {/* Type of Accommodation */}
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">نوع اقامتگاه:</strong>
             <span>{structure?.label || "نامشخص"}</span>
+          </div>
+
+          {/* Number of Stairs */}
+          <div className="flex items-center gap-3">
+            <strong className="text-gray-700">تعداد پله:</strong>
+            <span>
+              {structure?.number_stairs === 0
+                ? "پله ندارد"
+                : `${toPersianNumber(structure?.number_stairs)} پله`}
+            </span>
           </div>
         </div>
 
@@ -49,21 +58,21 @@ function HouseSpace({ houseData }) {
           {/* Land Size */}
           <div className="flex items-center gap-3">
             <strong className="text-gray-700">متراژ محوطه:</strong>
-            <span>
-              {toPersianNumber(structure?.land_size) || "نامشخص"} متر
-            </span>
+            <span>{toPersianNumber(structure?.land_size) || "نامشخص"} متر</span>
           </div>
 
-          {/* Region */}
-          <div className="flex flex-wrap items-center gap-3">
-            <strong className="text-gray-700">منطقه:</strong>
-            {areas && areas.length > 0
-              ? areas.map((item, index) => (
-                  <span key={index} className="font-medium">
-                    {item.label}
-                  </span>
-                ))
-              : "نامشخص"}
+          {/* Arrivals */}
+          <div className="flex flex-wrap items-center gap-1">
+            <strong className="text-gray-700">شیوه دسترسی به اقامتگاه:</strong>
+            {arrivals?.types && arrivals.types.length > 0 ? (
+              arrivals.types.map((item, index) => (
+                <span key={index} className="flex items-center gap-1 font-medium">
+                  {item.label}
+                </span>
+              ))
+            ) : (
+              <span className="text-gray-500">نامشخص</span>
+            )}
           </div>
         </div>
       </div>
