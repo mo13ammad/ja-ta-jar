@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { FaBed, FaCouch } from 'react-icons/fa';
+import toPersianNumber from '../../../utils/toPersianNumber';
 
 function HouseRooms({ houseData }) {
   const rooms = houseData.room;
@@ -10,18 +11,9 @@ function HouseRooms({ houseData }) {
     return null;
   }
 
-  // Helper function to get the bed icon
-  const getBedIcon = (room) => {
-    if (room.number_double_beds > 0) {
-      return <FaBed className="text-primary-600 text-3xl" />;
-    } else if (room.number_single_beds > 0) {
-      return <FaBed className="text-primary-600 text-3xl" />;
-    } else if (room.number_sofa_beds > 0) {
-      return <FaCouch className="text-primary-600 text-3xl" />;
-    } else {
-      return <FaBed className="text-primary-600 text-3xl" />;
-    }
-  };
+  const [activeRoomIndex, setActiveRoomIndex] = useState(0);
+
+
 
   // Helper function to get the bed information
   const getBedInfo = (room) => {
@@ -40,11 +32,11 @@ function HouseRooms({ houseData }) {
     return bedInfo.join('، ');
   };
 
-  // Function to convert numbers to Persian digits
-  const toPersianNumber = (num) => {
-    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
-    return num.toString().replace(/\d/g, (digit) => persianDigits[digit]);
-  };
+  const activeRoom = rooms[activeRoomIndex];
+
+  // Prepare bed info and floor service
+  const bedInfoStr = activeRoom ? getBedInfo(activeRoom) : '';
+  const showBedSection = bedInfoStr || (activeRoom && activeRoom.number_floor_service > 0);
 
   return (
     <div className="my-3 px-2">
@@ -62,22 +54,92 @@ function HouseRooms({ houseData }) {
           <SwiperSlide
             key={room.uuid || index}
             style={{ width: 'auto' }}
-            className="flex-shrink-0"
+            className={`flex-shrink-0 cursor-pointer ${
+              activeRoomIndex === index ? 'bg-primary-50' : 'bg-white'
+            } border rounded-lg p-4 flex flex-col items-center`}
+            onClick={() => setActiveRoomIndex(index)}
           >
-            <div className="border rounded-lg p-4 flex flex-col items-center">
-              {/* Icon and Room Name */}
-              <div className="mb-2 flex items-center gap-2">
-                {getBedIcon(room)}
-                <p className="font-semibold">{room.name}</p>
-              </div>
-              {/* Bed Information */}
-              <p className="text-sm text-gray-600">
-                {toPersianNumber(getBedInfo(room))}
-              </p>
+            {/* Icon and Room Name */}
+            <div className="mb-2 flex items-center gap-2">
+            <FaBed className="text-primary-600 text-3xl" />
+              <p className="font-semibold">{room.name}</p>
             </div>
+            {/* Removed bed info from here */}
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Room Details (اطلاعات اتاق) */}
+      {activeRoom && (
+        <div className="mt-4 bg-gray-50 p-3 rounded-xl">
+          <h4 className="text-md font-bold text-gray-800 mb-2">اطلاعات اتاق</h4>
+
+          {/* Description */}
+          {activeRoom.description && (
+            <p className="text-sm text-gray-700 mb-4">
+              {activeRoom.description}
+            </p>
+          )}
+
+          {/* Bed and Floor Service Info */}
+          {showBedSection && (
+            <div className="mb-4">
+              <h5 className="text-sm font-semibold text-gray-700 mb-1">خواب</h5>
+              <p className="text-sm text-gray-700">
+                {bedInfoStr && toPersianNumber(bedInfoStr)}
+                {activeRoom.number_floor_service > 0 && (
+                  <>
+                    {bedInfoStr ? ' - ' : ''}
+                    {toPersianNumber(activeRoom.number_floor_service)} سرویس کف خواب
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
+          {/* Facilities */}
+          {activeRoom.facilities && activeRoom.facilities.length > 0 && (
+            <div className="mb-4">
+              <h5 className="text-sm font-semibold text-gray-700 mb-1">امکانات</h5>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {activeRoom.facilities.map((fac) => (
+                  <li key={fac.key} className="flex items-center">
+                    <div className="w-6 h-6 flex-shrink-0 mr-2">
+                      <img
+                        src={fac.icon}
+                        alt={fac.label}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-sm text-gray-700 mr-1">{fac.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Air Conditions */}
+          {activeRoom.airConditions && activeRoom.airConditions.length > 0 && (
+            <div>
+              <h5 className="text-sm font-semibold text-gray-700 mb-1">سیستم سرمایش و گرمایش</h5>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {activeRoom.airConditions.map((air) => (
+                  <li key={air.key} className="flex items-center">
+                    <div className="w-6 h-6 flex-shrink-0 mr-2">
+                      <img
+                        src={air.icon}
+                        alt={air.label}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="text-sm text-gray-700 mr-1">{air.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
