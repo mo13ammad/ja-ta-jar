@@ -1,6 +1,9 @@
+// src/pages/calendar/CalendarContainer.jsx
+
 import React, { useState, useEffect } from "react";
 import toPersianNumber from "../../utils/toPersianNumber";
-import "../../index.css"; // Ensure this imports your CSS where .diagonal-stripes is defined
+import { Listbox } from "@headlessui/react";
+import "../../index.css"; // For diagonal-stripes CSS
 
 function CalendarContainer({
   reserveDateFrom,
@@ -10,31 +13,35 @@ function CalendarContainer({
   closeModal,
   instantBooking,
   calendarData,
+  isRentRoom = false,
+  roomUuids = [],
+  roomOptions = [],
+  selectedRoomUuid,
+  setSelectedRoomUuid,
 }) {
-  console.log(calendarData);
   const [hoverDate, setHoverDate] = useState(null);
   const [validRangeEnd, setValidRangeEnd] = useState(null);
 
+  // Format price with Persian numbers and comma separators
   const formatPrice = (price) => {
-    const formattedPrice = toPersianNumber(price.toLocaleString());
-    return formattedPrice;
+    return toPersianNumber(price.toLocaleString());
   };
 
+  // Handle clicking on a date
   const handleDateClick = (year, month, day, dayData) => {
     if (dayData.isDisable || dayData.isBlank || dayData.isLock) return;
 
     const selectedDate = { year, month, day };
 
+    // If no start date chosen or a full range already chosen, pick new start
     if (!reserveDateFrom || (reserveDateFrom && reserveDateTo)) {
-      // Set start date
       setReserveDateFrom(selectedDate);
       setReserveDateTo(null);
       setHoverDate(null);
-
-      // Update the valid range for the second date
       updateValidRange(selectedDate, calendarData);
     } else {
-      // Ensure the selected date is within the valid range
+      // We have a start date and we're choosing the end date
+      // Ensure end date is after start date and within valid range
       if (
         isBeforeDate(selectedDate, reserveDateFrom) ||
         isAfterDate(selectedDate, validRangeEnd)
@@ -42,13 +49,13 @@ function CalendarContainer({
         return; // Invalid selection
       }
 
-      // Set end date
       setReserveDateTo(selectedDate);
-      closeModal();
+      if (closeModal) closeModal();
       setHoverDate(null);
     }
   };
 
+  // Update the valid range for the second date after selecting a start date
   const updateValidRange = (startDate, calendarData) => {
     let foundValidRangeEnd = null;
 
@@ -61,19 +68,18 @@ function CalendarContainer({
         };
 
         if (isSameDate(date, startDate)) {
-          foundValidRangeEnd = date; // Start searching from this date
+          foundValidRangeEnd = date;
         } else if (foundValidRangeEnd && (day.isDisable || day.isLock)) {
           setValidRangeEnd(foundValidRangeEnd);
           return;
         }
 
-        if (foundValidRangeEnd) {
-          foundValidRangeEnd = date;
-        }
+        if (foundValidRangeEnd) foundValidRangeEnd = date;
       }
     }
 
-    setValidRangeEnd(foundValidRangeEnd); // If no `isDisable` is found, allow until the last day
+    // If no disabled day found, entire range is valid
+    setValidRangeEnd(foundValidRangeEnd);
   };
 
   const isBeforeDate = (date1, date2) => {
@@ -105,6 +111,7 @@ function CalendarContainer({
     return d > s && d < e;
   };
 
+  // Determine classes for each day cell based on state
   const getDayStyles = (day, date) => {
     let styles = [];
 
@@ -146,7 +153,7 @@ function CalendarContainer({
       styles.push("bg-primary-300 text-white");
     }
 
-    // Additional rule: Disable dates beyond validRangeEnd
+    // Disable dates beyond validRangeEnd
     if (reserveDateFrom && isAfterDate(date, validRangeEnd)) {
       styles.push("bg-gray-200 text-gray-400 cursor-not-allowed");
     }
@@ -164,8 +171,39 @@ function CalendarContainer({
     return <div className="text-center py-8">در حال بارگذاری...</div>;
   }
 
+  // For room selection
+  const selectedRoom = roomOptions?.find((r) => r.uuid === selectedRoomUuid);
+
   return (
     <div className="max-w-7xl bg-gray-50 w-full mx-auto p-4">
+      {isRentRoom && roomOptions?.length > 0 && (
+        <div className="mb-4 w-56">
+          <Listbox
+            value={selectedRoom}
+            onChange={(newValue) => setSelectedRoomUuid(newValue.uuid)}
+          >
+            <Listbox.Button className="w-full rounded border px-2 py-1 text-right bg-white">
+              {selectedRoom ? selectedRoom.name : "انتخاب اتاق"}
+            </Listbox.Button>
+            <Listbox.Options className="mt-1 rounded bg-white border shadow-lg max-h-60 overflow-auto">
+              {roomOptions.map((room) => (
+                <Listbox.Option
+                  key={room.uuid}
+                  value={room}
+                  className={({ active }) =>
+                    `cursor-pointer select-none py-1 px-2 ${
+                      active ? "bg-primary-500 text-white" : "text-gray-900"
+                    }`
+                  }
+                >
+                  {room.name}
+                </Listbox.Option>
+              ))}
+            </Listbox.Options>
+          </Listbox>
+        </div>
+      )}
+
       <div className="flex flex-col space-y-8">
         {calendarData.map((data, idx) => (
           <div key={idx}>
@@ -203,12 +241,7 @@ function CalendarContainer({
                         !day.isDisable &&
                         !day.isLock
                       ) {
-                        const hoverDateObj = {
-                          year: data.year,
-                          month: data.month,
-                          day: day.day,
-                        };
-                        setHoverDate(hoverDateObj);
+                        setHoverDate(date);
                       }
                     }}
                     onMouseLeave={() => {
@@ -217,43 +250,33 @@ function CalendarContainer({
                       }
                     }}
                   >
-                    {/* Triangle Indicator for Instant Booking */}
-                    {instantBooking &&
-                      !day.isDisable &&
-                      !day.isLock && (
-                        <div className="absolute -top-3 -right-1 w-8 h-8">
-                          <div className="w-1/2 h-full -rotate-45 bg-primary-600"></div>
-                        </div>
-                      )}
+                    {instantBooking && !day.isDisable && !day.isLock && (
+                      <div className="absolute -top-3 -right-1 w-8 h-8">
+                        <div className="w-1/2 h-full -rotate-45 bg-primary-600"></div>
+                      </div>
+                    )}
 
-                    {/* Day Number */}
                     <div className="font-bold w-full flex justify-center items-center relative text-xs sm:text-lg">
-                      {/* Discount Indicator */}
                       {day.has_discount && !day.isLock && !day.isDisable && (
                         <span className="absolute left-1 sm:text-lg text-primary-600 pr-1">
                           %
                         </span>
                       )}
-                      {/* Day Number */}
                       <p>{toPersianNumber(day.day)}</p>
                     </div>
 
-                    {/* Prices */}
                     {!day.isDisable && !day.isLock && (
                       <div className="text-2xs">
                         {day.has_discount ? (
                           <div className="relative xs:static">
-                            {/* Original Price */}
                             <div className="line-through text-3xs sm:text-xs absolute xs:static -top-1.5 right-1 text-gray-500">
                               {formatPrice(day.original_price)}
                             </div>
-                            {/* Discounted Price */}
                             <div className="text-2xs xs:text-xs sm:text-md">
                               {formatPrice(day.effective_price)}
                             </div>
                           </div>
                         ) : (
-                          // Regular Price
                           <div className="text-2xs xs:text-xs sm:text-md">
                             {formatPrice(day.effective_price)}
                           </div>

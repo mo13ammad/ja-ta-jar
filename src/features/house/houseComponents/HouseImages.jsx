@@ -91,7 +91,7 @@ function HouseImages({ houseData }) {
                 src={images[0].media}
                 alt={images[0].title}
                 title={images[0].title}
-                className="w-full h-full object-cover rounded-xl cursor-pointer"
+                className="w-full h-full max-h-128 object-cover rounded-xl cursor-pointer"
                 onClick={() => openModal(0)}
               />
             )}

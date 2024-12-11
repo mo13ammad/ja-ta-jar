@@ -4,9 +4,9 @@ import { getHouseCalendar } from "../../services/houseService";
 
 export default function useGetCalendar(uuid) {
   return useQuery({
-    queryKey: ["get-house-calender", uuid],
+    queryKey: ["get-house-calendar", uuid],
     queryFn: () => getHouseCalendar(uuid),
     retry: false,
-    enabled: !!uuid,
+    enabled: !!uuid ,
   });
 }

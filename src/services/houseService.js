@@ -23,12 +23,25 @@ export function showHouse(houseId) {
   return http.get(`/house/${houseId}`).then(({ data }) => data.data);
 }
 
-export function getHouseCalendar(houseId) {
-  return http.get(`/house/${houseId}/calendar`).then(({ data }) => data.data);
+export async function getHouseCalendar(houseId) {
+  const { data } = await http.get(`/house/${houseId}/calendar`);
+  return data.data;
 }
 
-export function getHouseCalendarByMonth(houseId,year,month) {
-  return http.get(`/house/${houseId}/calendar?year=${year}&month=${month}`).then(({ data }) => data.data);
+export async function getHouseCalendarByMonth(houseId, year, month) {
+  const { data } = await http.get(`/house/${houseId}/calendar?year=${year}&month=${month}`);
+  return data.data;
+}
+
+// Room Calendar Functions
+export async function getRoomCalendar(houseId, roomId) {
+  const { data } = await http.get(`/house/${houseId}/calendar/${roomId}`);
+  return data.data;
+}
+
+export async function getRoomCalendarByMonth(houseId, roomId, year, month) {
+  const { data } = await http.get(`/house/${houseId}/calendar/${roomId}?year=${year}&month=${month}`);
+  return data.data;
 }
 
 export function editHouse(houseId, houseData) {
@@ -55,7 +68,7 @@ export function editHouseFacilities(houseId, facilitiesData) {
   }
   return http
     .put(`/client/house/${houseId}/facility`, { facilities: facilitiesData })
-    .then(({ data }) => data.data) // Return updated house data directly
+    .then(({ data }) => data.data)
     .catch((error) => {
       console.error("editHouseFacilities - Error:", error);
       throw error;
@@ -143,7 +156,7 @@ export function updateHousePrice(houseId, prices) {
 
   return http
     .put(`/client/house/${houseId}/prices`, prices)
-    .then(({ data }) => data.data) // Ensure it returns the data
+    .then(({ data }) => data.data)
     .catch((error) => {
       console.error("updateHousePrice - Error:", error);
       throw error;
@@ -163,7 +176,7 @@ export function updateRoomPrice(houseId, roomId, prices) {
 
   return http
     .put(`/client/house/${houseId}/room/${roomId}/prices`, prices)
-    .then(({ data }) => data.data) // Ensure it returns the data
+    .then(({ data }) => data.data)
     .catch((error) => {
       console.error("updateRoomPrice - Error:", error);
       throw error;

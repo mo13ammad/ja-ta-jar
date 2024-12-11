@@ -1,8 +1,10 @@
+// HouseCalendar.jsx
+
 import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import toPersianNumber from "../../../utils/toPersianNumber";
 
-function HouseCalender({ calendarData }) {
+function HouseCalendar({ calendarData }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [monthsPerView, setMonthsPerView] = useState(1);
 
@@ -33,7 +35,6 @@ function HouseCalender({ calendarData }) {
 
   const getDayStyles = (day) => {
     let styles = [];
-
     if (day.isBlank) styles.push("invisible");
     if (day.isDisable || day.isLock) {
       styles.push("bg-gray-200 text-gray-400");
@@ -43,64 +44,49 @@ function HouseCalender({ calendarData }) {
     }
     if (day.isToDay) styles.push("border-2 border-primary-600");
     if (day.isHoliday) styles.push("text-red-600 border-red-600");
-
     return styles;
   };
 
-  // Navigation Handlers
   const handlePrev = () => {
-    // Decrease currentIndex to show previous month
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
   const handleNext = () => {
-    // Increase currentIndex to show next month
     setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
   };
 
   const translatePercentage = 100 / monthsPerView;
   const translateX = -currentIndex * translatePercentage;
 
-  // The currently active month is displayedData[currentIndex]
   const activeMonth = displayedData[currentIndex];
 
   return (
     <div className="max-w-7xl  w-full mx-auto p-4 relative rounded-2xl overflow-hidden">
-        <h3 className="text-lg font-bold text-gray-800 mb-2" >قیمت</h3>
-      {/* Header with Navigation Icons */}
-      <div className="flex items-center   justify-center gap-4 mb-4">
-        
-        {/* Right icon now calls handlePrev (previous month) */}
+      <h3 className="text-lg font-bold text-gray-800 mb-2" >قیمت</h3>
+      <div className="flex items-center justify-center gap-4 mb-4">
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`p-1 rounded-full bg-white shadow-lg ${
-            currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`p-1 rounded-full bg-white shadow-lg ${currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <ChevronRightIcon className="w-5 h-5 text-gray-700" />
         </button>
 
-        {/* If monthsPerView = 1, show active month name between the buttons */}
         {monthsPerView === 1 && activeMonth && (
           <h3 className="text-md font-bold text-gray-800">
             {activeMonth.month_name} {toPersianNumber(activeMonth.year)}
           </h3>
         )}
 
-        {/* Left icon now calls handleNext (next month) */}
         <button
           onClick={handleNext}
           disabled={currentIndex === maxIndex}
-          className={`p-1 rounded-full bg-white shadow-lg ${
-            currentIndex === maxIndex ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`p-1 rounded-full bg-white shadow-lg ${currentIndex === maxIndex ? "opacity-50 cursor-not-allowed" : ""}`}
         >
           <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
         </button>
       </div>
 
-      {/* Months Container */}
       <div
         className="flex transition-transform duration-300"
         style={{ transform: `translateX(${-translateX}%)` }}
@@ -111,14 +97,11 @@ function HouseCalender({ calendarData }) {
             className="flex-shrink-0 w-full md:w-full xl:w-1/2 px-2"
           >
             <div className="flex flex-col space-y-2">
-              {/* Month Name and Year above each month if monthsPerView=2 */}
               {monthsPerView === 2 && (
                 <div className="text-center font-bold mb-2">
                   {data.month_name} {toPersianNumber(data.year)}
                 </div>
               )}
-
-              {/* Days Header */}
               <div className="grid grid-cols-7 text-center font-semibold mb-2 mt-2">
                 <div>ش</div>
                 <div>ی</div>
@@ -129,7 +112,6 @@ function HouseCalender({ calendarData }) {
                 <div>ج</div>
               </div>
 
-              {/* Days Grid */}
               <div className="grid grid-cols-7 gap-0.5">
                 {data.days.map((day, index) => {
                   const styles = getDayStyles(day).join(" ");
@@ -140,13 +122,11 @@ function HouseCalender({ calendarData }) {
                     >
                       {!day.isBlank && (
                         <div className="font-bold w-full flex justify-center items-center relative text-xs sm:text-lg">
-                          {day.has_discount &&
-                            !day.isLock &&
-                            !day.isDisable && (
-                              <span className="absolute left-1 sm:text-lg text-primary-600 pr-1">
-                                %
-                              </span>
-                            )}
+                          {day.has_discount && !day.isLock && !day.isDisable && (
+                            <span className="absolute left-1 sm:text-lg text-primary-600 pr-1">
+                              %
+                            </span>
+                          )}
                           <p className="md:text-sm lg:text-md 2xl:text-lg" >{toPersianNumber(day.day)}</p>
                         </div>
                       )}
@@ -180,4 +160,4 @@ function HouseCalender({ calendarData }) {
   );
 }
 
-export default HouseCalender;
+export default HouseCalendar;

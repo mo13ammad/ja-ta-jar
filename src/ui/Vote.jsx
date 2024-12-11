@@ -46,7 +46,7 @@ function Vote({ vote, size = 'sm' }) {
   return (
     <div className="flex py-0.5   items-center">
       {stars}
-      <span className='mr-1 pt-0.5 text-base'>{toPersianNumber(vote)}</span>
+      <span className='mr-1 pt-0.5 text-base'>{vote}</span>
     </div>
   )
 }
