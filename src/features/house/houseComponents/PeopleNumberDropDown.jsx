@@ -20,7 +20,7 @@ const PeopleDropdown = () => {
   };
 
   return (
-    <div className="flex items-center bg-white  justify-between  text-gray-700 py-2 px-4 rounded-xl  w-full ">
+    <div className="flex items-center   justify-between  text-gray-700 py-2 px-4   w-full ">
       {/* Decrement Button */}
       <button
         className={`flex items-center justify-center text-gray-700 px-2 py-1 ${

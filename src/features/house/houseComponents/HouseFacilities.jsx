@@ -13,14 +13,10 @@ function HouseFacilities({ houseData }) {
   if (isLoading) {
     return (
       <div className="my-3 px-3">
-        <h3 className="text-lg font-bold text-gray-800 mb-2">امکانات</h3>
-        {/* Skeleton Loader */}
-        <div className="space-y-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonFacilityItem key={index} />
-          ))}
-        </div>
-      </div>
+      <h3 className="text-lg font-bold text-gray-800 mb-2">امکانات</h3>
+      {/* Single full-width skeleton loader */}
+      <div className="w-full h-32 rounded-2xl bg-gray-100 animate-pulse"></div>
+    </div>
     );
   }
 

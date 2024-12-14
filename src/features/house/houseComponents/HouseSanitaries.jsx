@@ -13,6 +13,15 @@ function HouseSanitaries({ houseData }) {
     return (
       <div className="px-2 my-3">
         <h3 className="text-lg font-bold text-gray-800 mb-2">بهداشت و نظافت</h3>
+        {/* Skeleton Loader */}
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-full h-8 bg-gray-100 rounded-2xl animate-pulse"
+            ></div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -86,7 +95,7 @@ function SanitaryItem({ sanitary }) {
   const { icon, label, isAvailable } = sanitary;
   return (
     <div
-      className={`flex items-center gap-2 px-3 py-2  rounded-lg  transition-opacity duration-300 ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-opacity duration-300 ${
         isAvailable ? "" : "opacity-50 line-through"
       }`}
     >

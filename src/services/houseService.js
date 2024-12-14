@@ -23,26 +23,34 @@ export function showHouse(houseId) {
   return http.get(`/house/${houseId}`).then(({ data }) => data.data);
 }
 
-export async function getHouseCalendar(houseId) {
-  const { data } = await http.get(`/house/${houseId}/calendar`);
-  return data.data;
-}
-
-export async function getHouseCalendarByMonth(houseId, year, month) {
-  const { data } = await http.get(`/house/${houseId}/calendar?year=${year}&month=${month}`);
-  return data.data;
-}
-
-// Room Calendar Functions
 export async function getRoomCalendar(houseId, roomId) {
+  console.log(`[getRoomCalendar] Fetching initial month for room ${roomId} in house ${houseId}`);
   const { data } = await http.get(`/house/${houseId}/calendar/${roomId}`);
+  console.log(`[getRoomCalendar] Response for room ${roomId} in house ${houseId}:`, data.data);
   return data.data;
 }
 
 export async function getRoomCalendarByMonth(houseId, roomId, year, month) {
+  console.log(`[getRoomCalendarByMonth] Fetching month ${year}-${month} for room ${roomId} in house ${houseId}`);
   const { data } = await http.get(`/house/${houseId}/calendar/${roomId}?year=${year}&month=${month}`);
+  console.log(`[getRoomCalendarByMonth] Response for ${year}-${month}, room ${roomId}, house ${houseId}:`, data.data);
   return data.data;
 }
+
+export async function getHouseCalendar(houseId) {
+  console.log(`[getHouseCalendar] Fetching initial month for house ${houseId}`);
+  const { data } = await http.get(`/house/${houseId}/calendar`);
+  console.log(`[getHouseCalendar] Response for house ${houseId}:`, data.data);
+  return data.data;
+}
+
+export async function getHouseCalendarByMonth(houseId, year, month) {
+  console.log(`[getHouseCalendarByMonth] Fetching month ${year}-${month} for house ${houseId}`);
+  const { data } = await http.get(`/house/${houseId}/calendar?year=${year}&month=${month}`);
+  console.log(`[getHouseCalendarByMonth] Response for ${year}-${month}, house ${houseId}:`, data.data);
+  return data.data;
+}
+
 
 export function editHouse(houseId, houseData) {
   if (!houseId || !houseData) {

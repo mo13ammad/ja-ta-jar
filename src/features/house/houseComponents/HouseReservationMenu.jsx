@@ -1,4 +1,4 @@
-// HouseReservationMenu.jsx
+// src/features/house/houseComponents/HouseReservationMenu.jsx
 
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import toPersianNumber from "../../../utils/toPersianNumber";
@@ -6,6 +6,7 @@ import { MinusIcon, TrashIcon } from "@heroicons/react/24/outline";
 import PeopleDropdown from "./PeopleNumberDropDown";
 import CalendarContainer from "../../calendar/CalendarContainer";
 import { Transition } from "@headlessui/react";
+import Loading from "../../../ui/Loading";
 
 function HouseReservationMenu({
   houseData,
@@ -15,28 +16,51 @@ function HouseReservationMenu({
   setReserveDateTo,
   uuid,
   calendarData,
+  isRentRoom,
+  roomOptions,
+  selectedRoomUuid,
+  setSelectedRoomUuid,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
-
   const reserveMenuRef = useRef(null);
   const calendarModalRef = useRef(null);
 
-  // Compute the price from the first encountered valid day
+  // Calculate the first valid price from calendar data
   const firstValidPrice = useMemo(() => {
     if (!calendarData || calendarData.length === 0) return null;
 
-    for (const month of calendarData) {
-      for (const day of month.days) {
-        if (!day.isDisable && !day.isLock && !day.isBlank && day.effective_price > 0) {
-          // Return the first valid price and stop searching
-          return day.effective_price;
+    if (isRentRoom) {
+      for (const room of calendarData) {
+        // Defensive check: Ensure room.calendar is an array
+        if (!Array.isArray(room.calendar)) continue;
+
+        for (const month of room.calendar) {
+          // Defensive check: Ensure month.days exists and is an array
+          if (!month.days || !Array.isArray(month.days)) continue;
+
+          for (const day of month.days) {
+            if (!day.isDisable && !day.isLock && !day.isBlank && day.effective_price > 0) {
+              return day.effective_price;
+            }
+          }
+        }
+      }
+    } else {
+      for (const month of calendarData) {
+        // Defensive check: Ensure month.days exists and is an array
+        if (!month.days || !Array.isArray(month.days)) continue;
+
+        for (const day of month.days) {
+          if (!day.isDisable && !day.isLock && !day.isBlank && day.effective_price > 0) {
+            return day.effective_price;
+          }
         }
       }
     }
 
-    return null; // No valid day found
-  }, [calendarData]);
+    return null;
+  }, [calendarData, isRentRoom]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -132,6 +156,11 @@ function HouseReservationMenu({
             closeModal={() => setShowCalendarModal(false)}
             instantBooking={houseData.instant_booking}
             calendarData={calendarData}
+            loadingCalendar={false} // Assuming loading is handled outside
+            isRentRoom={isRentRoom}
+            roomOptions={roomOptions}
+            selectedRoomUuid={selectedRoomUuid}
+            setSelectedRoomUuid={setSelectedRoomUuid}
           />
         </div>
       </Transition>
@@ -156,9 +185,9 @@ function HouseReservationMenu({
 
         <div className="overflow-hidden transition-all duration-300">
           {isExpanded ? (
-            // Expanded content
+            // Expanded
             <div className="flex-1 overflow-y-auto px-4">
-              <p className="text-sm ">تاریخ رزرو</p>
+              <p className="text-sm">تاریخ رزرو</p>
               <div
                 className="h-12 my-1.5 w-full flex items-center justify-between rounded-xl shadow-sm bg-white px-4 border"
                 onClick={() => setShowCalendarModal(true)}
@@ -205,24 +234,33 @@ function HouseReservationMenu({
               </div>
 
               <div className="w-full my-3 mt-6">
-                <button className="w-full btn rounded-3xl bg-primary-500 hover:bg-primary-600 transition-all duration-300 px-3 py-1.5">
+                <button
+                  className="w-full btn rounded-3xl bg-primary-500 hover:bg-primary-600 transition-all duration-300 px-3 py-1.5"
+                  onClick={() => {
+                    console.log("Reserve button clicked");
+                    // Implement your reservation logic here
+                  }}
+                >
                   رزرو
                 </button>
               </div>
             </div>
           ) : (
-            // Collapsed content
+            // Collapsed
             <div
               className="flex w-full justify-between items-center pb-4 cursor-pointer"
               onClick={handleToggle}
             >
               <div className="flex gap-2 text-primary-800 px-3 py-1.5 xs:mr-10 rounded-3xl">
                 <p className="font-bold xs:text-lg">قیمت هر شب از :</p>
+                {!firstValidPrice ?  <div className="flex justify-center items-center ">
+      <Loading type="beat" size={6} color="primary" />
+    </div>  :
                 <p className="font-bold xs:text-lg">
                   {firstValidPrice
                     ? toPersianNumber(firstValidPrice.toLocaleString())
                     : "ناموجود"}
-                </p>
+                </p>}
               </div>
 
               <button className="btn text-xs xs:text-md bg-primary-600 px-4 py-2">
