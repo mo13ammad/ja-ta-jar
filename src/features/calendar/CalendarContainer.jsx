@@ -182,7 +182,6 @@ function CalendarContainer({
       setHoverDate(null);
       updateValidRange(selectedDate, calendarData);
     } else {
-      // have start date, choosing end date
       if (isBeforeDate(selectedDate, reserveDateFrom) || isAfterDate(selectedDate, validRangeEnd)) {
         return;
       }
@@ -203,7 +202,7 @@ function CalendarContainer({
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className="flex justify-between items-center px-3 py-2 w-full rounded-xl border border-gray-300 text-right text-gray-700">
+                <Listbox.Button className="flex justify-between items-center px-3 py-2 w-full rounded-xl border border-primary-600 text-right text-gray-700">
                   <span>
                     {selectedRoom ? selectedRoom.name : "انتخاب اتاق"}
                   </span>
@@ -230,7 +229,7 @@ function CalendarContainer({
                         value={room}
                         className={({ active }) =>
                           `cursor-pointer select-none relative py-2 pr-4 pl-10 ${
-                            active ? "bg-primary-600 text-white" : "text-gray-900"
+                            active ? "bg-primary-400 text-white" : "text-gray-900"
                           }`
                         }
                       >

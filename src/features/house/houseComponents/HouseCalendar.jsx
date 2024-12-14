@@ -94,7 +94,7 @@ function HouseCalendar({
           >
             {({ open }) => (
               <div className="relative bg-white rounded-xl">
-                <Listbox.Button className="listbox__button flex justify-between items-center px-3 py-2 w-full rounded-xl border border-gray-300 text-right text-gray-700">
+                <Listbox.Button className="listbox__button flex justify-between items-center px-3 py-2 w-full rounded-xl border border-primary-600 text-right text-gray-700">
                   <span>
                     {selectedRoom ? selectedRoom.name : "انتخاب اتاق"}
                   </span>
@@ -140,7 +140,7 @@ function HouseCalendar({
         <button
           onClick={handlePrev}
           disabled={currentIndex === 0}
-          className={`p-1 rounded-full bg-white shadow-lg ${
+          className={`p-1 rounded-full bg-white shadow-centered ${
             currentIndex === 0 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
@@ -156,7 +156,7 @@ function HouseCalendar({
         <button
           onClick={handleNext}
           disabled={currentIndex === maxIndex}
-          className={`p-1 rounded-full bg-white shadow-lg ${
+          className={`p-1 rounded-full bg-white shadow-centered ${
             currentIndex === maxIndex ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
