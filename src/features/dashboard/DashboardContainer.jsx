@@ -19,11 +19,13 @@ function DashboardContainer() {
   }, [initialUser]);
 
   // Redirect to home if user does not exist after loading
-  useEffect(() => {
-    if (!isLoading && !user) {
-      navigate("/");
-    }
-  }, [isLoading, user, navigate]);
+useEffect(() => {
+  // Only navigate if we are not loading and initialUser is definitively null
+  if (!isLoading && initialUser === null) {
+    navigate("/");
+  }
+}, [isLoading, initialUser, navigate]);
+
 
   if (isLoading || !user) {
     return (

@@ -4,8 +4,7 @@ import Header from "./Header";
 import useUser from "../features/dashboard/useUser";
 
 function AppLayout() {
-  // Fetch user data in the background
-  useUser();
+ 
 
   return (
     <>

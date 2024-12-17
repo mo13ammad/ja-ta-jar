@@ -42,7 +42,7 @@ function HouseRules({ houseData }) {
       >
         مقررات اقامتگاه
       </h3>
-    <div className="my-4 w-full px-5 bg-gray-50 rounded-2xl">
+    <div className="my-4 w-full px-5 bg-gray-50 rounded-3xl">
       {/* Title */}
 
       {/* Timing Information */}

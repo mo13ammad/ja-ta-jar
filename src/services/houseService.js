@@ -1,5 +1,3 @@
-// src/services/houseService.js
-
 import http from "./httpService";
 
 // General House Functions
@@ -228,6 +226,60 @@ export function publishHouse(houseId) {
     .then(({ data }) => data.data)
     .catch((error) => {
       console.error("publishHouse - Error:", error);
+      throw error;
+    });
+}
+
+/** 
+ * New Peak Days APIs
+ */
+
+// Add peak days (POST /client/house/:uuid/calendar/peaks)
+export function addPeakDays(houseId, fromDate, toDate) {
+  if (!houseId || !fromDate || !toDate) {
+    console.error("Missing parameters:", { houseId, fromDate, toDate });
+    throw new Error("House ID, from_date and to_date are required.");
+  }
+
+  return http
+    .post(`/client/house/${houseId}/calendar/peaks`, { from_date: fromDate, to_date: toDate })
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("addPeakDays - Error:", error);
+      throw error;
+    });
+}
+
+// Get peak days for a specific month (GET /client/house/:uuid/calendar/:year/:month/peaks)
+export function getPeakDays(houseId, year, month) {
+  if (!houseId || !year || !month) {
+    console.error("Missing parameters:", { houseId, year, month });
+    throw new Error("House ID, year, and month are required.");
+  }
+
+  return http
+    .get(`/client/house/${houseId}/calendar/${year}/${month}/peaks`)
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("getPeakDays - Error:", error);
+      throw error;
+    });
+}
+
+// Remove peak days (DELETE /client/house/:uuid/calendar/peaks)
+export function removePeakDays(houseId, fromDate, toDate) {
+  if (!houseId || !fromDate || !toDate) {
+    console.error("Missing parameters:", { houseId, fromDate, toDate });
+    throw new Error("House ID, from_date, and to_date are required.");
+  }
+
+  return http
+    .delete(`/client/house/${houseId}/calendar/peaks`, {
+      data: { from_date: fromDate, to_date: toDate },
+    })
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("removePeakDays - Error:", error);
       throw error;
     });
 }

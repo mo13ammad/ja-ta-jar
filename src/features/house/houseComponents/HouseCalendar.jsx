@@ -214,12 +214,12 @@ function HouseCalendar({
                               <div className="line-through text-3xs sm:text-xs absolute xs:static -top-1.5 right-1 text-gray-500">
                                 {formatPrice(day.original_price)}
                               </div>
-                              <div className="text-2xs xs:text-xs sm:text-md">
+                              <div className="text-2xs xs:text-xs sm:text-md md:text-xs lg:text-md">
                                 {formatPrice(day.effective_price)}
                               </div>
                             </div>
                           ) : (
-                            <div className="text-2xs xs:text-xs sm:text-md">
+                            <div className="text-2xs xs:text-xs sm:text-md md:text-xs lg:text-md">
                               {formatPrice(day.effective_price)}
                             </div>
                           )}

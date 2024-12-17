@@ -7,6 +7,7 @@ import { Transition } from "@headlessui/react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import CalendarContainer from "../../calendar/CalendarContainer";
 import Loading from "../../../ui/Loading";
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 function ReserveMenuDesktop({
   reserveDateFrom,
@@ -100,18 +101,20 @@ function ReserveMenuDesktop({
                 setReserveDateFrom(null);
                 setReserveDateTo(null);
               }}
-              className="mr-4 py-1.5 px-3 border rounded-2xl border-gray-400 flex items-center"
+              className="mr-4 py-1.5 text-gray-700  px-3 border rounded-2xl border-red-600 flex items-center"
             >
-              <TrashIcon className="w-5 h-5 ml-2" />
+              <TrashIcon className="w-5 h-5 ml-2 text-red-600" />
               پاک کردن
             </button>
             <button
-              onClick={() => {
-                setShowCalendarModal(false);
-              }}
-            >
-              <span className="text-gray-700 text-xl">&times;</span>
-            </button>
+  onClick={() => {
+    setShowCalendarModal(false);
+  }}
+  className="rounded-full w-10 h-10 bg-primary-500 hover:bg-primary-100 text-white hover:text-primary-700 transition duration-150 ease-in-out flex items-center justify-center"
+>
+  <XMarkIcon className="w-6 h-6" />
+</button>
+
           </div>
           <CalendarContainer
             reserveDateFrom={reserveDateFrom}

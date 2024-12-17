@@ -15,6 +15,10 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      maxWidth: {
+        '8xl': '90rem', // adjust as needed
+        '9xl': '100rem', // adjust as needed
+      },
       spacing: {
         '128': '32rem',  // Add custom size (128 = 32rem)
         '144': '36rem',  // Add custom size (144 = 36rem)
@@ -33,9 +37,10 @@ module.exports = {
         '3xl': '1620px'
       },
       fontSize: {
-        '3xs': '0.5rem',  // 8px
-        '2xs': '0.625rem', // 10px
-        "md": '0.9375rem',
+        '4xs': '0.375rem',  // 6px
+        '3xs': '0.5rem',    // 8px
+        '2xs': '0.625rem',   // 10px
+        'md': '0.9375rem',   // ~15px
       },
       boxShadow: {
         centered: "0 0 15px rgba(0, 0, 0, 0.1)",

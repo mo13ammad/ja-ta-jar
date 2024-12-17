@@ -1,7 +1,18 @@
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import VendorCalendar from "./../calendar/VendorCalendar";
 
 const HouseCard = ({ house, onDelete }) => {
   const navigate = useNavigate();
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  // Reservation date states
+  const [reserveDateFrom, setReserveDateFrom] = useState(null);
+  const [reserveDateTo, setReserveDateTo] = useState(null);
+
+  const handleOpenCalendar = () => {
+    setIsCalendarOpen(true);
+  };
 
   return (
     <div className="house-card-container shadow-centered max-h-64">
@@ -41,17 +52,30 @@ const HouseCard = ({ house, onDelete }) => {
               حذف
             </button>
           </div>
-          <div>
-            <button
-              className="btn hover:opacity-100 bg-primary-500"
-              onClick={() => {}}
-            >
-              تقویم
-            </button>
-          </div>
+          {house.status.key === "Publish" && (
+            <div>
+              <button
+                className="btn hover:opacity-100 bg-primary-500"
+                onClick={handleOpenCalendar}
+              >
+                تقویم
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <img src={house.image} className="house-image" alt="house" />
+
+      {/* VendorCalendar Modal */}
+      <VendorCalendar
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        houseUuid={house.uuid}
+        reserveDateFrom={reserveDateFrom}
+        setReserveDateFrom={setReserveDateFrom}
+        reserveDateTo={reserveDateTo}
+        setReserveDateTo={setReserveDateTo}
+      />
     </div>
   );
 };
