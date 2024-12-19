@@ -3,9 +3,12 @@ import Modal from "../../ui/Modal";
 import Loading from "../../ui/Loading";
 import { Listbox, Transition, Tab } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useHouseCalendarData } from "../calendar/useHouseCalenderData";
-import { useAllRoomsCalendarData } from "../calendar/useAllRoomsCalendarData";
 import useFetchHouse from './../house/useShowHouse';
+
+import { useVendorHouseCalendarData } from "../calendar/useVendorHouseCalendarData";
+import { useVendorRoomCalendarData } from "../calendar/useVendorRoomCalendarData";
+
+import ViewTab from '../dashboard/veondorCalendar/ViewTab';
 import PeakDaysTab from '../dashboard/veondorCalendar/PeakDaysTab';
 import ReservationTab from '../dashboard/veondorCalendar/ReservationTab';
 import PriceChangeTab from '../dashboard/veondorCalendar/PriceChangeTab';
@@ -24,10 +27,8 @@ const VendorCalendar = ({
   setReserveDateTo,
   instantBooking = false,
 }) => {
-  // Fetch house details
   const { data: houseData, isLoading: loadingHouse, isError: isErrorHouse, error: errorHouse } = useFetchHouse(houseUuid);
 
-  // Determine isRentRoom and roomOptions after house is loaded
   const isRentRoom = useMemo(() => houseData?.is_rent_room || false, [houseData]);
   const roomOptions = useMemo(() => {
     if (!isRentRoom || !houseData?.room) return [];
@@ -37,6 +38,7 @@ const VendorCalendar = ({
   }, [houseData, isRentRoom]);
 
   const [selectedRoomUuid, setSelectedRoomUuid] = useState(null);
+
   useEffect(() => {
     if (isRentRoom && roomOptions.length > 0 && !selectedRoomUuid) {
       setSelectedRoomUuid(roomOptions[0].uuid);
@@ -50,31 +52,43 @@ const VendorCalendar = ({
     isLoading: isLoadingCalendarHouse,
     isError: isErrorCalendarHouse,
     error: errorCalendarHouse,
-    calendarData: houseCalendarData,
-  } = useHouseCalendarData({
+    calendarData: houseCalendarData = [],
+  } = useVendorHouseCalendarData({
     uuid: houseUuid,
     isRentRoom,
-    enabled: isOpen && Boolean(houseData) && !isRentRoom,
+    enabled: isOpen && !!houseUuid && !isRentRoom, 
     prefetchCount: housePrefetchCount,
   });
 
   const {
-    isLoading: isLoadingAllRooms,
-    isError: isErrorAllRooms,
-    error: errorAllRooms,
-    calendarData: allRoomsCalendarData,
-  } = useAllRoomsCalendarData({
+    isLoading: isLoadingRoom,
+    isError: isErrorRoom,
+    error: errorRoom,
+    calendarData: roomCalendarData = [],
+  } = useVendorRoomCalendarData({
     uuid: houseUuid,
     isRentRoom,
-    enabled: isOpen && Boolean(houseData) && isRentRoom,
+    enabled: isOpen && !!houseUuid && isRentRoom && !!selectedRoomUuid,
     prefetchCount: rentRoomPrefetchCount,
-    roomOptions,
+    selectedRoomUuid,
   });
 
-  const isLoadingCalendar = isRentRoom ? isLoadingAllRooms : isLoadingCalendarHouse;
-  const isErrorCalendar = isRentRoom ? isErrorAllRooms : isErrorCalendarHouse;
-  const errorCalendar = isRentRoom ? errorAllRooms : errorCalendarHouse;
-  const calendarData = isRentRoom ? allRoomsCalendarData : houseCalendarData;
+  let calendarData = [];
+  let isLoadingCalendar = false;
+  let isErrorCalendar = false;
+  let errorCalendar = null;
+
+  if (!isRentRoom) {
+    calendarData = houseCalendarData;
+    isLoadingCalendar = isLoadingCalendarHouse;
+    isErrorCalendar = isErrorCalendarHouse;
+    errorCalendar = errorCalendarHouse;
+  } else {
+    calendarData = roomCalendarData;
+    isLoadingCalendar = isLoadingRoom;
+    isErrorCalendar = isErrorRoom;
+    errorCalendar = errorRoom;
+  }
 
   const selectedRoom = isRentRoom
     ? roomOptions.find((r) => r.uuid === selectedRoomUuid) || null
@@ -88,11 +102,9 @@ const VendorCalendar = ({
 
   const loading = loadingHouse || (isOpen && isLoadingCalendar);
 
-  // Track the selected tab index and a state for transition effect
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changing, setChanging] = useState(false);
 
-  // Trigger the blur and opacity effect on tab change
   useEffect(() => {
     if (!isOpen) return;
     setChanging(true);
@@ -101,7 +113,7 @@ const VendorCalendar = ({
     }, 1000);
     return () => clearTimeout(timeout);
   }, [selectedIndex, isOpen]);
-
+  console.log(calendarData);
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="تقویم اقامتگاه">
       <div className="p-1 space-y-4">
@@ -119,7 +131,7 @@ const VendorCalendar = ({
           </div>
         )}
 
-        {!loadingHouse && !isErrorHouse && isRentRoom && roomOptions.length > 0 && (
+        {isRentRoom && roomOptions.length > 0 && (
           <div className="mb-4 w-56">
             <Listbox
               value={selectedRoom}
@@ -183,15 +195,24 @@ const VendorCalendar = ({
             onChange={(index) => setSelectedIndex(index)}
           >
             <Tab.List className="relative flex p-1 bg-gray-100 rounded-2xl max-w-4xl mx-auto">
-              {/* Animated background highlight for selected tab, anchored to the right */}
               <div
                 className="absolute top-1 bottom-1 right-1 rounded-2xl bg-primary-500 transition-transform duration-500 ease-in-out"
                 style={{
-                  width: 'calc((100%/3))',
+                  width: 'calc((100%/4))',
                   transform: `translateX(-${selectedIndex * 100}%)`,
                 }}
               ></div>
 
+              <Tab
+                className={({ selected }) =>
+                  classNames(
+                    'w-full rounded-2xl py-2.5 text-xs font-medium leading-5 relative z-10 transition-colors duration-200 text-center',
+                    selected ? 'text-white' : 'text-gray-700'
+                  )
+                }
+              >
+                مشاهده
+              </Tab>
               <Tab
                 className={({ selected }) =>
                   classNames(
@@ -231,7 +252,20 @@ const VendorCalendar = ({
               )}
             >
               <Tab.Panel>
+                <ViewTab
+                  isOpen={isOpen}
+                  calendarData={calendarData}
+                  isRentRoom={isRentRoom}
+                  roomOptions={roomOptions}
+                  selectedRoomUuid={selectedRoomUuid}
+                  setSelectedRoomUuid={setSelectedRoomUuid}
+                  instantBooking={instantBooking}
+                  viewOnly={true}
+                />
+              </Tab.Panel>
+              <Tab.Panel>
                 <PeakDaysTab
+                  isOpen={isOpen}
                   calendarData={calendarData}
                   isRentRoom={isRentRoom}
                   roomOptions={roomOptions}

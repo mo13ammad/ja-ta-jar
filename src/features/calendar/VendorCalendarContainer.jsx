@@ -1,3 +1,5 @@
+// src/features/calendar/VendorCalendarContainer.jsx
+
 import React, { useState, useEffect, useMemo } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import toPersianNumber from "../../utils/toPersianNumber";
@@ -9,126 +11,68 @@ function VendorCalendarContainer({
   roomOptions = [],
   selectedRoomUuid,
   setSelectedRoomUuid,
-  reserveDateFrom,
-  setReserveDateFrom,
-  reserveDateTo,
-  setReserveDateTo,
-  closeModal,
   instantBooking = false,
   loadingCalendar = false,
   dropdown = "true",
+  onDayClick,
+  viewOnly = false
 }) {
   const showDropdown = dropdown !== "false";
 
-  const [hoverDate, setHoverDate] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [monthsPerView, setMonthsPerView] = useState(1);
 
-  const updateMonthsPerView = () => {
-    const width = window.innerWidth;
-    setMonthsPerView(width >= 1280 ? 2 : 1);
-  };
-
   useEffect(() => {
+    const updateMonthsPerView = () => {
+      const width = window.innerWidth;
+      setMonthsPerView(width >= 1280 ? 2 : 1);
+    };
     updateMonthsPerView();
     window.addEventListener("resize", updateMonthsPerView);
     return () => window.removeEventListener("resize", updateMonthsPerView);
   }, []);
 
-  const formatPrice = (price) => toPersianNumber(price.toLocaleString());
-
-  const isSameDate = (date1, date2) => {
-    return (
-      date1 && date2 &&
-      date1.year === date2.year &&
-      date1.month === date2.month &&
-      parseInt(date1.day) === parseInt(date2.day)
-    );
-  };
-
-  const isBeforeDate = (date1, date2) => {
-    if (!date2) return false;
-    if (date1.year < date2.year) return true;
-    if (date1.year > date2.year) return false;
-    if (date1.month < date2.month) return true;
-    if (date1.month > date2.month) return false;
-    return parseInt(date1.day) < parseInt(date2.day);
-  };
-
-  const isBetweenDates = (date, startDate, endDate) => {
-    const d = new Date(date.year, date.month - 1, date.day);
-    const s = new Date(startDate.year, startDate.month - 1, startDate.day);
-    const e = new Date(endDate.year, endDate.month - 1, endDate.day);
-    return d > s && d < e;
-  };
+  function formatPrice(price) {
+    if (price == null) return "";
+    return toPersianNumber(price.toLocaleString());
+  }
 
   function handleDateClick(year, month, day, dayData) {
-    if (dayData.isDisable || dayData.isBlank || dayData.isLock) return;
-  
-    const selectedDate = { year, month, day };
-  
-    // If no start date or both dates are selected, start fresh
-    if (!reserveDateFrom || (reserveDateFrom && reserveDateTo)) {
-      setReserveDateFrom(selectedDate);
-      setReserveDateTo(null);
-      setHoverDate(null);
-      return;
-    }
-  
-    // If we have a start date but no end date
-    if (reserveDateFrom && !reserveDateTo) {
-      const start = new Date(reserveDateFrom.year, reserveDateFrom.month - 1, reserveDateFrom.day);
-      const end = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
-  
-      // Only select if end date is the same or after start date
-      if (end < start) {
-        return; 
-      }
-  
-      setReserveDateTo(selectedDate);
-      setHoverDate(null);
-      // Removed the line that closes the modal
+    // If day is disabled, locked, blank, or not in the current month, do not proceed
+    if (dayData.isDisable || dayData.isBlank || dayData.isLock || dayData.isCurrentMonth) return;
+
+    if (onDayClick) {
+      const selectedDate = { year, month, day, ...dayData };
+      onDayClick(selectedDate);
     }
   }
-  
 
-  function getDayStyles(day, date) {
+  function getDayStyles(day) {
     let styles = [];
 
-    if (day.isBlank) styles.push("invisible");
+    // If the day is in the current month, we treat it as invisible
+    // (so it mimics the behavior requested similar to the peak days container)
+    if (day.isCurrentMonth) {
+      styles.push("invisible");
+      return styles;
+    }
+
     if (day.isDisable || day.isLock) {
       styles.push("bg-gray-200 text-gray-400 cursor-not-allowed");
       if (day.isDisable) {
         styles.push("diagonal-stripes");
       }
     }
-    if (day.isToDay) styles.push("border-2 border-primary-600");
+
+    // Today's date highlighting
+    if (day.isToday) styles.push("border-2 border-primary-600");
+
+    // Holiday styling
     if (day.isHoliday) styles.push("text-red-600 border-red-600");
 
-    const isSelectedStart = isSameDate(date, reserveDateFrom);
-    const isSelectedEnd = isSameDate(date, reserveDateTo);
-
-    let isBetween = false;
-    if (reserveDateFrom && reserveDateTo) {
-      isBetween = isBetweenDates(date, reserveDateFrom, reserveDateTo);
-    } else if (reserveDateFrom && hoverDate) {
-      let startDate = reserveDateFrom;
-      let endDate = hoverDate;
-      if (isBeforeDate(endDate, startDate)) {
-        const temp = startDate;
-        startDate = endDate;
-        endDate = temp;
-      }
-      isBetween =
-        isBetweenDates(date, startDate, endDate) ||
-        isSameDate(date, startDate) ||
-        isSameDate(date, endDate);
-    }
-
-    if (isSelectedStart || isSelectedEnd) {
-      styles.push("bg-primary-500 text-white");
-    } else if (isBetween) {
-      styles.push("bg-primary-300 text-white");
+    // Weekend highlight
+    if (day.isWeekend) {
+      styles.push("bg-primary-600 text-white");
     }
 
     return styles;
@@ -136,14 +80,8 @@ function VendorCalendarContainer({
 
   const displayedData = useMemo(() => {
     if (!calendarData || calendarData.length === 0) return [];
-    if (isRentRoom) {
-      if (!selectedRoomUuid) return [];
-      const selectedRoom = calendarData.find((room) => room.roomUuid === selectedRoomUuid);
-      if (!selectedRoom) return [];
-      return selectedRoom.calendar;
-    } else {
-      return calendarData;
-    }
+    if (isRentRoom && !selectedRoomUuid) return [];
+    return calendarData;
   }, [calendarData, isRentRoom, selectedRoomUuid]);
 
   if (loadingCalendar) {
@@ -174,7 +112,8 @@ function VendorCalendarContainer({
   const activeMonth = displayedData[currentIndex];
 
   return (
-    <div className="max-w-7xl w-full mx-auto  xs:px-1.5 sm:px-2 md:px-4 relative rounded-2xl overflow-hidden">
+    <div className="max-w-7xl w-full mx-auto xs:px-1.5 sm:px-2 md:px-4 relative rounded-2xl overflow-hidden">
+      {/* Header with prev/next controls */}
       <div className="flex items-center justify-between">
         <button
           onClick={handlePrev}
@@ -203,8 +142,9 @@ function VendorCalendarContainer({
         </button>
       </div>
 
+      {/* Months container */}
       <div
-        className="flex transition-transform duration-300"
+        className="flex transition-transform duration-300 mt-2"
         style={{ transform: `translateX(${translateX}%)` }}
       >
         {displayedData.map((data, dataIndex) => (
@@ -217,7 +157,7 @@ function VendorCalendarContainer({
                 {data.month_name} {toPersianNumber(data.year)}
               </div>
             )}
-            <div className="grid grid-cols-7 text-center font-semibold mb-2">
+            <div className="grid grid-cols-7 text-center font-semibold mb-2 mt-2">
               <div>ش</div>
               <div>ی</div>
               <div>د</div>
@@ -229,33 +169,27 @@ function VendorCalendarContainer({
 
             <div className="grid grid-cols-7 gap-2">
               {data.days.map((day, index) => {
-                const date = { year: data.year, month: data.month, day: day.day };
-                const styles = getDayStyles(day, date).join(" ");
+                const styles = getDayStyles(day).join(" ");
 
                 return (
                   <div
                     key={index}
                     className={`border rounded-2xl p-1 text-center flex flex-col items-center justify-center relative aspect-square overflow-hidden ${styles}`}
                     onClick={() =>
-                      !day.isDisable &&
-                      !day.isLock &&
-                      !day.isBlank &&
+                      !day.isDisable && !day.isLock && !day.isBlank && !day.isCurrentMonth &&
                       handleDateClick(data.year, data.month, day.day, day)
                     }
-                    onMouseEnter={() => {
-                      if (reserveDateFrom && !reserveDateTo && !day.isDisable && !day.isLock) {
-                        setHoverDate(date);
-                      }
-                    }}
-                    onMouseLeave={() => {
-                      if (hoverDate) {
-                        setHoverDate(null);
-                      }
-                    }}
                   >
-                    {!day.isBlank && (
-                      <div className="font-bold w-full flex justify-center items-center relative text-xs sm:text-lg">
-                        {day.has_discount && !day.isLock && !day.isDisable && (
+                    {instantBooking && !day.isDisable && !day.isLock && !viewOnly && !day.isCurrentMonth && (
+                      <div className="absolute -top-3 -right-1 w-8 h-8">
+                        <div className="w-1/2 h-full -rotate-45 bg-primary-600"></div>
+                      </div>
+                    )}
+
+                    {!day.isBlank && !day.isCurrentMonth && (
+                      <div className={`font-bold w-full flex justify-center items-center relative text-xs sm:text-lg 
+                        ${viewOnly && day.isHoliday ? 'text-red-600' : ''}`}>
+                        {!viewOnly && day.has_discount && !day.isLock && !day.isDisable && (
                           <span className="absolute left-1 sm:text-lg text-primary-600 pr-1">
                             %
                           </span>
@@ -264,23 +198,37 @@ function VendorCalendarContainer({
                       </div>
                     )}
 
-                    {!day.isDisable && !day.isLock && !day.isBlank && (
-                      <>
-                        {day.has_discount ? (
-                          <div className="relative xs:static">
-                            <div className="line-through text-4xs sm:text-2xs absolute xs:static -top-1.5 right-1 text-gray-500">
-                              {formatPrice(day.original_price)}
-                            </div>
-                            <div className="text-2xs xs:text-xs sm:text-md">
-                              {formatPrice(day.effective_price)}
-                            </div>
-                          </div>
-                        ) : (
+                    {!viewOnly && !day.isDisable && !day.isLock && !day.isBlank && !day.isCurrentMonth && (
+                      (() => {
+                        const showPrice = day.specialPrice != null ? day.specialPrice : day.effective_price;
+                        const showOriginalPrice = day.has_discount && day.original_price != null;
+                        return (
                           <div className="text-2xs xs:text-xs sm:text-md">
-                            {formatPrice(day.effective_price)}
+                            {showOriginalPrice ? (
+                              <div className="relative xs:static">
+                                <div className="line-through text-4xs sm:text-2xs absolute xs:static -top-1.5 right-1 text-gray-500">
+                                  {formatPrice(day.original_price)}
+                                </div>
+                                <div>{formatPrice(showPrice)}</div>
+                              </div>
+                            ) : (
+                              <div>{formatPrice(showPrice)}</div>
+                            )}
                           </div>
-                        )}
-                      </>
+                        );
+                      })()
+                    )}
+
+                    {!viewOnly && day.isPeakDay && !day.isBlank && !day.isDisable && !day.isLock && !day.isCurrentMonth && (
+                      <div className="absolute bottom-1 left-1 text-[8px] text-red-500 font-bold">
+                        پیک
+                      </div>
+                    )}
+
+                    {!viewOnly && day.isBookingOffSite && !day.isCurrentMonth && (
+                      <div className="absolute top-1 left-1 text-[8px] text-blue-500 font-semibold">
+                        خارج سایت
+                      </div>
                     )}
                   </div>
                 );

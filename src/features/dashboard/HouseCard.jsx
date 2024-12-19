@@ -66,16 +66,18 @@ const HouseCard = ({ house, onDelete }) => {
       </div>
       <img src={house.image} className="house-image" alt="house" />
 
-      {/* VendorCalendar Modal */}
-      <VendorCalendar
-        isOpen={isCalendarOpen}
-        onClose={() => setIsCalendarOpen(false)}
-        houseUuid={house.uuid}
-        reserveDateFrom={reserveDateFrom}
-        setReserveDateFrom={setReserveDateFrom}
-        reserveDateTo={reserveDateTo}
-        setReserveDateTo={setReserveDateTo}
-      />
+      {/* Only render VendorCalendar if isCalendarOpen is true */}
+      {isCalendarOpen && (
+        <VendorCalendar
+          isOpen={isCalendarOpen}
+          onClose={() => setIsCalendarOpen(false)}
+          houseUuid={house.uuid}
+          reserveDateFrom={reserveDateFrom}
+          setReserveDateFrom={setReserveDateFrom}
+          reserveDateTo={reserveDateTo}
+          setReserveDateTo={setReserveDateTo}
+        />
+      )}
     </div>
   );
 };

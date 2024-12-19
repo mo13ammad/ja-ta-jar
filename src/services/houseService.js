@@ -21,6 +21,7 @@ export function showHouse(houseId) {
   return http.get(`/house/${houseId}`).then(({ data }) => data.data);
 }
 
+// Room Calendar (Existing)
 export async function getRoomCalendar(houseId, roomId) {
   console.log(`[getRoomCalendar] Fetching initial month for room ${roomId} in house ${houseId}`);
   const { data } = await http.get(`/house/${houseId}/calendar/${roomId}`);
@@ -35,6 +36,7 @@ export async function getRoomCalendarByMonth(houseId, roomId, year, month) {
   return data.data;
 }
 
+// House Calendar (Existing)
 export async function getHouseCalendar(houseId) {
   console.log(`[getHouseCalendar] Fetching initial month for house ${houseId}`);
   const { data } = await http.get(`/house/${houseId}/calendar`);
@@ -49,7 +51,7 @@ export async function getHouseCalendarByMonth(houseId, year, month) {
   return data.data;
 }
 
-
+// Edit House
 export function editHouse(houseId, houseData) {
   if (!houseId || !houseData) {
     console.error("Missing houseId or houseData:", { houseId, houseData });
@@ -81,7 +83,7 @@ export function editHouseFacilities(houseId, facilitiesData) {
     });
 }
 
-// House Media Functions
+// House Media
 export function getHouseTypes(data) {
   return http
     .get("/assets/types/structure/detail", data)
@@ -153,7 +155,7 @@ export function deleteRoom(houseId, roomId) {
     });
 }
 
-// Function to update house-level prices
+// Update House Prices
 export function updateHousePrice(houseId, prices) {
   if (!houseId || !prices) {
     console.error("Missing houseId or prices:", { houseId, prices });
@@ -169,7 +171,7 @@ export function updateHousePrice(houseId, prices) {
     });
 }
 
-// Function to update room-specific prices
+// Update Room Prices
 export function updateRoomPrice(houseId, roomId, prices) {
   if (!houseId || !roomId || !prices) {
     console.error("Missing houseId, roomId, or prices:", {
@@ -189,7 +191,7 @@ export function updateRoomPrice(houseId, roomId, prices) {
     });
 }
 
-// Function to upload a document for a house
+// Upload House Document
 export function uploadHouseDocument(houseId, documentData) {
   if (!houseId || !documentData) {
     console.error("Missing houseId or documentData:", {
@@ -214,7 +216,7 @@ export function uploadHouseDocument(houseId, documentData) {
     });
 }
 
-// Function to publish a house
+// Publish a House
 export function publishHouse(houseId) {
   if (!houseId) {
     console.error("Missing houseId:", { houseId });
@@ -230,11 +232,73 @@ export function publishHouse(houseId) {
     });
 }
 
-/** 
- * New Peak Days APIs
+/**
+ * Fetch the vendor house calendar for a specific room.
+ * Endpoint: GET /client/house/:uuid/calendar/:room_uuid?year=YYYY&month=MM
+ *
+ * @param {string} houseId - The UUID of the house.
+ * @param {string} roomId - The UUID of the room.
+ * @param {number} [year] - (Optional) Year for the requested month.
+ * @param {number} [month] - (Optional) Month for the requested year.
+ * @returns {Promise<object>} - Returns a single month object of the calendar data.
  */
+export function VendorHouseCalendarByRoom(houseId, roomId, year, month) {
+  if (!houseId || !roomId) {
+    console.error("VendorHouseCalendarByRoom - Missing houseId or roomId:", { houseId, roomId });
+    throw new Error("House ID or room ID is missing.");
+  }
 
-// Add peak days (POST /client/house/:uuid/calendar/peaks)
+  const params = {};
+  if (year && month) {
+    params.year = year;
+    params.month = month;
+  }
+
+  return http
+    .get(`/client/house/${houseId}/calendar/${roomId}`, { params })
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("VendorHouseCalendarByRoom - Error:", error);
+      throw error;
+    });
+}
+
+/**
+ * Fetch the vendor house calendar at the house level.
+ * Endpoint: GET /client/house/:uuid/calendar?year=YYYY&month=MM
+ *
+ * @param {string} houseId - The UUID of the house.
+ * @param {number} [year] - (Optional) Year for the requested month.
+ * @param {number} [month] - (Optional) Month for the requested year.
+ * @returns {Promise<object>} - Returns a single month object of the calendar data.
+ */
+export function VendorHouseCalendarByHouse(houseId, year, month) {
+  if (!houseId) {
+    console.error("VendorHouseCalendarByHouse - Missing houseId:", { houseId });
+    throw new Error("House ID is missing.");
+  }
+
+  const params = {};
+  if (year && month) {
+    params.year = year;
+    params.month = month;
+  }
+
+  return http
+    .get(`/client/house/${houseId}/calendar`, { params })
+    .then(({ data }) => data.data)
+    .catch((error) => {
+      console.error("VendorHouseCalendarByHouse - Error:", error);
+      throw error;
+    });
+}
+
+/**
+ * Peak Days Functions
+ * 
+ * POST /client/house/:uuid/calendar/peaks
+ * Body: { from_date: "YYYY-MM-DD", to_date: "YYYY-MM-DD" }
+ */
 export function addPeakDays(houseId, fromDate, toDate) {
   if (!houseId || !fromDate || !toDate) {
     console.error("Missing parameters:", { houseId, fromDate, toDate });
@@ -250,7 +314,9 @@ export function addPeakDays(houseId, fromDate, toDate) {
     });
 }
 
-// Get peak days for a specific month (GET /client/house/:uuid/calendar/:year/:month/peaks)
+/**
+ * GET /client/house/:uuid/calendar/:year/:month/peaks
+ */
 export function getPeakDays(houseId, year, month) {
   if (!houseId || !year || !month) {
     console.error("Missing parameters:", { houseId, year, month });
@@ -261,12 +327,15 @@ export function getPeakDays(houseId, year, month) {
     .get(`/client/house/${houseId}/calendar/${year}/${month}/peaks`)
     .then(({ data }) => data.data)
     .catch((error) => {
-      console.error("getPeakDays - Error:", error);
+      console.error("getListPeakDays - Error:", error);
       throw error;
     });
 }
 
-// Remove peak days (DELETE /client/house/:uuid/calendar/peaks)
+/**
+ * DELETE /client/house/:uuid/calendar/peaks
+ * Body: { from_date: "YYYY-MM-DD", to_date: "YYYY-MM-DD" }
+ */
 export function removePeakDays(houseId, fromDate, toDate) {
   if (!houseId || !fromDate || !toDate) {
     console.error("Missing parameters:", { houseId, fromDate, toDate });

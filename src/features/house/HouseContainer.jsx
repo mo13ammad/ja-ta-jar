@@ -88,7 +88,7 @@ function HouseContainer() {
   const isError = isRentRoom ? isErrorAllRooms : isErrorCalendarHouse;
   const error = isRentRoom ? errorAllRooms : errorCalendarHouse;
   const calendarData = isRentRoom ? allRoomsCalendarData : houseCalendarData;
-
+  console.log(houseData);
   if (loadingHouse) {
     return (
       <div className="flex justify-center items-center h-[50vh]">

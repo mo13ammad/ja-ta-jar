@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { getPeakDays, addPeakDays, removePeakDays } from '../../../services/houseService';
-import VendorCalendarContainer from './../../calendar/VendorCalendarContainer';
 import { useQueryClient, useMutation, useQuery } from '@tanstack/react-query';
 import { TrashIcon } from '@heroicons/react/24/solid';
+
+import PeakDayCalendarContainer from './PeakDayCalendarContainer';
 
 function formatSelectedDate(dateObj) {
   if (!dateObj) return '';
@@ -13,6 +14,7 @@ function formatSelectedDate(dateObj) {
 }
 
 function PeakDaysTab({
+  isOpen,
   calendarData,
   isRentRoom,
   roomOptions,
@@ -29,28 +31,34 @@ function PeakDaysTab({
 }) {
   const queryClient = useQueryClient();
 
-  const houseId = calendarData && calendarData.length > 0
-    ? (calendarData[0].houseUuid || calendarData[0].uuid)
-    : null;
+  const initialMonthData = useMemo(() => {
+    if (!calendarData || calendarData.length === 0) return null;
+    if (isRentRoom) {
+      const firstRoom = calendarData[0];
+      if (firstRoom && firstRoom.calendar && firstRoom.calendar.length > 0) {
+        return firstRoom.calendar[0];
+      }
+      return null;
+    } else {
+      return calendarData[0];
+    }
+  }, [calendarData, isRentRoom]);
 
-  // Get an initial month/year from calendarData for peak days fetching
-  const initialMonthData = calendarData && calendarData.length > 0 ? calendarData[0] : null;
+  const houseId = initialMonthData?.houseUuid || initialMonthData?.uuid || null;
   const year = initialMonthData?.year;
   const month = initialMonthData?.month;
 
-  // Fetch peak days
   const { data: peakDays, refetch: refetchPeakDays } = useQuery(
     ['peakDays', houseId, year, month],
     () => getPeakDays(houseId, year, month),
     {
-      enabled: !!(houseId && year && month),
+      enabled: isOpen && !!(houseId && year && month),
       onSuccess: (data) => {
         console.log("Peak days fetched:", data);
       }
     }
   );
 
-  // Mutations for adding and removing peak days
   const addMutation = useMutation(
     ({ from_date, to_date }) => addPeakDays(houseId, from_date, to_date),
     {
@@ -72,19 +80,16 @@ function PeakDaysTab({
   const fromDateStr = formatSelectedDate(reserveDateFrom);
   const toDateStr = formatSelectedDate(reserveDateTo);
 
-  // If the end date is before the start date, adjust it
   useEffect(() => {
     if (reserveDateFrom && reserveDateTo) {
       const fromDate = new Date(reserveDateFrom.year, reserveDateFrom.month - 1, reserveDateFrom.day);
       const toDate = new Date(reserveDateTo.year, reserveDateTo.month - 1, reserveDateTo.day);
       if (toDate < fromDate) {
-        // Set end date = start date to ensure end is never before start
         setReserveDateTo({ ...reserveDateFrom });
       }
     }
   }, [reserveDateFrom, reserveDateTo, setReserveDateTo]);
 
-  // Handle clearing the selected dates
   const handleClearSelection = () => {
     setReserveDateFrom(null);
     setReserveDateTo(null);
@@ -92,14 +97,13 @@ function PeakDaysTab({
 
   return (
     <div className="space-y-4 mx-auto">
-      {/* Move the delete button (پاک کردن) to the top */}
-      <div className="flex justify-end  mt-2 ml-2 md:ml-6 lg:ml-10 2xl:ml-32">
+      <div className="flex justify-end mt-2 ml-2 md:ml-6 lg:ml-10 2xl:ml-32">
         <button
           onClick={handleClearSelection}
-          className="flex items-center gap-2 border border-red-500  px-4 py-2 rounded-3xl  text-sm md:text-md"
+          className="flex items-center gap-2 border border-red-500 px-4 py-2 rounded-3xl text-sm md:text-md"
         >
           <TrashIcon className="w-5 h-5 sm:w-5 sm:h-5 text-red-500" />
-        <p className='pt-0.5 '>  پاک کردن</p>
+          <p className='pt-0.5'>پاک کردن</p>
         </button>
       </div>
 
@@ -108,8 +112,7 @@ function PeakDaysTab({
           <label className="text-xs sm:text-sm md:text-md font-medium text-gray-700">تاریخ از</label>
           <div
             className={`w-36 h-10 pt-1 border rounded-3xl flex items-center justify-center text-xs sm:text-sm md:text-md
-            ${fromDateStr ? 'bg-primary-200 text-white' : 'bg-gray-100 text-gray-700'}
-            `}
+            ${fromDateStr ? 'bg-primary-200 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             {fromDateStr || '---'}
           </div>
@@ -119,32 +122,43 @@ function PeakDaysTab({
           <label className="text-xs sm:text-sm md:text-md font-medium text-gray-700">تاریخ تا</label>
           <div
             className={`w-36 h-10 border pt-1 rounded-3xl flex items-center justify-center text-xs sm:text-sm md:text-md
-            ${toDateStr ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700'}
-            `}
+            ${toDateStr ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             {toDateStr || '---'}
           </div>
         </div>
       </div>
 
-      <VendorCalendarContainer
+      <PeakDayCalendarContainer
         calendarData={calendarData}
         isRentRoom={isRentRoom}
         roomOptions={roomOptions}
         selectedRoomUuid={selectedRoomUuid}
         setSelectedRoomUuid={setSelectedRoomUuid}
+        instantBooking={instantBooking}
+        loadingCalendar={loadingCalendar}
+        dropdown={dropdown}
         reserveDateFrom={reserveDateFrom}
         setReserveDateFrom={setReserveDateFrom}
         reserveDateTo={reserveDateTo}
         setReserveDateTo={setReserveDateTo}
         closeModal={closeModal}
-        instantBooking={instantBooking}
-        loadingCalendar={loadingCalendar}
-        dropdown={dropdown}
+        onDayClick={(selectedDate) => {
+          // Same selection logic as CalendarContainer:
+          if (!reserveDateFrom || (reserveDateFrom && reserveDateTo)) {
+            setReserveDateFrom({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+            setReserveDateTo(null);
+          } else {
+            const start = new Date(reserveDateFrom.year, reserveDateFrom.month - 1, reserveDateFrom.day);
+            const end = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
+            if (end >= start) {
+              setReserveDateTo({ year: selectedDate.year, month: selectedDate.month, day: selectedDate.day });
+            }
+          }
+        }}
       />
 
-      {/* Action Buttons at the end */}
-      <div className="flex flex-col sm:flex-row  justify-end gap-4 mx-4 mt-4">
+      <div className="flex flex-col sm:flex-row justify-end gap-4 mx-4 mt-4">
         <button
           onClick={() => {
             if (!fromDateStr || !toDateStr) return;
